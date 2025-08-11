@@ -1,5 +1,3 @@
-Alright — here’s your complete docs/ARCHITECTURE.md in one drop, fully formatted for GitHub and MkDocs, branded, with expanded diagrams, physics and symbolic reasoning context, operational quick start, and engineering deep dive.
-
 ⸻
 
 SpectraMind V50 — Mission Architecture & Engineering Doctrine
