@@ -1,0 +1,13 @@
+# Curriculum: MAE pretrain → supervised fine-tune
+phases:
+  - name: mae
+    epochs: 20
+    mask_ratio: 0.4
+    loss: mae_loss
+    optimizer: adamw
+    scheduler: cosine
+  - name: supervised
+    epochs: 30
+    loss: gll_symbolic_loss
+    optimizer: adamw
+    scheduler: cosine
