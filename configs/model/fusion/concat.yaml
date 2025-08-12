@@ -1,0 +1,21 @@
+# -----------------------------------------------------------------------------
+# Fusion: Concatenate + MLP (Fast, Strong Baseline)
+# -----------------------------------------------------------------------------
+# Simple, robust default: [h_fgs1 ; h_airs] -> MLP -> h_fused
+# Pros: fast, JIT-friendly, works well with decoders; good baseline.
+# -----------------------------------------------------------------------------
+
+defaults:
+  - base
+
+model:
+  fusion:
+    type: "concat_mlp"
+    dim: 256
+    mlp:
+      hidden: [512, 256]     # two-layer MLP after concat
+      activation: "gelu"     # ["gelu", "relu", "silu", "tanh"]
+      dropout: 0.05
+      bias: true
+    norm: "layernorm"        # norm on the fused output
+    dropout: 0.05
