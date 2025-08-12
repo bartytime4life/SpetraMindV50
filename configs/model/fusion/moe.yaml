@@ -1,0 +1,30 @@
+# -----------------------------------------------------------------------------
+# Fusion: Mixture-of-Experts (MoE)
+# -----------------------------------------------------------------------------
+# Multiple small experts process [fgs1; airs], with a gate producing mixture weights.
+# Faster than a giant single MLP; encourages specialization (timing vs spectral nuance).
+# -----------------------------------------------------------------------------
+
+defaults:
+  - base
+
+model:
+  fusion:
+    type: "moe"
+    dim: 256
+    moe:
+      num_experts: 4
+      expert_hidden: 256
+      activation: "silu"
+      dropout: 0.05
+      gating:
+        source: "concat"        # ["fgs1", "airs", "concat"]
+        kind: "softmax_mlp"     # softmax weights across experts
+        hidden: 128
+        dropout: 0.05
+        noisy_topk: 0           # >0 to enable noisy-topk gating
+        topk: 0                 # 0 = use all; >0 = sparse mixture (top-k experts)
+    norm: "layernorm"
+    dropout: 0.05
+    export:
+      gate_values: true
