@@ -1,0 +1,13 @@
+# Explainability settings specific to the AIRS GNN encoder
+export_attention: true
+export_node_importance: true
+save_dir: "outputs/explainability/airs_gnn"
+
+# Controls for attention export volume (avoid huge files)
+max_edges_to_save: 20000
+max_heads_to_save: 4
+
+# Optional compatibility flags for downstream tools
+dump_as:
+  numpy: true
+  parquet: false
