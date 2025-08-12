@@ -1,0 +1,17 @@
+# -----------------------------------------------------------------------------
+# Fusion: Identity (Debug / Ablation)
+# -----------------------------------------------------------------------------
+# For diagnostics: bypass fusion and pass through one encoder (FGS1 by default).
+# WARNING: Only for smoke tests or controlled ablations.
+# -----------------------------------------------------------------------------
+
+defaults:
+  - base
+
+model:
+  fusion:
+    type: "identity"
+    passthrough: "fgs1"        # ["fgs1", "airs"]
+    dim: 256
+    dropout: 0.0
+    norm: "none"
