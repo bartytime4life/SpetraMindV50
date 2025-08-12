@@ -1,0 +1,12 @@
+# Ultra-light preset: CI smoke & rapid iteration
+defaults: []
+
+enabled: true
+d_model: 96
+d_state: 16
+d_conv: 4
+expand: 2
+n_layers: 3
+bidirectional: true
+dropout: 0.05
+proj_out: 128
