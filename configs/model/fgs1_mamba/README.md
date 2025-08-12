@@ -1,9 +1,12 @@
-# FGS1 Mamba SSM — Hydra configs
+# FGS1 Mamba SSM — Encoder Config Group
 
-Temporal encoder for the FGS1 white-light time series, built on a selective State Space Model (Mamba).
-This folder provides a cohesive `base.yaml`, size presets, ablation search grid, and toggles for TorchScript
-export and step-latent diagnostics.
+Purpose: Modular configs for the FGS1 (temporal) encoder used by SpectraMind V50. These override only
+`model.encoders.fgs1_mamba` fields, keeping the rest of the model untouched.
 
-**How to compose (examples)**
+## How to use
 
-- Use the base as-is (from your model root):
+From the project root:
+
+- Compose against your main model config:
+  ```bash
+  python -m spectramind train model=base +model.encoders.fgs1_mamba=@fgs1_mamba/base
