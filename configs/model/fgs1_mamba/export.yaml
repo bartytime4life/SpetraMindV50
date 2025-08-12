@@ -1,10 +1,8 @@
-# JIT/TorchScript-leaning adjustments for production inference
-
-dropout: 0.0
-bidirectional: true
-export_step_latents: false
-
-jit:
-  enable: true
-  strict: true
-  check_trace: true
+# TorchScript/JIT friendliness; keeps encoder ops scriptable
+model:
+  encoders:
+    fgs1_mamba:
+      # Encoder-side flags; the global model.jit_export is elsewhere.
+      layer_norm: "rms"         # ensure ScriptModule parity (impl supports TS)
+      dropout: 0.10             # keep deterministic=false at trainer if benchmarking TS
+# NOTE: Set `model.jit_export.enable=true` in model/base or via CLI for full export.
