@@ -1,0 +1,5 @@
+# Stronger regularization for overfitting control
+clip_grad_norm: 0.5
+dropout: 0.3
+weight_decay: 0.05
+label_smoothing: 0.05
