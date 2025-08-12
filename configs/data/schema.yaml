@@ -1,0 +1,13 @@
+# Expected dataset schema and integrity checks
+
+train_csv:
+  columns: ["planet_id"] + ["spectrum_%d" % i for i in range(1, 284)]
+  dtype: float32
+
+test_csv:
+  columns: ["planet_id"]
+  dtype: str
+
+sample_submission:
+  columns: ["planet_id"] + ["mu_%d" % i for i in range(283)] + ["sigma_%d" % i for i in range(283)]
+  dtype: float32
