@@ -1,0 +1,5 @@
+# Default regularization and gradient control
+clip_grad_norm: 1.0
+dropout: 0.1
+weight_decay: 0.01
+label_smoothing: 0.0
