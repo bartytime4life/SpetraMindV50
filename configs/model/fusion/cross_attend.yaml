@@ -1,30 +1,13 @@
-# -----------------------------------------------------------------------------
-# Fusion: Cross-Attention (FGS1 <-> AIRS)
-# -----------------------------------------------------------------------------
-# Bi-directional cross-attention to let FGS1 (global transit context) and AIRS
-# (spectral structure) inform each other before pooling to a fused vector.
-# Internally uses multi-head attention with residuals + norm.
-# -----------------------------------------------------------------------------
-
-defaults:
-  - base
-
-model:
-  fusion:
-    type: "cross_attend"
-    dim: 256
-    attn:
-      heads: 4                 # multi-heads (tradeoff: quality vs speed)
-      layers: 2                # stacked x-attn blocks
-      dropout: 0.05            # attn dropout
-      qkv_bias: true
-      resid_dropout: 0.05
-      norm: "layernorm"        # pre/post norm style inside the block
-      rotary_pe: false         # rotary position enc (if per-step latents used)
-    pool:
-      # If encoders can export per-step/per-node latents, enable "context_pool".
-      # Otherwise, it falls back to working on pooled inputs only.
-      context_pool: "mean"     # ["mean", "cls", "max", "attn_pool"]
-      attn_pool_heads: 2       # used only if context_pool == "attn_pool"
-    export:
-      attn_weights: true
+# Cross-Attention Fusion Config — attends AIRS latents to FGS1 latents
+fusion:
+  enabled: true
+  type: cross-attend
+  dim: 256
+  n_heads: 4
+  dropout: 0.1
+  layer_norm: true
+  residual: true
+  cross_attention_position: post-encoder  # where to insert cross-attention in the model
+  attention_window: null                   # optional: restrict attention to wavelength windows
+  export_attention: true                   # store attention maps for diagnostics/HTML dashboard
+  export_step_latents: true                 # allow latent export for UMAP/t-SNE/FFT overlays
