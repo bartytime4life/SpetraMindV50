@@ -1,0 +1,29 @@
+# Base data configuration for SpectraMind V50
+# All dataset-related settings inherit from here unless overridden.
+
+defaults:
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+# Common data settings
+raw_dir: ${oc.env:DATA_RAW_DIR,"data/raw"}
+calibrated_dir: ${oc.env:DATA_CAL_DIR,"data/calibrated"}
+features_dir: ${oc.env:DATA_FEAT_DIR,"data/features"}
+splits_file: ${oc.env:DATA_SPLITS_FILE,"data/splits/groupkfold.json"}
+
+# File patterns
+fgs1_pattern: "FGS1_signal_*.parquet"
+airs_pattern: "AIRS-CH0_signal_*.parquet"
+
+# Metadata files
+adc_info: "adc_info.csv"
+wavelengths: "wavelengths.csv"
+
+# Loader parameters
+fgs1_shape: [135000, 1024]    # flattened 32x32 frames
+airs_shape: [11250, 11392]    # flattened 32x356 frames
+dtype_raw: "uint16"
+
+# Runtime options
+cache_enabled: true
+cache_backend: "dvc"          # options: [dvc, filesystem, none]
