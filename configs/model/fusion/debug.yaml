@@ -1,0 +1,11 @@
+# Debug Fusion Config — minimal overhead for ablations/CI smoke tests
+fusion:
+  enabled: true
+  type: concat+mlp
+  dim: 64
+  dropout: 0.0
+  layer_norm: false
+  residual: false
+  amp: false
+  export_attention: false
+  export_step_latents: true  # still allow embedding export for verification
