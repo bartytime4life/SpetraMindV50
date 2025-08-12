@@ -1,0 +1,38 @@
+stages:
+  calibrate:
+    cmd: python -m spectramind calibrate-temp
+    deps:
+      - spectramind.py
+      - configs/config_v50.yaml
+    outs:
+      - outputs/calibrated:
+          persist: true
+
+  train:
+    cmd: python -m spectramind train
+    deps:
+      - spectramind.py
+      - configs/config_v50.yaml
+      - outputs/calibrated
+    outs:
+      - outputs/checkpoints:
+          persist: true
+
+  predict:
+    cmd: python -m spectramind predict --out-csv outputs/submission.csv
+    deps:
+      - spectramind.py
+      - configs/config_v50.yaml
+      - outputs/checkpoints
+    outs:
+      - outputs/submission.csv
+
+  diagnose:
+    cmd: python -m spectramind diagnose
+    deps:
+      - spectramind.py
+      - configs/config_v50.yaml
+      - outputs/submission.csv
+    outs:
+      - outputs/diagnostics:
+          persist: true
