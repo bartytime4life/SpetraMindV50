@@ -1,0 +1,14 @@
+# Mid-size AIRS GNN preset for single‑GPU development
+defaults:
+  - base
+
+hidden_dim: 192
+out_dim: 192
+n_layers: 3
+heads: 4
+dropout: 0.10
+
+positional_encoding:
+  use: true
+  kind: "fourier"
+  dim: 12
