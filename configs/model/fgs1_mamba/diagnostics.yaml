@@ -1,12 +1,6 @@
-# Turn on richer capture & exports for debugging and explainability
-
-export_step_latents: true
-
-diagnostics:
-  capture_saliency: true
-  capture_grad_norms: true
-  step_latents_topk: 0
-  save_dir: "outputs/diagnostics/fgs1_mamba"
-  save_numpy: true
-  save_parquet: false
-  save_png: false
+# Diagnostics switches for analysis & explainability
+model:
+  encoders:
+    fgs1_mamba:
+      export_step_latents: true   # emit per-time-step latents for UMAP/t-SNE/FFT
+# Optional: richer probing can be handled in the training/diagnostics loop via hooks.
