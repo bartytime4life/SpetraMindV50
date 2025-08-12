@@ -21,18 +21,18 @@ lint:
 
 # Lightweight unit tests placeholder
 test:
-	python -m pytest -q || true
+	poetry run python -m pytest -q || true
 
 selftest:
-	python -m spectramind selftest
+	poetry run python -m spectramind selftest
 
 train:
-	python -m spectramind train --dry-run
+	poetry run python -m spectramind train --dry-run
 
 predict:
-	python -m spectramind predict --out-csv outputs/submission.csv
+	poetry run python -m spectramind predict --out-csv outputs/submission.csv
 
 dashboard:
-	python -m spectramind dashboard --html outputs/diagnostics/diagnostic_report_v50.html
+	poetry run python -m spectramind dashboard --html outputs/diagnostics/diagnostic_report_v50.html
 
 ci-local: deps selftest test predict dashboard
