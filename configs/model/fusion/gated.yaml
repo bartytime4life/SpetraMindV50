@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------------
+# Fusion: Gated (FGS1 as gate on AIRS or vice versa)
+# -----------------------------------------------------------------------------
+# Learn a data-dependent gate that controls contribution from each encoder.
+# h = gate * proj(airs) + (1 - gate) * proj(fgs1)
+# Gate in (0,1) via sigmoid; can also use bilinear gating for higher capacity.
+# -----------------------------------------------------------------------------
+
+defaults:
+  - base
+
+model:
+  fusion:
+    type: "gated"
+    dim: 256
+    gate:
+      from: "fgs1"             # ["fgs1", "airs", "both"] source to compute gate
+      kind: "sigmoid_mlp"      # ["sigmoid_mlp", "bilinear"]
+      hidden: 256              # hidden size for MLP gate
+      dropout: 0.05
+    proj:
+      fgs1_dim: 256            # projection target for fgs1 -> dim
+      airs_dim: 256            # projection target for airs -> dim
+      bias: true
+    norm: "layernorm"
+    dropout: 0.05
+    export:
+      gate_values: true
