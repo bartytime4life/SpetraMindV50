@@ -1,14 +1,9 @@
-# /configs/model/fgs1_mamba
+# FGS1 Mamba SSM — Hydra configs
 
-Hydra YAML configs for the **FGS1 Mamba SSM encoder** used in SpectraMind V50.
+Temporal encoder for the FGS1 white-light time series, built on a selective State Space Model (Mamba).
+This folder provides a cohesive `base.yaml`, size presets, ablation search grid, and toggles for TorchScript
+export and step-latent diagnostics.
 
-These configs let you override just the `model.encoders.fgs1_mamba` section of the main `model/base.yaml`.
+**How to compose (examples)**
 
-## Usage
-
-Run with Hydra override syntax:
-```bash
-python -m spectramind train model.fgs1_mamba=base
-python -m spectramind train model.fgs1_mamba=small
-python -m spectramind train model.fgs1_mamba=medium
-python -m spectramind train model.fgs1_mamba=large
+- Use the base as-is (from your model root):
