@@ -1,0 +1,8 @@
+# Mid-size FGS1 Mamba preset for development on a single GPU
+defaults:
+  - base
+
+d_model: 192
+d_state: 48
+n_layers: 6
+proj_out: 192
