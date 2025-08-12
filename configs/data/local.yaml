@@ -1,0 +1,8 @@
+# Local workstation overrides
+paths:
+  fgs1: "~/datasets/ariel/raw/fgs1"
+  airs: "~/datasets/ariel/raw/airs_ch0"
+  calibration: "~/datasets/ariel/calibration"
+loader:
+  batch_size: 8
+  num_workers: 4

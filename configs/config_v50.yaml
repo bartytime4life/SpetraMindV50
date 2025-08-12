@@ -1,0 +1,50 @@
+# Root Hydra config for SpectraMind V50
+seed: 1337
+run:
+  out_dir: outputs
+  log_file: v50_debug_log.md
+  jsonl_file: events.jsonl
+  save_hash_summary: run_hash_summary_v50.json
+
+loader:
+  batch_size: 8
+  num_workers: 2
+  pin_memory: true
+  persistent_workers: false
+
+paths:
+  fgs1: "~/datasets/ariel/raw/fgs1"
+  airs: "~/datasets/ariel/raw/airs_ch0"
+  calibration: "~/datasets/ariel/calibration"
+  metadata: ""
+  splits: ""
+
+model:
+  fgs1_mamba:
+    latent_dim: 128
+  airs_gnn:
+    latent_dim: 128
+    use_gat: true
+  decoder:
+    multiscale: true
+  sigma_head:
+    type: flow
+    softplus: true
+
+loss:
+  lambda_symbolic: 0.1
+
+train:
+  phase: supervised   # mae | contrastive | supervised
+  epochs: 2
+  optimizer: adamw
+  lr: 3e-4
+  amp: true
+
+calibration:
+  temperature: 1.0
+  corel:
+    enabled: true
+
+diagnostics:
+  make_html: true

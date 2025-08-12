@@ -1,0 +1,8 @@
+# Kaggle environment overrides
+paths:
+  fgs1: "/kaggle/input/ariel-fgs1/raw/fgs1"
+  airs: "/kaggle/input/ariel-airs-ch0/raw/airs_ch0"
+  calibration: "/kaggle/input/ariel-calibration/calibration"
+loader:
+  batch_size: 8
+  num_workers: 2

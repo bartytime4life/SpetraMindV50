@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+
+# Poetry
+poetry.lock
+
+# DVC / data artifacts
+.dvc/
+.dvcignore
+.cache/
+outputs/
+/tmp/
+/tmp/**
+
+# Notebooks & logs
+*.ipynb_checkpoints/
+.vscode/
+.vscode/**
+.v50_cache/
+*.log
+
+# Generated
+run_hash_summary_v50.json
+v50_debug_log.md
+events.jsonl
+
+# OS
+.DS_Store
+Thumbs.db

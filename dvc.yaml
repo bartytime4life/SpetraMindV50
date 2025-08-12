@@ -1,0 +1,33 @@
+stages:
+  calibrate:
+    cmd: python -m spectramind calibrate --no-run   # placeholder for now
+    deps:
+      - src/spectramind/calibration/__init__.py
+    outs:
+      - outputs/calibrated
+  features:
+    cmd: python -m spectramind features --no-run    # placeholder for now
+    deps:
+      - outputs/calibrated
+    outs:
+      - outputs/features
+  train:
+    cmd: python -m spectramind train
+    deps:
+      - outputs/features
+      - src/spectramind/training/train_v50.py
+    outs:
+      - outputs/checkpoints
+  predict:
+    cmd: python -m spectramind predict --out-csv outputs/submission.csv
+    deps:
+      - outputs/checkpoints
+    outs:
+      - outputs/submission.csv
+  dashboard:
+    cmd: python -m spectramind dashboard --html outputs/diagnostics/diagnostic_report_v50.html
+    deps:
+      - outputs/submission.csv
+      - src/spectramind/diagnostics/generate_html_report.py
+    outs:
+      - outputs/diagnostics/diagnostic_report_v50.html

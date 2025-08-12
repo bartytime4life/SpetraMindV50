@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+      - name: Install deps
+        run: |
+          poetry install --no-root
+      - name: Selftest
+        run: |
+          python -m spectramind --version
+          python -m spectramind selftest
+      - name: Predict & Dashboard (smoke)
+        run: |
+          python -m spectramind predict --out-csv outputs/submission.csv
+          python -m spectramind dashboard --html outputs/diagnostics/diagnostic_report_v50.html
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics
+          path: |
+            outputs/submission.csv
+            outputs/diagnostics/diagnostic_report_v50.html
+            v50_debug_log.md
+            events.jsonl
