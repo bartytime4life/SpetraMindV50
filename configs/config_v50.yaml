@@ -1,0 +1,70 @@
+# SpectraMind V50 — Master Hydra Config
+# This file composes defaults from the data/, model/, and train/ subconfigs.
+
+defaults:
+  - data: local         # default data paths; can override with `data=kaggle`
+  - model: default      # model architecture settings
+  - train: default      # training hyperparameters
+  - _self_
+
+# Project metadata
+project:
+  name: spectramind-v50
+  seed: 133742
+  author: "SpectraMind Team"
+
+# Runtime settings
+runtime:
+  device: auto          # auto-select GPU if available
+  num_workers: 4        # DataLoader workers
+  fp16: true            # mixed precision
+  kaggle_budget_hours: 9
+  log_level: INFO
+
+# Logging & audit
+logging:
+  rich: true
+  level: INFO
+  audit_path: v50_debug_log.md
+  jsonl_path: events.jsonl
+
+# Diagnostics configuration
+diagnostics:
+  enable: true
+  shap: true
+  umap: true
+  tsne: true
+  fft: true
+  smoothness: true
+  html_report: true
+  report_version: v1
+
+# Calibration configuration
+calibration:
+  temperature_scaling: true
+  corel:
+    enable: true
+    coverage_target: 0.9
+    per_bin: true
+    output_plots: true
+
+# Symbolic constraints
+symbolic:
+  smoothness_lambda: 0.1
+  nonnegativity_lambda: 0.05
+  molecular_coherence_lambda: 0.05
+  seam_continuity_lambda: 0.01
+  ratio_constraints_lambda: 0.02
+  quantile_monotonicity_lambda: 0.02
+  enabled_rules:
+    - smoothness
+    - nonnegativity
+    - molecular_coherence
+    - seam_continuity
+    - ratio_constraints
+    - quantile_monotonicity
+
+# CLI presets (can be overridden at runtime)
+cli:
+  fast_mode: false
+  resume: false
