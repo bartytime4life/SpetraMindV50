@@ -1,0 +1,7 @@
+# Single-phase supervised training
+phases:
+  - name: supervised
+    epochs: 50
+    loss: gll_symbolic_loss
+    optimizer: adamw
+    scheduler: cosine
