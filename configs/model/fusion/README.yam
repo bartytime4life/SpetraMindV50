@@ -1,0 +1,50 @@
+# -----------------------------------------------------------------------------
+# README (Meta Config for Documentation Generation)
+# -----------------------------------------------------------------------------
+# This file exists only so `spectramind selftest` and docs tooling can enumerate
+# available fusion variants and render brief help into the HTML diagnostics.
+#
+# Not consumed by the model; safe to keep in-tree for discoverability.
+# -----------------------------------------------------------------------------
+
+fusion_variants:
+  - name: concat_mlp
+    path: configs/model/fusion/concat.yaml
+    summary: "Concatenate + MLP; fast and reliable baseline."
+
+  - name: cross_attend
+    path: configs/model/fusion/cross_attend.yaml
+    summary: "Bi-directional cross-attention between FGS1 and AIRS contexts."
+
+  - name: gated
+    path: configs/model/fusion/gated.yaml
+    summary: "Sigmoid/bilinear gate blends projected encoders; exports gate values."
+
+  - name: residual_sum
+    path: configs/model/fusion/residual_sum.yaml
+    summary: "Learned α/β scales with residual projections; ultra-lightweight."
+
+  - name: late_blend
+    path: configs/model/fusion/late_blend.yaml
+    summary: "Keep heads separate briefly; blend later with fixed/learned/cosine γ."
+
+  - name: moe
+    path: configs/model/fusion/moe.yaml
+    summary: "Mixture-of-experts over [fgs1;airs] with softmax/noisy-topk gating."
+
+  - name: adapter
+    path: configs/model/fusion/adapter.yaml
+    summary: "Param-efficient adapter bottlenecks then concat+MLP."
+
+  - name: identity
+    path: configs/model/fusion/identity.yaml
+    summary: "Bypass for debug/ablations; do not use for leaderboard runs."
+
+notes:
+  hydra:
+    select_example: "python -m spectramind train model/fusion=cross_attend model.fusion.attn.layers=3"
+  runtime:
+    jit_safe: "All variants keep TorchScript-safe ops for Kaggle speed, unless you add exotic layers."
+  diagnostics:
+    export:
+      tips: "Enable export.* flags to feed UMAP/HTML dashboard with attention maps and gate traces."
