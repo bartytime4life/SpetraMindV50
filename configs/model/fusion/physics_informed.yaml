@@ -1,0 +1,17 @@
+# Physics-Informed Fusion Config — inject symbolic priors into fusion weights
+fusion:
+  enabled: true
+  type: cross-attend
+  dim: 256
+  n_heads: 4
+  dropout: 0.1
+  layer_norm: true
+  residual: true
+  symbolic_injection:       # additional inputs for fusion conditioning
+    include_molecule_masks: true      # binary mask per wavelength for molecule presence
+    include_detector_seams: true      # binary mask for seam positions
+    include_wavelengths: true         # normalized wavelength position encoding
+    include_snr_weights: false        # optional: SNR-based scaling vector
+  attention_bias_init: 0.0  # bias for physics-informed attention scores
+  export_attention: true
+  export_step_latents: true
