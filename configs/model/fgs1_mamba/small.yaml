@@ -1,0 +1,9 @@
+# Lightweight FGS1 Mamba preset for fast iteration / CI runs
+defaults:
+  - base
+
+d_model: 128
+d_state: 32
+n_layers: 4
+dropout: 0.05
+proj_out: 128
