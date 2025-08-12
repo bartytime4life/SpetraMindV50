@@ -1,8 +1,6 @@
 SpectraMind V50 — Mission Architecture & Engineering Doctrine
 
-ESA Ariel × NeurIPS 2025 Challenge – Physics‑Informed, Neuro‑Symbolic AI for Exoplanet Spectroscopy
-
- 
+ESA Ariel × NeurIPS 2025 — Physics‑Informed, Neuro‑Symbolic AI for Exoplanet Spectroscopy
 
  
 
@@ -15,67 +13,58 @@ ESA Ariel × NeurIPS 2025 Challenge – Physics‑Informed, Neuro‑Symbolic AI 
 
 Executive Summary
 
-SpectraMind V50 is a mission‑grade, neuro‑symbolic, physics‑informed AI system engineered to excel in the NeurIPS 2025 Ariel Data Challenge with uncompromising scientific fidelity, reproducibility, and operator‑first explainability.
-
-Architecture highlights
+SpectraMind V50 is a mission‑grade AI stack to win the NeurIPS 2025 Ariel Data Challenge with physics‑faithful μ/σ, robust OOD behavior, and operator‑first explainability. It combines:
 	•	FGS1‑first temporal encoding (Mamba SSM) for high‑weight transit morphology.
-	•	Physics‑informed spectral graph encoding (AIRS GAT) with λ‑adjacency, molecular bands, and seam edges.
-	•	Symbolic physics constraints as differentiable losses and an ex‑post auditing engine.
-	•	Uncertainty calibration (Temperature Scaling + COREL spectral conformal).
-	•	CLI‑first, Hydra‑configured MLOps with SHA/config hash/env/seed traceability.
+	•	Physics‑informed spectral graph encoding (AIRS GAT) with λ‑adjacency, molecule bands, and seam edges.
+	•	Symbolic physics constraints as differentiable losses and an ex‑post auditor.
+	•	Post‑hoc uncertainty calibration (Temperature Scaling → COREL conformal).
+	•	CLI‑first MLOps (Hydra configs, JSONL events, DVC/lakeFS, Poetry/Docker parity).
 
-Engineered outcomes
-	•	Inference for ~1,100 planets in ≤ 9 h on Kaggle GPUs.
-	•	Physically plausible, calibrated μ/σ spectra robust to OOD atmospheres.
-	•	Interactive diagnostics: SHAP × symbolic overlays, UMAP/t‑SNE, FFT smoothness, coverage plots.
+Targets: ≤ 9 h for ~1,100 planets on Kaggle; reproducible by SHA+config hash; rich diagnostics (UMAP/t‑SNE, SHAP×Symbolic, FFT, coverage).
 
 ⸻
 
 Table of Contents
 	1.	Scientific & Competitive Landscape
-	2.	End‑to‑End System (Level‑1 Dataflow)
+	2.	Level‑1 Dataflow
 	3.	Data Contracts & Schemas
 	4.	Calibration Kill Chain
 	5.	Modeling System
 	6.	Objective: Likelihood + Symbolic Physics
 	7.	Uncertainty Calibration
-	8.	Training Curriculum & Schedules
-	9.	CLI‑First MLOps & Config Discipline
+	8.	Training Curriculum
+	9.	MLOps & Reproducibility
 	10.	Diagnostics & Dashboard
 	11.	CI/CD Doctrine
-	12.	Reproducibility Stack
-	13.	Failure Modes & Runbooks
-	14.	Symbolic Logic Engine
-	15.	Exact Config Knobs
-	16.	Tests
-	17.	ADR & Change Control
-	18.	Operational Quick Start
-	19.	Appendices (Deep Dive)
+	12.	Failure Modes & Runbooks
+	13.	Symbolic Logic Engine
+	14.	Exact Config Knobs
+	15.	Tests
+	16.	ADR & Change Control
+	17.	Operational Quick Start
+	18.	Appendices
 
 ⸻
 
 Scientific & Competitive Landscape
 
-Observational Physics
-	•	Transmission spectroscopy encodes atmospheric absorption in wavelength‑dependent transit depth.
-	•	Scale height
+Transmission Spectroscopy — transit depth vs wavelength encodes atmospheric absorption.
+Scale Height
+
 $$
 H=\frac{kT}{\mu g}
 $$
-Hotter / lower‑$g$ planets exhibit deeper features.
-	•	Stellar limb darkening: prefer 3D MHD‑derived laws; modeling errors project into $\mu$ bias.
-	•	Astrophysical noise: star spots/faculae, oscillations; partially separable via FGS1 context.
-	•	Instrument systematics: pointing jitter, intrapixel variation, non‑linearity, ramps, seams.
 
-Challenge Constraints
-	•	Primary metric: Gaussian Log‑Likelihood (GLL) on 283 bins (joint $\mu/\sigma$).
-	•	FGS1 dominance: ~58× weight vs a single AIRS bin → architecture is FGS1‑first.
-	•	OOD atmospheres expected → symbolic priors for invariance.
-	•	Runtime: hard wall ≤ 9 h; enforced by telemetry & fast overrides.
+Hotter / lower‑g planets → deeper features.
+FGS1 Dominance — broadband photometry anchors transits; ~58× weight vs any single AIRS bin.
+AIRS‑CH0 — 283 spectral bins (1.95–3.90 µm) spanning H_2O/CH_4/CO_2 features.
+Constraints — metric is Gaussian Log‑Likelihood (μ/σ); runtime ≤ 9 h; OOD atmospheres expected.
 
 ⸻
 
-End‑to‑End System (Level‑1 Dataflow)
+Level‑1 Dataflow
+
+System overview (Mermaid):
 
 flowchart LR
   subgraph RAW[Raw Inputs]
@@ -96,18 +85,18 @@ flowchart LR
 
   subgraph MODEL[Encoders→Fusion→Decoders]
     M1[FGS1 Mamba SSM]
-    M2[AIRS GAT (283 nodes)]
+    M2[AIRS GAT]
     MF[Fusion Layer]
-    D1[Multi-Scale μ Decoder]
-    D2[Flow/Quantile σ Head]
+    D1[μ Decoder (multi-scale)]
+    D2[σ Head (flow/quantile)]
   end
 
   subgraph SYM[Symbolic Physics Engine]
-    S1[Smoothness ∂²μ]
-    S2[Non-negativity μ≥0]
-    S3[Molecule coherence]
+    S1[Smoothness]
+    S2[Non-negativity]
+    S3[Molecular coherence]
     S4[Seam continuity]
-    S5[CH4:H2O:CO2 envelopes]
+    S5[Chemistry envelopes]
     S6[Quantile monotonicity]
   end
 
@@ -129,123 +118,111 @@ flowchart LR
 
 Data Contracts & Schemas
 
-Invariant: do not clip negatives in calibrated frames; always propagate variance; log correction magnitudes.
+Invariant: never clip negatives in calibrated frames; always propagate variance; log correction magnitudes.
 
-Directory Layout
+Directory topology
 
 /data
-  raw/{fgs1,airs_ch0}/...
-  calibrated/{fgs1,airs}/...
-  features/{fgs1_white,airs_bins}/...
-  splits/groupkfold.json
+  raw/
+    fgs1/...
+    airs_ch0/...
+  calibrated/
+    fgs1/...
+    airs/...
+  features/
+    fgs1_white/...
+    airs_bins/...
+  splits/
+    groupkfold.json
 
-Calibrated Tensors
+Calibrated tensors
 
 File	Keys	Shape	Notes
 fgs1_{planet}.npz	frames, variance, mask	(T,H,W)	float32/bool
 airs_{planet}.npz	frames, variance, mask, trace_meta	(T,H,W)	slit position, seam indices, dispersion poly
 
-Feature Tensors
-	•	fgs1_white_{planet}.npz: flux[T], time[T], centroid[T,2], jitter[T,2]
-	•	airs_bins_{planet}.npz: flux[T,283], time[T]
+Feature tensors
+	•	fgs1_white_{planet}.npz → flux[T], time[T], centroid[T,2], jitter[T,2]
+	•	airs_bins_{planet}.npz → flux[T,283], time[T]
 
-Submission Schema
-	•	Columns: mu_0..mu_282, sigma_0..sigma_282 (decimal strings permitted, parse to float32).
+Submission schema
+	•	Columns: mu_0..mu_282, sigma_0..sigma_282 (decimal strings OK; parse to float32).
 	•	Validator: src/spectramind/utils/schema_check.py.
 
 ⸻
 
 Calibration Kill Chain
 
+Schematic
+
 graph TD
-  A[ADC Reversal] --> B[Bad Pixel Mask & Interp]
+  A[ADC Reversal] --> B[Bad Pixel Mask/Interp]
   B --> C[Non-Linearity Correction]
   C --> D[Dark Subtraction]
   D --> E[Flat-Fielding]
   E --> F[Trace Extraction / Photometry]
 
-Per‑step math & logging
-	1.	ADC reversal / bias
-$E=(R-o)\cdot g,\ \ \mathrm{Var}_E=g^2 \mathrm{Var}_R$
-Log: g, o, pre/post stats.
-	2.	Bad pixel masking & interpolation
-Mask = hot|cold|NaN|sat|persistence|cosmic. Interp with noise floor $\epsilon^2$.
-Log: mask_frac, interp_kernel.
-	3.	Non‑linearity
-$E_{lin}=f(E)$ per‑pixel LUT/poly; $\mathrm{Var}_{lin}=(f’(E))^2\mathrm{Var}_E$
-Log: median correction (ppm), clips.
-	4.	Dark subtraction
-$E_d=E_{lin}-D;\ \ \mathrm{Var}d=\mathrm{Var}{lin}+\mathrm{Var}_D$
-Log: dark stats, temperature proxy.
-	5.	Flat‑fielding
-$E_f=E_d/F;\ \ \mathrm{Var}_f=\mathrm{Var}_d/F^2$
-Log: flat norm stats; cross‑hatch flag.
-	6.	Trace extraction / photometry
-FGS1 white‑light aperture sum; AIRS optimal extraction; seam mask $\mathcal{S}$.
-Log: aperture radii, seam indices, throughput.
+Per‑step math & logs
 
-Outputs: calibrated frames → features (fgs1_white, airs_bins) + per‑stage logs.
+1) ADC reversal / bias
+E=(R-o)\cdot g,\ \ \mathrm{Var}_E=g^2\mathrm{Var}_R. Log: g, o, pre/post stats.
+
+2) Bad pixel mask & interpolation
+Mask: hot|cold|NaN|sat|persistence|cosmic. Interp with noise floor \epsilon^2. Log: mask_frac, interp_kernel.
+
+3) Non‑linearity correction
+Per‑pixel LUT/poly E_{lin}=f(E). Propagate \mathrm{Var}_{lin}=(f’(E))^2\mathrm{Var}_E. Log: median correction (ppm), clips.
+
+4) Dark subtraction
+E_d=E_{lin}-D,\ \ \mathrm{Var}d=\mathrm{Var}{lin}+\mathrm{Var}_D. Log: dark stats, temperature proxy.
+
+5) Flat‑fielding
+E_f=E_d/F,\ \ \mathrm{Var}_f=\mathrm{Var}_d/F^2. Log: flat normalization; cross‑hatch flag.
+
+6) Trace extraction / photometry
+FGS1: aperture sum + annulus background. AIRS: optimal extraction, seam‑aware. Log: aperture radii, seam indices, throughput.
 
 ⸻
 
 Modeling System
 
 Encoders
+	•	FGS1 Mamba SSM — long‑sequence temporal encoder (bidir option, AMP).
+Input x_{fgs1}\in\mathbb{R}^{B\times T\times C} → latent h_{fgs1}\in\mathbb{R}^{B\times D} (+ step latents for UMAP).
+	•	AIRS GAT (physics‑informed) — nodes V=\{0..282\}; edges E_\lambda\cup E_{mol}\cup E_{seam}.
+Node feat x_i\in\mathbb{R}^{C_n}; edge feat [\Delta\lambda_{ij},mol_i,mol_j,seam_{ij}].
+Output h_{airs}\in\mathbb{R}^{B\times D}; attention exported.
 
-FGS1 Mamba SSM
-	•	Input $x_{fgs1}\in\mathbb{R}^{B\times T\times C}$ (flux, jitter, centroid, …)
-	•	Output $h_{fgs1}\in\mathbb{R}^{B\times D}$ (+ optional step‑latents for UMAP)
-	•	Options: bidirectional, dropout, residual, AMP.
-
-AIRS GAT (physics‑informed)
-	•	Nodes $V={0..282}$; edges $E=E_\lambda \cup E_{mol} \cup E_{seam}$
-	•	Node features $x_i\in\mathbb{R}^{C_n}$; edge features $[\Delta\lambda_{ij}, mol_i, mol_j, seam_{ij}]$
-	•	Output $h_{airs}\in\mathbb{R}^{B\times D}$; attention exported for diagnostics.
-
-Fusion
-
-h = Fuse(h_fgs1, h_airs) → concat+MLP | cross‑attend | gated (configurable).
+Fusion — concat+MLP | cross‑attend | gated (configurable): h = \mathrm{Fuse}(h_{fgs1}, h_{airs}).
 
 Decoders
-
-Multi‑Scale μ: coarse→mid→fine with skip fusion; auxiliary losses optional.
-σ Head (flow/quantile): heteroscedastic $\sigma=\mathrm{Softplus}(g(h))+\sigma_{min}$; TorchScript‑safe; compatible with temp scaling + COREL.
+	•	Multi‑scale μ — coarse→mid→fine with skip fusion; auxiliary losses optional.
+	•	σ head (flow/quantile) — heteroscedastic \sigma=\mathrm{Softplus}(g(h))+\sigma_{min}; TorchScript‑safe; works with temp scaling & COREL.
 
 ⸻
 
 Objective: Likelihood + Symbolic Physics
 
-Gaussian Log‑Likelihood (primary)
-
+Primary (GLL)
 $$
-\mathcal{L}{\text{gll}}=\frac{1}{2}\sum{i}\left[\log(2\pi\sigma_i^2)+\frac{(y_i-\mu_i)^2}{\sigma_i^2}\right]
+\mathcal{L}{\mathrm{gll}}=\frac{1}{2}\sum{i}\Big[\log(2\pi\sigma_i^2)+\frac{(y_i-\mu_i)^2}{\sigma_i^2}\Big]
 $$
+Numerics: clamp \sigma\ge\sigma_{min}; optional \log\sigma parameterization.
 
-Numerics: clamp $\sigma!\ge!\sigma_{min}$; optional $\log\sigma$ parameterization.
-
-Symbolic Loss Pack (differentiable, mask‑aware)
-
-Let $\mu\in\mathbb{R}^{283}$, wavelength‑ordered; molecule windows $W_m$; seam index $s$.
-	1.	Smoothness (2nd derivative $L_2$)
-$\delta_i=\mu_{i+1}-2\mu_i+\mu_{i-1}$,
-$\displaystyle \mathcal{L}_{sm}=\sum_i w^{sm}_i,\delta_i^2$
-	2.	Non‑negativity
-$\displaystyle \mathcal{L}_{nn}=\sum_i w^{nn}_i,\mathrm{ReLU}(-\mu_i)$
-	3.	Molecular coherence (soft implication)
-Normalize $\mu_{W_m}$ and hinge on nonnegative templates $t^m$ inside $W_m$.
-	4.	Seam continuity
-$\displaystyle \mathcal{L}{seam}=w^{seam},(\mu{s^-}-\mu_{s^+})^2$
-	5.	Chemistry envelopes (band‑area ratios)
-$A_m=\sum_{i\in W_m}\mu_i\Delta\lambda_i$; hinge on bounds of $A_a/(A_b+\epsilon)$.
-	6.	Quantile monotonicity (if predicting $q_{10},q_{50},q_{90}$)
-$\displaystyle \mathcal{L}{qm}=\sum_i[\mathrm{ReLU}(q{10,i}-q_{50,i})+\mathrm{ReLU}(q_{50,i}-q_{90,i})]$
+Symbolic pack (mask‑aware over 283 wavelength‑ordered bins)
+	•	Smoothness (2nd diff L2) — \delta_i=\mu_{i+1}-2\mu_i+\mu_{i-1}, \mathcal{L}_{sm}=\sum w^{sm}_i\delta_i^2
+	•	Non‑negativity — \mathcal{L}_{nn}=\sum w^{nn}_i\operatorname{ReLU}(-\mu_i)
+	•	Molecular coherence — normalized response ≥ molecule templates t^m within windows W_m
+	•	Seam continuity — \mathcal{L}{seam}=w^{seam}(\mu{s^-}-\mu_{s^+})^2
+	•	Chemistry envelopes (area ratios) — A_m=\sum_{i\in W_m}\mu_i\Delta\lambda_i, hinge on A_a/(A_b+\epsilon) bounds
+	•	Quantile monotonicity — if q_{10},q_{50},q_{90} present: hinge to keep q_{10}\le q_{50}\le q_{90}
 
 Total
 $$
-\mathcal{L}=\mathcal{L}{\text{gll}}
+\mathcal{L}=\mathcal{L}{\mathrm{gll}}
 +\lambda{sm}\mathcal{L}{sm}
 +\lambda{nn}\mathcal{L}{nn}
-+\lambda{coh}\sum_m\mathcal{L}^m_{coh}
++\lambda{coh}!\sum_m!\mathcal{L}^m_{coh}
 +\lambda_{seam}\mathcal{L}{seam}
 +\lambda{ratio}\mathcal{L}{ratio}
 +\lambda{qm}\mathcal{L}_{qm}
@@ -254,28 +231,28 @@ $$
 ⸻
 
 Uncertainty Calibration
-	1.	Temperature Scaling
-Fit global $\tau>0$ minimizing validation GLL, then $\sigma^*=\tau\sigma$.
-	2.	COREL Spectral Conformal
-Binwise score $\epsilon_i=\frac{|y_i-\mu_i|}{\sigma^*_i}$ → choose quantile $q_i$ targeting $1-\alpha$ coverage → calibrated $\sigma’_i=q_i\sigma^*_i$.
+
+1) Temperature Scaling — learn global \tau>0 minimizing val GLL; \(\sigma^\=\tau\sigma\).
+2) COREL Spectral Conformal — scores \epsilon_i=\frac{|y_i-\mu_i|}{\sigma^\_i}; choose quantile q_i for target coverage 1-\alpha; \(\sigma’_i=q_i\sigma^\*_i\).
 
 Artifacts: per‑bin q_i.csv, coverage plots, z‑score histograms.
 
 ⸻
 
-Training Curriculum & Schedules
-	1.	MAE pretrain — physics‑aware masking; optional $\log\sigma$ pretrain.
-	2.	Contrastive (optional) — InfoNCE on in‑transit vs out‑of‑transit latents.
-	3.	Supervised — $\mathcal{L}=\text{GLL}+\lambda\cdot\text{Symbolic}$; AMP, cosine LR, grad accumulation, frequent checkpoints.
-	4.	Calibration — Temp scaling → COREL; log coverage deltas and molecule region summaries.
+Training Curriculum
 
-CV Protocol: GroupKFold on planet_id; no cross‑planet leakage.
+Phase 1 — MAE: physics‑aware masking; optional \log\sigma pretrain.
+Phase 2 — Contrastive (opt.): InfoNCE on in‑transit vs out‑of‑transit latents.
+Phase 3 — Supervised: \mathcal{L}=\text{GLL}+\lambda\cdot\text{Symbolic}; AMP, cosine LR, grad accumulation.
+Phase 4 — Calibration: Temp scaling → COREL; log coverage deltas & molecule summaries.
+
+CV protocol: GroupKFold on planet_id; no cross‑planet leakage.
 
 ⸻
 
-CLI‑First MLOps & Config Discipline
+MLOps & Reproducibility
 
-Unified CLI
+Unified CLI (Typer)
 
 spectramind --version
 spectramind selftest --deep
@@ -286,7 +263,7 @@ spectramind calibrate-corel
 spectramind diagnose dashboard --html outputs/diagnostics/v1.html [--open]
 spectramind submit bundle --submission outputs/submission.csv --out-zip outputs/submission_bundle.zip
 
-Hydra Config Tree
+Hydra config tree
 
 configs/
   config_v50.yaml
@@ -298,39 +275,41 @@ configs/
   overrides/{kaggle_fast.yaml}
   experiment/{exp_baseline.yaml,exp_kaggle_fast.yaml}
 
-Telemetry & Provenance
-	•	Human log: v50_debug_log.md (UTC ISO, append‑only).
-	•	Machine log: events.jsonl (one JSON per CLI call).
-	•	Run manifest: run_hash_summary_v50.json (SHA, cfg hash, seeds, env, artifacts).
+Telemetry & provenance
+	•	Human log v50_debug_log.md (UTC ISO, append‑only).
+	•	Machine log events.jsonl (one JSON per CLI call).
+	•	Run manifest run_hash_summary_v50.json (git SHA, cfg hash, seeds, env, artifacts).
 
 ⸻
 
 Diagnostics & Dashboard
 	•	Backend: FastAPI • Frontend: React + Tremor + D3
-	•	Embedded visuals: UMAP/t‑SNE, SHAP × symbolic overlays, FFT spectra, COREL coverage, z‑score histograms, Config‑Hash × GLL heatmap, CLI log table.
-	•	Generator: generate_html_report.py → outputs/diagnostics/vN.html (tolerant of missing artifacts).
+	•	Views: UMAP/t‑SNE, SHAP×Symbolic overlays, FFT spectra, COREL coverage & q_i table, Config‑Hash × GLL heatmap, CLI log table.
+	•	Generator: generate_html_report.py → outputs/diagnostics/vN.html (graceful when some artifacts are missing).
 
 ⸻
 
 CI/CD Doctrine
+
+PR gate sequence (Mermaid)
 
 sequenceDiagram
   participant Dev
   participant CI as GitHub Actions
   Dev->>CI: Push PR
   CI->>CI: Poetry/Docker setup
-  CI->>CI: Selftest (fast)
-  CI->>CI: Unit tests (symbolic, encoders, decoders)
-  CI->>CI: Smoke E2E (predict + dashboard)
-  CI->>CI: Pipeline consistency checker
-  CI->>Dev: Upload artifacts (CSV, HTML, logs)
+  CI->>CI: selftest.py (fast)
+  CI->>CI: unit tests (symbolic, encoders, decoders)
+  CI->>CI: smoke E2E (predict + dashboard)
+  CI->>CI: pipeline_consistency_checker.py
+  CI->>Dev: Upload artifacts (CSV/HTML/logs)
   alt all green
     CI->>Dev: Merge allowed
   else any red
     CI->>Dev: PR blocked
   end
 
-Acceptance per phase
+Acceptance artifacts
 
 Phase	Gate	Artifact
 0	--version, selftest	logs, events.jsonl
@@ -343,25 +322,17 @@ Phase	Gate	Artifact
 
 ⸻
 
-Reproducibility Stack
-	•	Code/Config: Git SHA + Hydra config hash stamped on every run.
-	•	Env: Poetry lock; optional CUDA Docker for parity.
-	•	Data/Models: DVC/lakeFS with immutable hashes; DVC Experiments optional.
-	•	Provenance: immutable run manifest & JSONL event stream.
-
-⸻
-
 Failure Modes & Runbooks
-	•	Overconfident σ → calibrate-temp → if molecule regions still under‑covered, calibrate-corel.
-	•	Seam discontinuity spikes → ↑ λ_seam; verify seam indices; inspect AIRS slit trace; re‑flat if required.
-	•	FGS1 drift → widen/deepen Mamba; enable bidirectional; add limb‑darkening features to FGS1 channel.
-	•	Runtime over budget → use overrides/kaggle_fast.yaml; increase batch sizes; skip heavy diagnostics in‑run.
+	•	Overconfident σ → calibrate-temp; if molecule bands under‑covered, run calibrate-corel.
+	•	Seam discontinuity → ↑ λ_seam; verify seam index; re‑flat or re‑extract if needed.
+	•	FGS1 drift → increase Mamba width/depth; enable bidir; add limb‑darkening features.
+	•	Runtime over budget → -c overrides/kaggle_fast.yaml, ↑ batches, skip heavy diagnostics during train/predict.
 
 ⸻
 
 Symbolic Logic Engine
 
-Per‑planet auditor comparing $\mu$ (and optional quantiles) to constraints; writes constraint_violation_log.json.
+Per‑planet auditor comparing \mu (and optional quantiles) to constraints; writes constraint_violation_log.json and influence maps \partial\mathcal{L}_{sym}/\partial\mu overlayed on SHAP.
 
 {
   "planet_id": "P123",
@@ -375,7 +346,6 @@ Per‑planet auditor comparing $\mu$ (and optional quantiles) to constraints; wr
   }
 }
 
-Also computes symbolic influence maps $\partial\mathcal{L}_{sym}/\partial \mu$ and overlays them on SHAP heatmaps.
 
 ⸻
 
@@ -417,51 +387,46 @@ overrides:
 
 Tests
 
-Unit
-	•	test_symbolic_smoothness_second_diff.py — stepped μ → high penalty; smooth μ → low.
-	•	test_nonnegativity.py — negatives penalized; zero grad above 0.
-	•	test_molecule_coherence.py — template inside $W_m$ → near‑zero penalty.
-	•	test_quantile_monotonicity.py — shuffled quantiles → positive penalty.
-
-Integration
-	•	selftest.py --deep — CLI registration, file presence, dummy forward, TorchScript export.
-	•	pipeline_consistency_checker.py — DVC DAG ↔ CLI map ↔ configs coherence.
-
-Smoke E2E
-	•	Tiny planet set → predict + dashboard must run and emit artifacts.
+Unit — smoothness 2nd‑diff, non‑negativity, molecular coherence, quantile monotonicity, encoder/decoder IO.
+Integration — selftest --deep, TorchScript export, pipeline consistency checker.
+Smoke E2E — tiny planet subset: predict → dashboard (artifacts emitted).
 
 ⸻
 
 ADR & Change Control
-	•	Maintain ADRs in docs/adr/ for I/O shapes, rule math, masks, seam semantics, and CLI contracts.
-	•	CI gate: all green before merge; artifacts uploaded per PR.
-	•	Tag releases when a submission candidate (validated bundle + diagnostics) is produced.
+	•	ADRs under docs/adr/ for I/O shapes, rule math, masks, seam semantics, CLI contracts.
+	•	Merge gates: CI must be green; artifacts uploaded for review.
+	•	Release tags: when producing a submission candidate (validated bundle + diagnostics).
 
 ⸻
 
 Operational Quick Start
 
-# Verify
+Verify
+
 spectramind --version
 spectramind selftest --deep
 
-# Train (curriculum)
+Train (curriculum)
+
 spectramind train --phase mae
 spectramind train --phase supervised +loss.λ_sm=0.2 +model.fusion.type=cross-attend
 
-# Predict + calibrate + bundle
+Predict + calibrate + bundle
+
 spectramind predict --out-csv outputs/submission.csv
 spectramind calibrate-temp
 spectramind calibrate-corel
 spectramind submit bundle --submission outputs/submission.csv --out-zip outputs/submission_bundle.zip
 
-# Diagnostics
+Diagnostics
+
 spectramind diagnose dashboard --html outputs/diagnostics/v1.html
 
 
 ⸻
 
-Appendices (Deep Dive)
+Appendices
 
 <details>
 <summary><b>Appendix A — Symbolic Loss (Vectorized, mask‑aware PyTorch)</b></summary>
@@ -556,20 +521,5 @@ stages:
     cmd: spectramind diagnose dashboard --html outputs/diagnostics/v1.html
     deps: [outputs/submission.csv]
     outs: [outputs/diagnostics/v1.html]
-
-</details>
-
-
-<details>
-<summary><b>Appendix D — CI Hints (jobs skeleton)</b></summary>
-
-
-	•	setup: cache Poetry, set CUDA toolkit
-	•	selftest: spectramind selftest
-	•	unit: pytest -q (symbolic + encoders + utils)
-	•	smoke‑e2e: tiny dataset → predict + dashboard
-	•	consistency: pipeline_consistency_checker.py
-	•	artifacts: upload CSV/HTML/logs
-	•	gate: require all green
 
 </details>
