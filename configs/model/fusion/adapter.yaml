@@ -1,0 +1,25 @@
+# -----------------------------------------------------------------------------
+# Fusion: Adapter-Bottleneck (Param-Efficient)
+# -----------------------------------------------------------------------------
+# Project each encoder through a bottleneck (adapter) with residual, then concat+MLP.
+# Parameter-efficient for ablations; plays well with AMP/JIT; easy to tune.
+# -----------------------------------------------------------------------------
+
+defaults:
+  - base
+
+model:
+  fusion:
+    type: "adapter"
+    dim: 256
+    adapter:
+      bottleneck: 64           # small adapter width
+      activation: "relu"
+      dropout: 0.05
+      bias: true
+    mlp:
+      hidden: [256]            # tiny MLP after adapter concat
+      activation: "gelu"
+      dropout: 0.05
+    norm: "layernorm"
+    dropout: 0.05
