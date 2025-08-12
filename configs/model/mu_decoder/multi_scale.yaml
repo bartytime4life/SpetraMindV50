@@ -1,0 +1,7 @@
+# Multi-scale μ decoder
+type: multi_scale
+scales: [coarse, mid, fine]
+latent_dim: 256
+dropout: 0.1
+aux_losses: true
+smooth_init: true      # initialize for smoother outputs
