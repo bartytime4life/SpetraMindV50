@@ -1,0 +1,37 @@
+# SpectraMind V50 — Default Training Config
+# Hydra composition root for training phases
+
+defaults:
+  - optimizer: adamw
+  - scheduler: cosine
+  - curriculum: mae_supervised
+  - regularization: default
+  - _self_
+
+# Device and runtime
+device: cuda
+num_workers: 4
+amp: true              # automatic mixed precision
+seed: 42
+
+# Logging
+log_interval: 50
+save_interval: epoch   # save model every epoch
+eval_interval: 1       # run validation every N epochs
+mlflow: false
+wandb: false
+
+# Checkpointing
+resume: null           # path to resume checkpoint
+save_dir: outputs/checkpoints
+
+# Dataset
+train_split: data/splits/train.json
+val_split: data/splits/val.json
+batch_size: 16
+val_batch_size: 32
+shuffle: true
+pin_memory: true
+
+# Output targets
+n_bins: 283
