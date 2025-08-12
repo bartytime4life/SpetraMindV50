@@ -1,0 +1,7 @@
+# Flow-based σ head (heteroscedastic)
+type: flow
+latent_dim: 256
+dropout: 0.05
+activation: softplus
+sigma_min: 1.0e-4
+quantiles: false       # enable for q10/q50/q90
