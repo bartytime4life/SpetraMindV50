@@ -1,0 +1,25 @@
+# Edge construction and edge feature presets for AIRS GNN
+# These merge into model.encoders.airs_gnn.graph / edge_features
+graph:
+  edges:
+    wavelength_adjacency: true    # connect i <-> i±1 (and optional ±k)
+    molecular_links: true         # connect bins sharing molecule windows (H2O/CO2/CH4)
+    detector_seams: true          # connect across seam to enforce continuity
+  adjacency:
+    k_hop: 1                      # 1 = immediate neighbors; increase for wider smoothing
+  molecular_links:
+    connect_within_window: true
+    connect_across_windows: false
+    weight: 1.0
+  seam:
+    cross_link_weight: 1.5
+    symmetric: true
+
+edge_features:
+  use: true
+  dims: 4                         # [Δλ, mol_tag_i, mol_tag_j, seam_flag]
+  scalers:
+    delta_lambda: "standard"
+  embed:
+    mol_tags: true
+    seam_flag: true
