@@ -1,0 +1,11 @@
+# Local development dataset configuration
+defaults:
+  - base
+
+# Override paths for local workstation runs
+raw_dir: "/mnt/data/ariel/raw"
+calibrated_dir: "/mnt/data/ariel/calibrated"
+features_dir: "/mnt/data/ariel/features"
+splits_file: "/mnt/data/ariel/splits/groupkfold.json"
+
+cache_backend: "filesystem"
