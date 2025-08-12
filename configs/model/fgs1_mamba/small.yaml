@@ -1,12 +1,14 @@
-# Lightweight preset: fast dev cycles
-defaults: []
-
-enabled: true
-d_model: 128
-d_state: 32
-d_conv: 4
-expand: 2
-n_layers: 4
-bidirectional: true
-dropout: 0.08
-proj_out: 128
+# Lightweight preset for fast iteration / CI smoke
+model:
+  encoders:
+    fgs1_mamba:
+      d_model: 128
+      d_state: 32
+      d_conv: 4
+      expand: 2
+      n_layers: 4
+      bidirectional: true
+      dropout: 0.10
+      layer_norm: "rms"
+      proj_out: 128
+      export_step_latents: false
