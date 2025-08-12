@@ -1,0 +1,4 @@
+# Explainability settings for the FGS1 Mamba encoder
+export_step_latents: true    # Save per-timestep latents for UMAP/t-SNE diagnostics
+attention_dump: false        # Mamba doesn't use attention, but keep flag for consistency
+save_dir: "outputs/explainability/fgs1_mamba"
