@@ -1,4 +1,4 @@
-SpectraMind V50 — Authoritative Mission Architecture & Engineering Doctrine
+**SpectraMind V50 — Authoritative Mission Architecture & Engineering Doctrine**
 
 Mission‑grade, neuro‑symbolic, physics‑informed AI system for the NeurIPS 2025 Ariel Data Challenge. This is the single source of truth for science, contracts, ops, and code.
 
