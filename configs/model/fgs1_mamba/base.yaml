@@ -1,0 +1,47 @@
+# Canonical FGS1 Mamba SSM encoder configuration
+
+enabled: true
+name: "fgs1_mamba"
+in_features: 6           # [flux, time_norm, centroid_x, centroid_y, jitter_x, jitter_y]
+
+# Model width/depth
+d_model: 256
+d_state: 64
+d_conv: 4
+expand: 2
+n_layers: 8
+bidirectional: true
+
+# Regularization & norms
+dropout: 0.10
+layer_norm: "rms"        # ["layernorm", "rms"]
+
+# Projections & outputs
+proj_out: 256
+export_step_latents: false   # enable to dump per-step latents for UMAP/t-SNE diagnostics
+
+# Numerics & stability
+amp: ${model.amp}
+precision: ${model.precision}
+deterministic: false
+cudnn_benchmark: true
+epsilon: 1.0e-6
+
+# JIT/TorchScript toggles (encoder-only; full-model is in model.jit_export)
+jit:
+  enable: false
+  strict: false
+  check_trace: false
+
+# Training-time extras (masking used during MAE pretrain)
+mae_masking:
+  enable: true
+  kind: "snr_aware"     # ["random","block","fixed","snr_aware"]
+  mask_ratio: 0.35
+  snr_floor_db: 10.0
+
+# Logging/diagnostics hooks
+diagnostics:
+  capture_saliency: true
+  capture_grad_norms: true
+  step_latents_topk: 0     # 0 = keep all; otherwise keep top-k by variance
