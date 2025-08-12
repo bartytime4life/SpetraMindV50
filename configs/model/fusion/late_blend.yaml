@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------------
+# Fusion: Late Blend (Two-Head Decoding + Blend)
+# -----------------------------------------------------------------------------
+# Keep μ/σ heads conditionally separate for a few blocks, then blend fused states.
+# Useful if FGS1 dominates timing/depth and AIRS adds spectral detail later.
+# Blend coefficient γ can be fixed or learned; optional curriculum schedule.
+# -----------------------------------------------------------------------------
+
+defaults:
+  - base
+
+model:
+  fusion:
+    type: "late_blend"
+    dim: 256
+    late:
+      blocks_before_blend: 1    # number of decoder blocks before fusion blend
+      strategy: "learned"       # ["fixed", "learned", "cosine_schedule"]
+      fixed_gamma: 0.5          # used if strategy="fixed": h = γ*h_airs + (1-γ)*h_fgs1
+      cosine:
+        min_gamma: 0.3          # start favoring FGS1, gradually increase AIRS
+        max_gamma: 0.7
+        total_steps: 10000
+    proj:
+      fgs1_dim: 256
+      airs_dim: 256
+    norm: "layernorm"
+    dropout: 0.05
