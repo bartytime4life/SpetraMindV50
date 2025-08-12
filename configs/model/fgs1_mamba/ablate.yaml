@@ -1,0 +1,11 @@
+# Structured ablation / sweep space for FGS1 Mamba
+ablate:
+  enable: true
+  search_space:
+    model.encoders.fgs1_mamba.n_layers: [4, 6, 8, 10]
+    model.encoders.fgs1_mamba.d_model: [128, 192, 256, 320]
+    model.encoders.fgs1_mamba.d_state: [32, 48, 64, 96]
+    model.encoders.fgs1_mamba.layer_norm: ["rms", "layernorm"]
+    model.encoders.fgs1_mamba.bidirectional: [true]   # keep true by default; can test [false] if needed
+  max_runs: 24
+  top_n: 5
