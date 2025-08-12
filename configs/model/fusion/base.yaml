@@ -1,0 +1,37 @@
+# -----------------------------------------------------------------------------
+# Fusion (Base Contracts) — SpectraMind V50
+# -----------------------------------------------------------------------------
+# This file defines the canonical schema and shared defaults for all fusion modes.
+# Other files inherit and override fields as needed. Keep this minimal and stable.
+#
+# Contract:
+#  - Inputs:
+#      h_fgs1:  [B, Df]   # FGS1 encoder pooled latent
+#      h_airs:  [B, Da]   # AIRS encoder pooled (or per-bin pooled) latent
+#  - Output:
+#      h_fused: [B, D]    # shared fused latent feeding μ/σ decoders
+#
+# Notes:
+#  - `dim` is the fused feature size given to decoders.
+#  - `type` selects the fusion implementation in code (switch/registry).
+#  - `export`: turn on extra taps to dump internals for diagnostics/UMAP/HTML.
+#  - `jit_safe`: enforce TorchScript-safe submodules (runtime speed on Kaggle).
+# -----------------------------------------------------------------------------
+
+model:
+  fusion:
+    enabled: true
+    type: "concat_mlp"          # one of: [concat_mlp, cross_attend, gated, residual_sum, late_blend, moe, adapter, identity]
+    dim: 256                    # output fused dim D
+    dropout: 0.0                # global/base dropout applied in many fusers
+    norm: "layernorm"           # ["layernorm", "rms", "batch", "none"]
+    jit_safe: true              # prefer JIT/TorchScript friendly ops
+    export:
+      taps: false               # export intermediate tensors (perf cost)
+      attn_weights: false       # only used by attention-based fusers
+      gate_values: false        # only used by gated/moe
+    # Shape assumptions to help runtime assertions
+    shapes:
+      d_fgs1: 256               # expected FGS1 latent size
+      d_airs: 256               # expected AIRS latent size
+      strict_check: true        # if true, assert shape matches exactly
