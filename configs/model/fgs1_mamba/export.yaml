@@ -1,0 +1,10 @@
+# JIT/TorchScript-leaning adjustments for production inference
+
+dropout: 0.0
+bidirectional: true
+export_step_latents: false
+
+jit:
+  enable: true
+  strict: true
+  check_trace: true
