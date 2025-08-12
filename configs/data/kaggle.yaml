@@ -1,0 +1,11 @@
+# Kaggle competition dataset configuration
+defaults:
+  - base
+
+# Kaggle input/output mount points
+raw_dir: "/kaggle/input/ariel-data-2025/raw"
+calibrated_dir: "/kaggle/working/data/calibrated"
+features_dir: "/kaggle/working/data/features"
+splits_file: "/kaggle/working/data/splits/groupkfold.json"
+
+cache_backend: "filesystem"
