@@ -1,0 +1,8 @@
+# Explicit GAT backend alias. Safe to use instead of base when you want to be explicit.
+# Inherit semantics rely on Hydra composition in upper-level configs.
+
+model:
+  encoders:
+    airs_gnn:
+      backend: "gat"
+      export_attention: true

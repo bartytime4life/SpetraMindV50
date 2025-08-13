@@ -1,0 +1,24 @@
+# Neural message passing with edge-conditioned filters (NNConv-like).
+# Useful if Δλ and molecule one-hots carry most of the structure signal.
+
+model:
+  encoders:
+    airs_gnn:
+      enabled: true
+      backend: "nnconv"
+      hidden_dim: 192
+      num_layers: 6
+      dropout: 0.10
+      residual: true
+      layer_norm: "layernorm"
+      activation: "gelu"
+      edge_mlp:
+        hidden_dim: 128
+        num_layers: 2
+        activation: "silu"
+        dropout: 0.05
+      export_attention: false
+      jit_scriptable: true
+      diagnostics:
+        assert_connected_graph: true
+        log_shapes: true

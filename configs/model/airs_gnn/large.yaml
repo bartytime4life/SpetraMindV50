@@ -1,11 +1,13 @@
+# Large preset — more depth/width & heads; consider runtime budget.
+
 model:
   encoders:
     airs_gnn:
       enabled: true
       backend: "gat"
-      hidden_dim: 224
-      num_layers: 5
-      attn_heads: 4
+      hidden_dim: 320
+      num_layers: 7
+      attn_heads: 6
       attn_dropout: 0.10
       dropout: 0.10
       residual: true
@@ -13,11 +15,12 @@ model:
       activation: "silu"
       node_features:
         use: ["stat", "learned"]
-        stat_dim: 8
-        learned_dim: 32
+        stat_dim: 12
+        learned_dim: 48
         fuse: "concat"
-        mlp_dim: 128
+        mlp_dim: 192
       diagnostics:
-        export_shapes: false
+        save_attention_csv: false
+        save_graphviz: false
         assert_connected_graph: true
         log_shapes: true
