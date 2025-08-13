@@ -1,4 +1,23 @@
-site_name: SpectraMind V50 Docs
+site_name: SpectraMind V50
+site_description: Neuro-symbolic, physics-informed pipeline for the NeurIPS 2025 Ariel Data Challenge
+repo_url: https://github.com/your-org/SpectraMindv50
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - content.code.copy
+    - content.action.edit
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
 nav:
   - Home: index.md
-  - Architecture: ARCHITECTURE.md
+  - Architecture: ../ARCHITECTURE.md
+  - Research: research/index.md
+  - CLI Reference: docs/cli.md
+  - Diagnostics: docs/diagnostics.md
+plugins: []
