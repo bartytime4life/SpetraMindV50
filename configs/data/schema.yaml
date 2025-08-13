@@ -3,9 +3,18 @@
 
 data:
   schema:
-    calibrated_npz_required: ["frames", "variance", "mask"]
-    fgs1_white_npz_required: ["flux", "time", "centroid", "jitter"]
-    airs_bins_npz_required:  ["flux", "time"]
+    calibrated_npz_required:
+      - frames
+      - variance
+      - mask
+    fgs1_white_npz_required:
+      - flux
+      - time
+      - centroid
+      - jitter
+    airs_bins_npz_required:
+      - flux
+      - time
 
     # Optional sidecar JSON keys
     fgs1_white_sidecar:

@@ -1,6 +1,6 @@
 # configs/data/dev_fast.yaml
 # Developer quick path — smallest safe settings for rapid iteration.
-@package global
+@package _global_
 
 data:
   loader:
