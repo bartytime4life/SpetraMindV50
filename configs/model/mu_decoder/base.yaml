@@ -1,26 +1,69 @@
 # configs/model/mu_decoder/base.yaml
-model:
-  decoders:
-    mu_decoder:
-      enabled: true
-      type: "multi_scale"
-      in_dim: 256
-      hidden_dims: [512, 256]
-      scales:
-        - name: "coarse"
-          bins: 71
-          loss_weight: 0.25
-        - name: "mid"
-          bins: 142
-          loss_weight: 0.25
-        - name: "fine"
-          bins: 283
-          loss_weight: 0.50
-      activation: "gelu"
-      dropout: 0.1
-      skip_fusion: true
-      norm: "layernorm"
-      output_activation: null
-      init: "xavier_uniform"
-      export_attention: false
-      aux_losses: true
+# --------------------------------------------------------------------
+# SpectraMind V50 — Multi-Scale μ Decoder (base config)
+# Outputs mean transmission spectrum μ ∈ ℝ[283] from fused encoder latents.
+# Physics-aware: preserves large-scale shape (smoothness) while resolving narrow molecular bands.
+# TorchScript-safe, Hydra-composable, diagnostics-friendly.
+# --------------------------------------------------------------------
+
+mu_decoder:
+  _target_: spectramind.models.mu_decoder.MultiScaleMuDecoder
+
+  # === Input / fusion ===
+  in_dim: 512              # dim of fused encoder features (FGS1 + AIRS)
+  fusion_type: "concat"    # ["concat", "cross_attend", "gate"]
+  fusion_dropout: 0.1      # dropout before first projection
+  fusion_norm: "layernorm" # ["layernorm", "rmsnorm", "none"]
+
+  # === Multi-scale heads ===
+  n_scales: 3               # coarse, mid, fine
+  scale_factors: [4, 2, 1]  # resolution ratios (relative to 283 bins)
+  hidden_dims: [256, 128, 64]  # per-scale hidden dims
+  kernel_sizes: [9, 5, 3]      # conv kernel per scale (odd, for symmetric padding)
+  dilations: [1, 1, 1]         # conv dilation per scale
+
+  # === Skip connections & upsampling ===
+  skip_type: "residual"       # ["residual", "dense", "none"]
+  upsample_mode: "linear"     # ["linear", "nearest", "conv_transpose"]
+  align_corners: false        # only for upsample_mode="linear"
+
+  # === Output head ===
+  out_dim: 283                 # μ per wavelength bin
+  out_activation: "identity"   # ["identity", "relu", "softplus"] — nonnegativity handled in symbolic loss
+  out_init: "xavier_uniform"   # weight init for final layer
+
+  # === Regularization ===
+  dropout: 0.1
+  weight_norm: false
+  spectral_norm: false
+
+  # === Diagnostics ===
+  export_intermediate: true    # save intermediate scale outputs for SHAP/symbolic overlays
+  export_saliency: true        # save grad×input or attention maps for dashboard
+  save_attention_weights: false
+
+  # === TorchScript / Inference ===
+  scriptable: true             # ensures no Python-only ops
+  amp_autocast: true           # use mixed precision in inference
+  inference_chunk_size: null   # if set, process μ in chunks to save memory
+
+  # === Symbolic Loss Hooks (optional per-scale weighting) ===
+  symbolic_hook:
+    smoothness_weight: 1.0
+    nonnegativity_weight: 1.0
+    molecular_coherence_weight: 1.0
+    seam_continuity_weight: 1.0
+
+  # === Logging ===
+  log_scale_outputs: true      # log per-scale μ histograms to MLflow/W&B
+  log_grad_norm: false
+
+# --------------------------------------------------------------------
+# Notes:
+# - Follows doctrine: coarse→mid→fine skip fusion preserves smooth continuum + line detail [oai_citation:2‡ARCHITECTURE.md](file-service://file-GjRSMLRK6yhV8nqdyx9a9Q).
+# - Symbolic penalties (smoothness, nonnegativity, etc.) not baked in here; they’re applied in symbolic_loss.py [oai_citation:3‡ARCHITECTURE.md](file-service://file-GjRSMLRK6yhV8nqdyx9a9Q).
+# - Fusion config matches encoder fusion block: change fusion_type here if you alter encoder fusion.
+# - out_activation kept as "identity" for full symbolic control; enforce positivity via loss, not hard clip.
+# - scale_factors chosen so coarse ≈ 71 bins, mid ≈ 142, fine = 283 bins.
+# - All params Hydra-overridable: e.g. `+model.mu_decoder.fusion_type=gated` on CLI [oai_citation:4‡Repo and project structure start (North Star).pdf](file-service://file-48QwRwyruT8r78LkzfvJC3).
+# --------------------------------------------------------------------
