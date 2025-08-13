@@ -1,11 +1,73 @@
-# Base Fusion Config — physics-informed latent fusion between FGS1 Mamba and AIRS GAT
-fusion:
-  enabled: true
-  type: concat+mlp           # options: concat+mlp | cross-attend | gate
-  dim: 256                   # latent dimension after fusion
-  dropout: 0.1               # dropout applied after fusion layer
-  layer_norm: true           # whether to apply LayerNorm after fusion
-  residual: true             # whether to add residual connection between encoders and fused output
-  amp: true                  # use automatic mixed precision in fusion
-  export_attention: false    # export attention maps for diagnostics (only for attention-based fusion)
-  export_step_latents: false # export per-step latents for embedding visualizations (UMAP/t-SNE)
+# Common knobs for all fusion variants
+dim: 256
+dropout: 0.05
+norm: layernorm         # layernorm|rms|batch|none
+jit_safe: true
+
+export:
+  taps: false
+  attn_weights: false
+  gate_values: false
+
+shapes:
+  d_fgs1: 256
+  d_airs: 256
+  strict_check: true
+
+mlp:
+  hidden: [512, 256]
+  activation: gelu
+  dropout: 0.05
+  bias: true
+
+attn:
+  layers: 2
+  heads: 4
+  qkv_bias: true
+  dropout: 0.05
+  resid_dropout: 0.05
+  norm: layernorm
+
+gate:
+  from: fgs1           # fgs1|airs|both
+  hidden: 256
+  dropout: 0.05
+
+proj:
+  bias: true
+  per_feature: false
+  init_alpha: 0.5
+  init_beta: 0.5
+
+late:
+  strategy: learned     # learned|fixed|cosine_schedule
+  fixed_gamma: 0.5
+  cosine:
+    min_gamma: 0.3
+    max_gamma: 0.7
+    total_steps: 10000
+
+moe:
+  num_experts: 4
+  expert_hidden: 256
+  activation: silu
+  dropout: 0.05
+  gating:
+    source: concat
+    hidden: 128
+    dropout: 0.05
+
+adapter:
+  bottleneck: 64
+  activation: relu
+  dropout: 0.05
+  bias: true
+
+symbolic_injection:
+  include_molecule_masks: false
+  include_detector_seams: false
+  include_wavelengths: false
+  include_snr_weights: false
+
+attention_bias_init: 0.0
+passthrough: fgs1
