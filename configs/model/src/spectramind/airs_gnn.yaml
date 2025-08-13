@@ -1,0 +1,9 @@
+# Hydra config for AIRS spectral GNN encoder
+_target_: spectramind.models.airs_gat.AIRSGAT
+input_dim: 256
+latent_dim: 256
+n_heads: 4
+n_layers: 3
+dropout: 0.1
+use_edges: true
+edge_dim: 4
