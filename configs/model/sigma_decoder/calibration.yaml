@@ -1,0 +1,47 @@
+# Post-hoc calibration stages tuned for GLL: temperature scaling and COREL spectral conformalization.
+# These operate after raw σ head predictions to improve coverage honesty and final GLL.
+calibration:
+  temperature:
+    enabled: true
+    # Global temperature scalar on σ; optimized on validation fold(s).
+    init_temp: 1.0
+    bounds: [0.25, 4.0]
+    optimizer:
+      name: "adamw"
+      lr: 5.0e-3
+      weight_decay: 0.0
+      steps: 300
+      patience: 50
+    # Separate temps by instrument if desired
+    per_instrument:
+      enabled: true
+      instruments: ["fgs1", "airs"]
+  corel:
+    enabled: true
+    # Graph calibration over wavelength bins (edge features allowed in model).
+    coverage_target:
+      # Conformal target nominally 90% across bins; optionally stratify by instrument.
+      overall: 0.90
+      per_instrument:
+        fgs1: 0.90
+        airs: 0.90
+    split:
+      strategy: "group_kfold"
+      n_splits: 5
+      group_key: "planet_id"
+    optimizer:
+      name: "adamw"
+      lr: 1.0e-3
+      weight_decay: 1.0e-4
+      steps: 1000
+      patience: 100
+    regularizers:
+      # Smoothness on calibration deltas across wavelength (L2 on Δdelta)
+      delta_smooth_l2:
+        weight: 1.0e-3
+      # Limit overall inflation to avoid gaming GLL via huge σ
+      l2_on_sigma_scale:
+        weight: 5.0e-4
+    export:
+      write_json: true
+      path: "outputs/calibration/corel_bin_scales.json"

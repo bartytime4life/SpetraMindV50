@@ -1,0 +1,15 @@
+# Hydra config group selector for sigma decoder
+# Usage:
+#   - Default (flow): no override required
+#   - Quantile head:   +sigma_decoder=quantile
+#   - Ensemble:        +sigma_decoder=ensemble
+# Keys integrate under: model.sigma_decoder
+# Doctrine notes:
+#  - Flow σ head with Softplus is the default (heteroscedastic); quantile optional.
+#  - Post-hoc calibration (temperature, COREL) handled in calibration.yaml (same group).
+#  - See monitor.yaml for coverage targets and diagnostics hooks.
+defaults:
+  - flow
+  - calibration
+  - monitor
+  - export

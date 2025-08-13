@@ -74,3 +74,17 @@ Immutable operator log — append-only. Every CLI invocation, config, and key re
 	•	Artifacts: outputs/submission/submission.csv, outputs/submission/submission_bundle.zip, run_hash_summary_v50.json
 
 ⸻
+
+
+---
+### 2025-08-13T17:40:44Z — sigma_decoder self-test
+- Result: **PASS**
+- Files checked: 7
+  - `_group_.yaml`: `f90d895734f23208cd6154675ca43b7dbdbecafdf8658ddeeb79b9f4776cee13`
+  - `flow.yaml`: `e65e34cdb197f0ba1f2e97c17535f5a428640f33342e7b9c33f00d647c916cb1`
+  - `quantile.yaml`: `879f6bf63d948e52ea114ad04c9d6c4cd58ac391dd9d308a5064e9e79f292dd6`
+  - `ensemble.yaml`: `9b5247a91d8f3b3961301b7b0461996bb8119c09ba096750ff71f48b87179c87`
+  - `calibration.yaml`: `df3961801924674da2c570915b8e0ccb1dee09b045d2381737da41d64a325580`
+  - `monitor.yaml`: `1e16d65ccb8137ca4d94de4d0560374095256d0c915895ed57ac1eacb0bb5164`
+  - `export.yaml`: `10134b4b9b9f42c16e5007423a49fb0ed2614e5638f9546bbb08d1182cb0bdcf`
+- Notes: configs present; keys validated; ensemble weights sane; coverage targets sane.
