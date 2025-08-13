@@ -1,29 +1,26 @@
 # configs/model/mu_decoder/base.yaml
-# Multi-Scale μ Decoder — SpectraMind V50
-# Predicts mean transit depth (μ) across 283 bins from fused latent representation.
-# See ARCHITECTURE.md §5.3 for design rationale.
 model:
   decoders:
     mu_decoder:
       enabled: true
-      type: "multi_scale"      # [multi_scale, simple_mlp]
-      in_dim: 256              # Matches fusion output dimension
-      hidden_dims: [512, 256]  # Progression of hidden layers
-      scales:                  # Multi-scale prediction heads
+      type: "multi_scale"
+      in_dim: 256
+      hidden_dims: [512, 256]
+      scales:
         - name: "coarse"
-          bins: 71             # e.g., 4× downsample
+          bins: 71
           loss_weight: 0.25
         - name: "mid"
-          bins: 142            # 2× downsample
+          bins: 142
           loss_weight: 0.25
         - name: "fine"
-          bins: 283            # Full resolution
+          bins: 283
           loss_weight: 0.50
-      activation: "gelu"       # Non-linear activation
-      dropout: 0.1             # Regularization
-      skip_fusion: true        # Enable coarse→mid→fine skip connections
-      norm: "layernorm"        # [batchnorm, layernorm, rmsnorm]
-      output_activation: null  # No activation — raw μ for GLL + symbolic losses
-      init: "xavier_uniform"   # Weight initialization
-      export_attention: false  # Set true if decoder uses attention for explainability
-      aux_losses: true         # Apply loss at coarse/mid scales (λ from scales list)
+      activation: "gelu"
+      dropout: 0.1
+      skip_fusion: true
+      norm: "layernorm"
+      output_activation: null
+      init: "xavier_uniform"
+      export_attention: false
+      aux_losses: true
