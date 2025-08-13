@@ -1,0 +1,11 @@
+# Hydra default list for SpectraMind model components
+# These defaults compose the core model components for SpectraMind V50.
+
+defaults:
+  - fgs1_mamba
+  - airs_gnn
+  - multi_scale_decoder
+  - flow_uncertainty_head
+  - symbolic_loss
+  - fusion
+  - _self_
