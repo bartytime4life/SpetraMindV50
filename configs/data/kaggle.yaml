@@ -1,7 +1,7 @@
 # configs/data/kaggle.yaml
-# Kaggle runtime guardrails — fewer workers, reduced IO overhead, explicit paths.
+# Kaggle runtime guardrails — fewer workers, reduced IO overhead, explicit container paths.
 
-@package global
+@package _global_
 
 data:
   paths:
@@ -31,7 +31,7 @@ data:
       integrity_check: true
     dvc_track: false
     mmap:
-      enabled: false     # kaggle FS often slower for mmap
+      enabled: false        # Kaggle FS often slower for mmap
     telemetry:
       log_open_close: false
       log_io_stats: true

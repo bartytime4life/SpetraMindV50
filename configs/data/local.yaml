@@ -1,6 +1,6 @@
 # configs/data/local.yaml
 # Workstation override for paths, IO parallelism, and caching.
-@package global
+@package _global_
 
 data:
   paths:
