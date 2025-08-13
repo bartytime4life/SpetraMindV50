@@ -1,5 +1,7 @@
-# Fusion: concat + MLP projection
-type: concat_mlp
-proj_dim: 256
-dropout: 0.1
-activation: gelu
+# @package _global_.model.fusion
+type: concat+mlp
+mlp:
+  hidden: [512, 256]
+  activation: gelu
+  dropout: 0.05
+  bias: true

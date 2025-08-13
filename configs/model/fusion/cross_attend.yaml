@@ -1,13 +1,17 @@
-# Cross-Attention Fusion Config — attends AIRS latents to FGS1 latents
-fusion:
-  enabled: true
-  type: cross-attend
-  dim: 256
-  n_heads: 4
-  dropout: 0.1
-  layer_norm: true
-  residual: true
-  cross_attention_position: post-encoder  # where to insert cross-attention in the model
-  attention_window: null                   # optional: restrict attention to wavelength windows
-  export_attention: true                   # store attention maps for diagnostics/HTML dashboard
-  export_step_latents: true                 # allow latent export for UMAP/t-SNE/FFT overlays
+# @package _global_.model.fusion
+type: cross_attend
+attn:
+  layers: 2
+  heads: 4
+  qkv_bias: true
+  dropout: 0.05
+  resid_dropout: 0.05
+  norm: layernorm
+symbolic_injection:
+  include_molecule_masks: false
+  include_detector_seams: false
+  include_wavelengths: false
+  include_snr_weights: false
+attention_bias_init: 0.0
+export:
+  attn_weights: true

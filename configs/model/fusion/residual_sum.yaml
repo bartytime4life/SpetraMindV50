@@ -1,25 +1,7 @@
-# -----------------------------------------------------------------------------
-# Fusion: Residual Sum with Learned Scales (Ultra-Light)
-# -----------------------------------------------------------------------------
-# h = α * P_fgs1(h_fgs1) + β * P_airs(h_airs), where α, β are learned scalars
-# (or small MLPs) initialized to 0.5 / 0.5. Very fast; good when encoders are strong.
-# -----------------------------------------------------------------------------
-
-defaults:
-  - base
-
-model:
-  fusion:
-    type: "residual_sum"
-    dim: 256
-    scales:
-      learnable: true          # learn alpha/beta
-      init_alpha: 0.5
-      init_beta: 0.5
-      per_feature: false       # if true, α/β are vectors of size dim
-    proj:
-      fgs1_dim: 256
-      airs_dim: 256
-      bias: true
-    norm: "rms"                # lighter than layernorm
-    dropout: 0.0
+# @package _global_.model.fusion
+type: residual_sum
+proj:
+  bias: true
+  per_feature: false
+  init_alpha: 0.5
+  init_beta: 0.5

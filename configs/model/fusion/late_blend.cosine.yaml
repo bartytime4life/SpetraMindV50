@@ -1,0 +1,13 @@
+# @package _global_.model.fusion
+type: late_blend
+late:
+  strategy: cosine_schedule
+  fixed_gamma: 0.5
+  cosine:
+    min_gamma: 0.3
+    max_gamma: 0.7
+    total_steps: 10000
+proj:
+  bias: true
+export:
+  gate_values: true
