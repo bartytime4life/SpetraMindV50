@@ -1,0 +1,57 @@
+# configs/data/calibration.yaml
+# Tuning knobs for each calibration kill‑chain stage.
+
+data:
+  calibration:
+    keep_negatives: true
+
+    adc_reversal:
+      enabled: true
+      bias_key: "bias"
+      gain_key: "gain"
+      fgs1:
+        enabled: true
+      airs:
+        enabled: true
+
+    bad_pixels:
+      enabled: true
+      mask_sources: ["hot", "cold", "nan", "sat", "persistence", "cosmic"]
+      interp_kernel: "spatio_temporal"
+      interp_eps2: 1.0e-6
+      max_frac: 0.10         # fail fast if >10% are masked
+
+    nonlinearity:
+      enabled: true
+      model: "poly"
+      max_order: 3
+      clamp_after: false     # do not clip values post-correction
+
+    dark_subtraction:
+      enabled: true
+      method: "median_frame"
+      scale_by_exptime: true
+
+    flat_field:
+      enabled: true
+      normalize_to_median: true
+      crosshatch_protection: true
+
+    cds_trace:
+      enabled: true
+      fgs1:
+        aperture_radius_px: 8
+        annulus_inner_px: 12
+        annulus_outer_px: 20
+        background_model: "annulus"   # "annulus" | "polynomial"
+      airs:
+        optimal_extraction: true
+        seam_mask_value: 1
+        dispersion_poly_order: 3
+        fringe_correction: false       # reserved; IR fringe removal if needed
+
+  diagnostics:
+    write_stage_logs: true
+    shape_checks: true
+    # Additional per-stage metrics
+    per_stage_metrics: ["mean", "std", "min", "max", "nan_pct"]

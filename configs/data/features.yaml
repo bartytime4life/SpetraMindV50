@@ -1,0 +1,32 @@
+# configs/data/features.yaml
+# Master feature extraction toggles & schemas for persisted npz.
+
+data:
+  features:
+    fgs1_white:
+      compute: true
+      keys:
+        flux: "float32[T]"
+        time: "float64[T]"
+        centroid: "float32[T,2]"
+        jitter: "float32[T,2]"
+      detrend:
+        poly_order: 2
+        highpass_window: 0
+      export_json_sidecar: true
+      sidecar_name: "fgs1_white_meta.json"
+
+    airs_bins:
+      compute: true
+      n_bins: 283
+      keys:
+        flux: "float32[T,283]"
+        time: "float64[T]"
+      align_to_fgs1_phase: true
+      jitter_regression: true
+      export_json_sidecar: true
+      sidecar_name: "airs_bins_meta.json"
+
+  diagnostics:
+    write_feature_logs: true
+    shape_checks: true

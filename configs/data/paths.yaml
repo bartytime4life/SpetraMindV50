@@ -1,0 +1,18 @@
+# configs/data/paths.yaml
+# Centralized path skeleton generator (useful for CLI scaffolding).
+
+data:
+  paths:
+    root: "${oc.env:SM_ROOT,${hydra:runtime.cwd}}"
+    skeleton:
+      - "${data.paths.root}/data/raw/fgs1"
+      - "${data.paths.root}/data/raw/airs_ch0"
+      - "${data.paths.root}/data/raw/meta"
+      - "${data.paths.root}/data/calibrated/fgs1"
+      - "${data.paths.root}/data/calibrated/airs"
+      - "${data.paths.root}/data/calibrated/logs"
+      - "${data.paths.root}/data/features/fgs1_white"
+      - "${data.paths.root}/data/features/airs_bins"
+      - "${data.paths.root}/data/features/meta"
+      - "${data.paths.root}/data/splits"
+      - "${data.paths.root}/schemas"
