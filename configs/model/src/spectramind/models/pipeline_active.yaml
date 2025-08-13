@@ -1,0 +1,9 @@
+# SpectraMind V50 — Active model selection for the pipeline
+spectramind:
+  models:
+    active:
+      encoder_fgs1: "fgs1_mamba"
+      encoder_airs: "airs_gnn"
+      fusion: "fusion"
+      mu_decoder: "multi_scale_decoder"
+      sigma_head: "flow_uncertainty_head"
