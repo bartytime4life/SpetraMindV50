@@ -1,29 +1,151 @@
-# Base data configuration for SpectraMind V50
-# All dataset-related settings inherit from here unless overridden.
+# configs/data/base.yaml
+# Canonical, Hydra-safe data configuration for SpectraMind V50.
 
-defaults:
-  - override hydra/job_logging: disabled
-  - override hydra/hydra_logging: disabled
+data:
+  version: "v50"
+  seed: 1337
 
-# Common data settings
-raw_dir: ${oc.env:DATA_RAW_DIR,"data/raw"}
-calibrated_dir: ${oc.env:DATA_CAL_DIR,"data/calibrated"}
-features_dir: ${oc.env:DATA_FEAT_DIR,"data/features"}
-splits_file: ${oc.env:DATA_SPLITS_FILE,"data/splits/groupkfold.json"}
+  # -------------------- Paths & Layout --------------------
+  # Override these in platform-specific files (e.g., local.yaml, kaggle.yaml).
+  paths:
+    # Project-root-relative default layout; can be absolute.
+    root: "${oc.env:SM_ROOT,${hydra:runtime.cwd}}"
+    raw:
+      fgs1: "${data.paths.root}/data/raw/fgs1"
+      airs: "${data.paths.root}/data/raw/airs_ch0"
+      meta: "${data.paths.root}/data/raw/meta"
+    calibrated:
+      fgs1: "${data.paths.root}/data/calibrated/fgs1"
+      airs: "${data.paths.root}/data/calibrated/airs"
+      logs: "${data.paths.root}/data/calibrated/logs"
+    features:
+      fgs1_white: "${data.paths.root}/data/features/fgs1_white"
+      airs_bins:  "${data.paths.root}/data/features/airs_bins"
+      meta:       "${data.paths.root}/data/features/meta"
+    splits:
+      file: "${data.paths.root}/data/splits/groupkfold.json"
+    schemas:
+      submission:  "${data.paths.root}/schemas/submission.schema.json"
+      planet_meta: "${data.paths.root}/schemas/planet_meta.schema.json"
 
-# File patterns
-fgs1_pattern: "FGS1_signal_*.parquet"
-airs_pattern: "AIRS-CH0_signal_*.parquet"
+  # -------------------- IO & Caching --------------------
+  io:
+    # File formats for persisted tensors and logs.
+    format:
+      frames: "npz"       # npz with {frames, variance, mask}
+      features: "npz"
+      logs: "jsonl"
+    # Compression and chunking strategies.
+    compression:
+      npz: {allow_pickle: false, compress_level: 4}  # zlib level 0–9
+    # Memory-mapped access for big arrays (experimental).
+    mmap:
+      enabled: true
+      mode: "r"          # read-only during training / inference
+    # Caching policy for repeated reuse.
+    cache:
+      calibrated: true
+      features: true
+      integrity_check: true   # verify keys & shapes on load
+    # Optional DVC/lakeFS: when enabled, data artifacts are tracked upstream.
+    dvc_track: false          # set true in CI or heavy runs
+    # Telemetry and audits for IO hotpaths.
+    telemetry:
+      log_open_close: false
+      log_io_stats: true
 
-# Metadata files
-adc_info: "adc_info.csv"
-wavelengths: "wavelengths.csv"
+  # -------------------- Loaders & Batching --------------------
+  loader:
+    num_workers: 8
+    prefetch_factor: 4
+    pin_memory: true
+    persistent_workers: true
+    drop_last: false
+    shuffle:
+      train: true
+      eval: false
+    batch:
+      train: 16
+      eval: 16
+    # Planet-level grouping to avoid leakage; implemented in sampler.
+    group_by_planet: true
 
-# Loader parameters
-fgs1_shape: [135000, 1024]    # flattened 32x32 frames
-airs_shape: [11250, 11392]    # flattened 32x356 frames
-dtype_raw: "uint16"
+  # -------------------- Splits & Folds --------------------
+  splits:
+    strategy: "GroupKFold"
+    n_splits: 5
+    group_key: "planet_id"
+    stratify_by: null
+    seed: "${data.seed}"
 
-# Runtime options
-cache_enabled: true
-cache_backend: "dvc"          # options: [dvc, filesystem, none]
+  # -------------------- Calibration Kill-Chain Flags --------------------
+  # Each step logs JSON entries with timing, parameter deltas, and variance propagation.
+  calibration:
+    keep_negatives: true
+    adc_reversal:
+      enabled: true
+      bias_key: "bias"
+      gain_key: "gain"
+    bad_pixels:
+      enabled: true
+      mask_sources: ["hot", "cold", "nan", "sat", "persistence", "cosmic"]
+      interp_kernel: "spatio_temporal"
+      interp_eps2: 1.0e-6
+    nonlinearity:
+      enabled: true
+      model: "poly"        # "poly" | "lut"
+      max_order: 3
+    dark_subtraction:
+      enabled: true
+      method: "median_frame"   # or "per_pixel_map"
+    flat_field:
+      enabled: true
+      normalize_to_median: true
+    cds_trace:
+      enabled: true
+      fgs1:
+        aperture_radius_px: 8
+        annulus_inner_px: 12
+        annulus_outer_px: 20
+      airs:
+        optimal_extraction: true
+        seam_mask_value: 1
+        dispersion_poly_order: 3
+
+  # -------------------- Feature Cache --------------------
+  features:
+    fgs1_white:
+      compute: true
+      include: [flux, time, centroid, jitter]
+      detrend:
+        poly_order: 2
+        highpass_window: 0       # 0 disables
+    airs_bins:
+      compute: true
+      n_bins: 283
+      align_to_fgs1_phase: true
+      jitter_regression: true    # decorrelate flux using jitter/centroids
+
+  # -------------------- Instrument Settings --------------------
+  instruments:
+    fgs1:
+      channels: 1
+      input_stack: ["flux", "time_norm", "centroid_x", "centroid_y", "jitter_x", "jitter_y"]
+      export_latents: false
+    airs:
+      bins: 283
+      molecule_windows: ["H2O", "CO2", "CH4"]   # symbolic regions
+      include_seam_flags: true
+
+  # -------------------- Diagnostics & Logs --------------------
+  diagnostics:
+    write_stage_logs: true
+    stage_log_path: "${data.paths.calibrated.logs}/calibration_events.jsonl"
+    write_feature_logs: true
+    feature_log_path: "${data.paths.features.meta}/feature_events.jsonl"
+    shape_checks: true
+    # On read, assert keys in persisted npz.
+    required_keys:
+      frames: ["frames", "variance", "mask"]
+      features_fgs1_white: ["flux", "time", "centroid", "jitter"]
+      features_airs_bins: ["flux", "time"]

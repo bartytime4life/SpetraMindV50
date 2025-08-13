@@ -1,0 +1,27 @@
+# configs/data/airs.yaml
+# Instrument-specific settings for AIRS spectral stream (283 bins).
+
+data:
+  instruments:
+    airs:
+      bins: 283
+      molecule_windows: ["H2O", "CO2", "CH4"]
+      include_seam_flags: true
+      # Spectral feature extractor knobs
+      spectral:
+        normalize_flux: true
+        time_norm: "zscore"
+        align_to_fgs1_phase: true
+        jitter_regression:
+          enabled: true
+          model: "ridge"
+          alpha: 1.0e-3
+        continuum_detrend:
+          enabled: true
+          poly_order: 2
+        seam_smoothing:
+          enabled: true
+          window_bins: 3
+        bin_masking:
+          enabled: false
+          mask_indices: []       # e.g., [5, 127, 201]

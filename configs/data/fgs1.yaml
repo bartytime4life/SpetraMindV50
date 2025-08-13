@@ -1,0 +1,27 @@
+# configs/data/fgs1.yaml
+# Instrument-specific settings for FGS1 photometric stream.
+
+data:
+  instruments:
+    fgs1:
+      channels: 1
+      input_stack: ["flux", "time_norm", "centroid_x", "centroid_y", "jitter_x", "jitter_y"]
+      export_latents: false
+      # White-light feature extractor knobs
+      white_light:
+        normalize_flux: true
+        time_norm: "zscore"     # "zscore" | "minmax" | "none"
+        center_time: true
+        cadence_trim:
+          head: 0
+          tail: 0
+        outlier_clip:
+          enabled: true
+          sigma: 6.0
+        gap_filling:
+          enabled: true
+          method: "linear"      # "linear" | "kalman"
+        jitter_regression:
+          enabled: true
+          model: "ridge"
+          alpha: 1.0e-3

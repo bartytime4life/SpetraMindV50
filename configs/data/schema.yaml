@@ -1,13 +1,22 @@
-# Expected dataset schema and integrity checks
+# configs/data/schema.yaml
+# Schema references and required keys used by runtime validators.
 
-train_csv:
-  columns: ["planet_id"] + ["spectrum_%d" % i for i in range(1, 284)]
-  dtype: float32
+data:
+  schema:
+    calibrated_npz_required: ["frames", "variance", "mask"]
+    fgs1_white_npz_required: ["flux", "time", "centroid", "jitter"]
+    airs_bins_npz_required:  ["flux", "time"]
 
-test_csv:
-  columns: ["planet_id"]
-  dtype: str
+    # Optional sidecar JSON keys
+    fgs1_white_sidecar:
+      - detrend_poly_order
+      - outlier_clip_sigma
+      - jitter_reg_alpha
+    airs_bins_sidecar:
+      - continuum_poly_order
+      - seam_smoothing_window
+      - jitter_reg_alpha
 
-sample_submission:
-  columns: ["planet_id"] + ["mu_%d" % i for i in range(283)] + ["sigma_%d" % i for i in range(283)]
-  dtype: float32
+  diagnostics:
+    fail_on_missing_keys: true
+    warn_only_on_extra_keys: true

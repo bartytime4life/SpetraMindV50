@@ -1,0 +1,19 @@
+# configs/data/splits.yaml
+# Explicit split materialization / control knobs (used by CLI).
+
+data:
+  splits:
+    strategy: "GroupKFold"
+    n_splits: 5
+    # If materialize: true, the CLI will write ${data.paths.splits.file}
+    materialize: true
+    file: "${data.paths.splits.file}"
+    group_key: "planet_id"
+    stratify_by: null
+    seed: "${data.seed}"
+    # Optional: fixed fold assignment if provided (overrides GroupKFold).
+    fixed_file: null            # e.g., "${data.paths.root}/data/splits/fixed_folds.csv"
+    # Validation slice override for quick experiments
+    quick_dev:
+      enabled: false
+      max_planets: 50

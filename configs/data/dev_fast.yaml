@@ -1,0 +1,39 @@
+# configs/data/dev_fast.yaml
+# Developer quick path — smallest safe settings for rapid iteration.
+@package global
+
+data:
+  loader:
+    num_workers: 2
+    prefetch_factor: 2
+    batch:
+      train: 8
+      eval: 8
+
+  splits:
+    n_splits: 3
+    quick_dev:
+      enabled: true
+      max_planets: 30
+
+  features:
+    fgs1_white:
+      detrend:
+        poly_order: 1
+        highpass_window: 0
+    airs_bins:
+      align_to_fgs1_phase: true
+      jitter_regression: false
+
+  io:
+    cache:
+      integrity_check: true
+    mmap:
+      enabled: false
+
+  calibration:
+    cds_trace:
+      fgs1:
+        aperture_radius_px: 6
+        annulus_inner_px: 10
+        annulus_outer_px: 16
