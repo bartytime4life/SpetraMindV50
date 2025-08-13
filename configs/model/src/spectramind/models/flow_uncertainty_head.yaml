@@ -1,0 +1,16 @@
+# SpectraMind V50 — σ head (flow / quantile / mlp), Softplus with floor
+# Binds to: src/spectramind/models/flow_uncertainty_head.py::FlowUncertaintyHead
+spectramind:
+  models:
+    flow_uncertainty_head:
+      class: "spectramind.models.flow_uncertainty_head.FlowUncertaintyHead"
+      params:
+        type: "flow"
+        hidden_dim: 256
+        dropout: 0.05
+        activation: "gelu"
+        min_sigma: 1.0e-4
+        softplus: true
+        predict_quantiles: false
+        quantile_monotonicity_loss: true
+        torchscript_safe: true
