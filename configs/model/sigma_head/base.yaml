@@ -1,0 +1,52 @@
+# Canonical Sigma Head defaults (Hydra-safe)
+
+model:
+  decoders:
+    sigma_head:
+      kind: "gaussian"          # ["gaussian","flow","evidential","quantile","ensemble"]
+      in_features: 256
+      hidden_features: 256
+      num_layers: 4
+      dropout: 0.10
+      activation: "gelu"        # ["relu","gelu","silu"]
+      init: "kaiming_uniform"   # ["kaiming_uniform","xavier_uniform","lecun_normal"]
+      output:
+        min_sigma: 1.0e-05
+        max_sigma: 1.0
+        clamp_strategy: "hard"  # ["none","hard","softplus"]
+      fusion:
+        enable_attention_fuse: false
+        attention_heads: 4
+        attention_dropout: 0.10
+        symbolic_overlay_weight: 0.0   # 0.0 = off; 0.05-0.2 typical
+        export_attention_weights: false
+      logging:
+        export_sigma_hist: true
+        export_calibration_plots: true
+        export_per_bin_csv: true
+      calibration:
+        enable: false
+        method: "none"          # ["none","temperature","corel","conformal"]
+        temperature:
+          init_t: 1.0
+          learn_t: false
+        corel:
+          enabled: false
+          ckpt: null
+          binwise: true
+          graph:
+            use_edge_features: true
+            edge_types: ["distance","molecule","detector_region"]
+          training:
+            epochs: 10
+            lr: 1.0e-3
+            weight_decay: 1.0e-4
+            batch_size: 64
+            coverage_target: 0.6827
+            coverage_tolerance: 0.01
+        conformal:
+          enabled: false
+          mode: "binwise"       # ["binwise","molecule_grouped"]
+          quantile: 0.6827
+          calibration_split: "val"
+          jitter_epsilon: 1.0e-6

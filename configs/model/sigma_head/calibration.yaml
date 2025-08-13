@@ -1,0 +1,31 @@
+# Uncertainty calibration controls (compose after a head)
+
+model:
+  decoders:
+    sigma_head:
+      calibration:
+        enable: true
+        method: "corel"            # ["none","temperature","corel","conformal"]
+        temperature:
+          init_t: 1.0
+          learn_t: true
+        corel:
+          enabled: true
+          ckpt: null
+          binwise: true
+          graph:
+            use_edge_features: true
+            edge_types: ["distance","molecule","detector_region"]
+          training:
+            epochs: 10
+            lr: 1.0e-3
+            weight_decay: 1.0e-4
+            batch_size: 64
+            coverage_target: 0.6827
+            coverage_tolerance: 0.01
+        conformal:
+          enabled: false
+          mode: "binwise"          # ["binwise","molecule_grouped"]
+          quantile: 0.6827
+          calibration_split: "val"
+          jitter_epsilon: 1.0e-6

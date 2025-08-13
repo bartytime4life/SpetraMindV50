@@ -1,5 +1,4 @@
-# Flow-based σ head with attention × symbolic fusion
-# Expects FlowUncertaintyHead in codebase with MAF/RQ-Coupling support.
+# Leaderboard-oriented σ config: stable, well-calibrated, mild fusion
 
 model:
   decoders:
@@ -13,17 +12,17 @@ model:
       init: "xavier_uniform"
       output:
         min_sigma: 1.0e-05
-        max_sigma: 0.8
+        max_sigma: 0.7
         clamp_strategy: "softplus"
       fusion:
         enable_attention_fuse: true
         attention_heads: 4
         attention_dropout: 0.10
-        export_attention_weights: true
-        symbolic_overlay_weight: 0.12   # inflates σ where symbolic flags fire
+        export_attention_weights: false
+        symbolic_overlay_weight: 0.10
       flow:
-        type: "maf"              # ["maf","rq_coupling"]
-        num_transforms: 6
+        type: "maf"
+        num_transforms: 5
         context_dim: 256
         hidden_features: 256
         num_blocks_per_transform: 2
@@ -31,16 +30,16 @@ model:
         batch_norm: true
       calibration:
         enable: true
-        method: "corel"         # GNN-COREL binwise calibration after flow
+        method: "corel"
         corel:
           enabled: true
-          ckpt: null            # path resolved at runtime if provided
+          ckpt: null
           binwise: true
           graph:
             use_edge_features: true
             edge_types: ["distance","molecule","detector_region"]
           training:
-            epochs: 12
+            epochs: 10
             lr: 1.0e-3
             weight_decay: 1.0e-4
             batch_size: 64

@@ -1,0 +1,25 @@
+# Heteroscedastic Gaussian σ head (fast, strong baseline)
+
+model:
+  decoders:
+    sigma_head:
+      kind: "gaussian"
+      in_features: 256
+      hidden_features: 256
+      num_layers: 3
+      dropout: 0.05
+      activation: "silu"
+      init: "kaiming_uniform"
+      output:
+        min_sigma: 1.0e-05
+        max_sigma: 0.5
+        clamp_strategy: "softplus"   # smooth, avoids zero
+      fusion:
+        enable_attention_fuse: false
+        symbolic_overlay_weight: 0.0
+      calibration:
+        enable: true
+        method: "temperature"
+        temperature:
+          init_t: 1.0
+          learn_t: true
