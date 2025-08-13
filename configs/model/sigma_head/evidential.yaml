@@ -1,0 +1,39 @@
+# Evidential uncertainty (Normal-Inverse-Gamma)
+# Produces (mu, v, alpha, beta) with closed-form aleatoric/epistemic proxies.
+
+model:
+  decoders:
+    sigma_head:
+      kind: "evidential"
+      in_features: 256
+      hidden_features: 256
+      num_layers: 4
+      dropout: 0.10
+      activation: "gelu"
+      init: "kaiming_uniform"
+      evidential:
+        min_alpha: 1.0 + 1.0e-3
+        min_v: 1.0e-3
+        min_beta: 1.0e-6
+        prior_strength: 1.0
+        regularizer:
+          enable: true
+          lambda_evi: 1.0e-3   # evidential penalty weight
+      output:
+        min_sigma: 1.0e-05
+        max_sigma: 0.9
+        clamp_strategy: "softplus"
+      fusion:
+        enable_attention_fuse: true
+        attention_heads: 2
+        attention_dropout: 0.10
+        symbolic_overlay_weight: 0.08
+      calibration:
+        enable: true
+        method: "conformal"
+        conformal:
+          enabled: true
+          mode: "binwise"
+          quantile: 0.6827
+          calibration_split: "val"
+          jitter_epsilon: 1.0e-6
