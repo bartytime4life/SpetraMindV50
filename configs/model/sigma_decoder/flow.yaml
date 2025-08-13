@@ -1,0 +1,29 @@
+# Flow σ head (default): heteroscedastic uncertainty with Softplus + σ_min floors.
+# Architecture-only knobs (no code edits required). TorchScript-safe by design in model code.
+model:
+  sigma_decoder:
+    name: flow
+    enabled: true
+    # Head MLP dimensions (post-fusion features -> 283 bins)
+    hidden_dims: [512, 256]
+    dropout: 0.05
+    activation: "gelu"         # ["relu","gelu","silu","tanh"]
+    norm: "layernorm"          # ["none","layernorm","rmsnorm"]
+    # Softplus temperature for σ; numerically stable, strictly positive.
+    softplus_beta: 1.0
+    # Minimum σ floors by instrument (ppm); applied after unit normalization inside code.
+    sigma_min_ppm:
+      fgs1: 1.0
+      airs: 10.0
+    # Optional temperature scalar applied to σ post-forward (pre-calibration stage).
+    pre_calibration_temp: 1.0
+    # Optional log-sigma parameterization toggle in the head (for numeric stability).
+    param_log_sigma: false
+    # Regularizers on σ predictions (stability, smoothness across wavelength)
+    regularizers:
+      # L2 penalty on (Δσ) across wavelength bins for AIRS; helps avoid jagged σ.
+      sigma_smooth_l2:
+        weight: 1.0e-4
+      # Clamp guard in model forward (hard clamp applied outside loss), for safety:
+      clamp_min_ppm: 0.5
+      clamp_max_ppm: 5000.0

@@ -1,0 +1,17 @@
+# Monitoring specification for σ calibration quality and scientific diagnostics.
+monitor:
+  coverage:
+    enabled: true
+    targets: [0.50, 0.80, 0.90, 0.95]
+    tolerance: 0.02
+    per_instrument: true
+    per_band_windows:
+      enabled: true
+      windows: ["H2O", "CO2", "CH4"]
+  plots:
+    enabled: true
+    kinds: ["per_bin_coverage", "sigma_vs_residual", "z_hist", "quantile_calibration"]
+    out_dir: "outputs/diagnostics/calibration"
+  logging:
+    v50_debug_log: true
+    events_jsonl: true
