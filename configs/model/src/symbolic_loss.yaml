@@ -1,0 +1,15 @@
+# Hydra config for symbolic loss
+_target_: spectramind.models.symbolic_loss.SymbolicLoss
+lambda_sm: 0.1
+lambda_nn: 0.05
+lambda_coh: 0.05
+lambda_seam: 0.01
+lambda_ratio: 0.02
+lambda_qm: 0.02
+enabled_rules:
+  - smoothness
+  - nonnegativity
+  - molecular_coherence
+  - seam_continuity
+  - ratio_constraints
+  - quantile_monotonicity
