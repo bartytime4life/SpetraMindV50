@@ -1,69 +1,67 @@
-# configs/model/mu_decoder/base.yaml
-# --------------------------------------------------------------------
-# SpectraMind V50 — Multi-Scale μ Decoder (base config)
-# Outputs mean transmission spectrum μ ∈ ℝ[283] from fused encoder latents.
-# Physics-aware: preserves large-scale shape (smoothness) while resolving narrow molecular bands.
-# TorchScript-safe, Hydra-composable, diagnostics-friendly.
-# --------------------------------------------------------------------
+# Canonical μ (mean) decoder — SpectraMind V50
+#
+# Hydra path: model/mu_decoder/base
+#
+# Compose via: defaults: [ model/mu_decoder@model.decoders.mu_decoder: base ]
 
-mu_decoder:
-  _target_: spectramind.models.mu_decoder.MultiScaleMuDecoder
+model:
+  decoders:
+    mu_decoder:
+      enabled: true
 
-  # === Input / fusion ===
-  in_dim: 512              # dim of fused encoder features (FGS1 + AIRS)
-  fusion_type: "concat"    # ["concat", "cross_attend", "gate"]
-  fusion_dropout: 0.1      # dropout before first projection
-  fusion_norm: "layernorm" # ["layernorm", "rmsnorm", "none"]
+      # --- I/O & shape -------------------------------------------------------------------------
+      # in_dim should match the fused latent dimension coming out of encoders.
+      # For SpectraMind V50 defaults, 256 or 384 are common; keep in sync with encoder projections.
+      in_dim: 256
+      out_bins: 283
 
-  # === Multi-scale heads ===
-  n_scales: 3               # coarse, mid, fine
-  scale_factors: [4, 2, 1]  # resolution ratios (relative to 283 bins)
-  hidden_dims: [256, 128, 64]  # per-scale hidden dims
-  kernel_sizes: [9, 5, 3]      # conv kernel per scale (odd, for symmetric padding)
-  dilations: [1, 1, 1]         # conv dilation per scale
+      # --- MLP body -----------------------------------------------------------------------------
+      # A robust, shallow-to-medium MLP typically balances accuracy and runtime on Kaggle GPUs.
+      hidden:
+        dims: [512, 512]
+        activation: "silu"        # ["relu", "gelu", "silu", "mish"]
+        dropout: 0.10
+        normalization: "layernorm" # ["none", "layernorm", "rmsnorm"]
+        residual: true
 
-  # === Skip connections & upsampling ===
-  skip_type: "residual"       # ["residual", "dense", "none"]
-  upsample_mode: "linear"     # ["linear", "nearest", "conv_transpose"]
-  align_corners: false        # only for upsample_mode="linear"
+      # --- Output head --------------------------------------------------------------------------
+      # Keep linear output for μ; clamp in training loop if needed (e.g., non-negativity).
+      head:
+        type: "linear"            # ["linear"]
+        final_activation: "none"  # ["none"]  (do not use softplus here—use symbolic/loss for constraints)
+        init: "xavier_uniform"    # ["xavier_uniform", "kaiming_uniform"]
 
-  # === Output head ===
-  out_dim: 283                 # μ per wavelength bin
-  out_activation: "identity"   # ["identity", "relu", "softplus"] — nonnegativity handled in symbolic loss
-  out_init: "xavier_uniform"   # weight init for final layer
+      # --- Loss pack (μ-specific) ---------------------------------------------------------------
+      loss:
+        type: "gll"               # Gaussian log-likelihood with σ from separate head
+        weight: 1.0
 
-  # === Regularization ===
-  dropout: 0.1
-  weight_norm: false
-  spectral_norm: false
+        # Physical/symbolic auxiliaries — tune per-ablation:
+        smooth:
+          l2_weight: 0.010        # L2(∇μ) in wavelength space
+          window: 5               # smoothing window (bins) for finite-diff approx or SavGol in code
+        fft_smooth:
+          weight: 0.000           # frequency-domain smoothness regularizer
+          max_freq: null          # optional low-pass (Hz in normalized bin space); null = auto
+        asymmetry:
+          weight: 0.000           # penalize unphysical asymmetric patterns if enabled in code
+        nonneg:
+          weight: 0.000           # encourage μ >= 0 without hard clamp (symbolic-friendly)
 
-  # === Diagnostics ===
-  export_intermediate: true    # save intermediate scale outputs for SHAP/symbolic overlays
-  export_saliency: true        # save grad×input or attention maps for dashboard
-  save_attention_weights: false
+      # --- Multiscale input fusion (disabled in base) -------------------------------------------
+      multiscale:
+        enabled: false
+        # If later enabled, see multiscale.yaml for full knobs.
 
-  # === TorchScript / Inference ===
-  scriptable: true             # ensures no Python-only ops
-  amp_autocast: true           # use mixed precision in inference
-  inference_chunk_size: null   # if set, process μ in chunks to save memory
+      # --- MoE routing (disabled in base) -------------------------------------------------------
+      moe:
+        enabled: false
+        # If later enabled, see moe.yaml for full knobs.
 
-  # === Symbolic Loss Hooks (optional per-scale weighting) ===
-  symbolic_hook:
-    smoothness_weight: 1.0
-    nonnegativity_weight: 1.0
-    molecular_coherence_weight: 1.0
-    seam_continuity_weight: 1.0
-
-  # === Logging ===
-  log_scale_outputs: true      # log per-scale μ histograms to MLflow/W&B
-  log_grad_norm: false
-
-# --------------------------------------------------------------------
-# Notes:
-# - Follows doctrine: coarse→mid→fine skip fusion preserves smooth continuum + line detail [oai_citation:2‡ARCHITECTURE.md](file-service://file-GjRSMLRK6yhV8nqdyx9a9Q).
-# - Symbolic penalties (smoothness, nonnegativity, etc.) not baked in here; they’re applied in symbolic_loss.py [oai_citation:3‡ARCHITECTURE.md](file-service://file-GjRSMLRK6yhV8nqdyx9a9Q).
-# - Fusion config matches encoder fusion block: change fusion_type here if you alter encoder fusion.
-# - out_activation kept as "identity" for full symbolic control; enforce positivity via loss, not hard clip.
-# - scale_factors chosen so coarse ≈ 71 bins, mid ≈ 142, fine = 283 bins.
-# - All params Hydra-overridable: e.g. `+model.mu_decoder.fusion_type=gated` on CLI [oai_citation:4‡Repo and project structure start (North Star).pdf](file-service://file-48QwRwyruT8r78LkzfvJC3).
-# --------------------------------------------------------------------
+      # --- Export & logging ---------------------------------------------------------------------
+      export:
+        save_intermediate: false
+        save_dir: "artifacts/mu_decoder"
+      log:
+        level: "INFO"             # ["DEBUG","INFO","WARNING","ERROR"]
+        include_shapes: true
