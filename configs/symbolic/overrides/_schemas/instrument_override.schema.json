@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Instrument Override Bundle",
+  "description": "Hydra-friendly override bundle that selects an instrument and tweaks runtime/physics knobs.",
+  "type": "object",
+  "properties": {
+    "defaults": {
+      "type": "array",
+      "items": { "type": "object" },
+      "minItems": 1
+    },
+    "run": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "string", "enum": ["transit", "eclipse", "phasecurve", "guiding"] },
+        "tag": { "type": "string" }
+      },
+      "required": ["mode"]
+    },
+    "instrument_tweaks": {
+      "type": "object",
+      "properties": {
+        "cadence_s": { "type": "number" },
+        "extra_white_noise_ppm": { "type": "number" },
+        "jitter_scale": { "type": "number" },
+        "downsample_R_factor": { "type": "number", "minimum": 0.1, "maximum": 1.0 },
+        "bin_time_s": { "type": "number" }
+      }
+    },
+    "benchmark": {
+      "type": "object",
+      "properties": {
+        "target_mag": { "type": "number" },
+        "exposure_s": { "type": "number" }
+      }
+    },
+    "stress": {
+      "type": "object",
+      "properties": {
+        "add_jitter_arcsec": { "type": "number" },
+        "telemetry_dropout_frac": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "thermal_drift_arcsec": { "type": "number" }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "properties": {
+        "sigma_floor": { "type": "number" },
+        "temperature_scaling": { "type": "number" }
+      }
+    },
+    "qa": {
+      "type": "object",
+      "properties": {
+        "enable_linearity_test": { "type": "boolean" },
+        "enable_dark_subtraction_test": { "type": "boolean" },
+        "enable_wave_regression": { "type": "boolean" }
+      }
+    }
+  },
+  "required": ["defaults", "run"]
+}

@@ -1,0 +1,29 @@
+name: "JWST NIRSpec (bench)"
+telescope:
+  aperture_m: 6.5
+  f_number: 20.0
+  optical_efficiency: 0.35
+spectral_range_um: [0.7, 5.3]
+channels:
+  - name: PRISM
+    range_um: [0.7, 5.3]
+    resolving_power: 100
+    dispersion: prism
+detectors:
+  type: "HgCdTe"
+  pixel_scale_arcsec: 0.1
+  read_noise_e: 6.0
+  dark_current_e_s: 0.005
+  saturation_ke: 80.0
+modes: ["transit", "eclipse"]
+pointing:
+  rms_jitter_arcsec: 0.007
+  long_drift_arcsec: 0.01
+photometry:
+  precision_ppm_1hr: 15
+  cadence_s: 5
+  throughput_curve: "cal/throughputs/jwst/nirspec_throughput.csv"
+calibration:
+  flat: "cal/flat/jwst/nirspec_flat_v0.fits"
+  dark: "cal/dark/jwst/nirspec_dark_v0.fits"
+  wavelength: "cal/wave/jwst/nirspec_wave_v0.json"

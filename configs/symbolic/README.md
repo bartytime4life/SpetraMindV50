@@ -1,10 +1,9 @@
-# Symbolic Configuration (SpectraMind V50)
+# symbolic configs
 
-This subtree contains symbolic configuration for physics-/logic-aware constraints used across the SpectraMind V50 pipeline.
+Symbolic, stable entry points for pipeline configuration. Treat `index.yaml` as the public API.
+Modules under `instruments/` define concrete instrument profiles validated by `instrument.schema.yaml`.
 
-- `rules/` (if present): Canonical symbolic rule packs (base truths; usually do not mutate frequently)
-- `molecules/`: Molecule-centric metadata/configs and region mappings
-- `overrides/`: Contextual override layers (competition, events, molecules) that are composed over the canonical packs
-- `profiles/` (if present): Profile definitions selecting subsets/weights of rules for different operating modes
-
-> Policy: **immutable base + composable overrides**. Always update overrides first for scenario-specific needs.
+Usage (Hydra-style):
+- Select via alias: `python -m spectramind +instrument=@ariel_airs`
+- Or direct path: `python -m spectramind +instrument=instruments/ariel/airs`
+- Apply an override bundle: `python -m spectramind -c configs/symbolic/overrides/instruments/dev-ariel`

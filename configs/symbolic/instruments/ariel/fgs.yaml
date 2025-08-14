@@ -1,0 +1,33 @@
+name: "ARIEL FGS (proto)"
+telescope:
+  aperture_m: 1.0
+  f_number: 13.0
+  optical_efficiency: 0.35
+spectral_range_um: [0.5, 1.1]
+channels:
+  - name: VIS
+    range_um: [0.5, 0.8]
+    resolving_power: 10
+    dispersion: photometer
+  - name: NIR
+    range_um: [0.8, 1.1]
+    resolving_power: 10
+    dispersion: photometer
+detectors:
+  type: "CCD"
+  pixel_scale_arcsec: 0.2
+  read_noise_e: 4.0
+  dark_current_e_s: 0.001
+  saturation_ke: 150.0
+modes: ["guiding", "photometry"]
+pointing:
+  rms_jitter_arcsec: 0.18
+  long_drift_arcsec: 0.07
+photometry:
+  precision_ppm_1hr: 50
+  cadence_s: 1
+  throughput_curve: "cal/throughputs/ariel/fgs_throughput.csv"
+calibration:
+  flat: "cal/flat/ariel/fgs_flat_v0.fits"
+  dark: "cal/dark/ariel/fgs_dark_v0.fits"
+  wavelength: "cal/wave/ariel/fgs_wave_v0.json"

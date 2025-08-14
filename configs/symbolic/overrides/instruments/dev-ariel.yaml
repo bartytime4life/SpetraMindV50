@@ -1,0 +1,11 @@
+# Development-friendly ARIEL AIRS profile for transit spectroscopy
+defaults:
+  - override /instrument: instruments/ariel/airs
+
+run:
+  mode: "transit"
+  tag: "dev-ariel"
+instrument_tweaks:
+  cadence_s: 8
+  extra_white_noise_ppm: 10
+  jitter_scale: 1.0

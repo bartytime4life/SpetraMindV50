@@ -1,0 +1,29 @@
+name: Validate Symbolic Configs
+
+on:
+  push:
+    paths:
+      - 'configs/symbolic/**'
+      - 'tools/validate_configs.py'
+  pull_request:
+    paths:
+      - 'configs/symbolic/**'
+      - 'tools/validate_configs.py'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema pyyaml
+      - name: Validate
+        run: |
+          python tools/validate_configs.py

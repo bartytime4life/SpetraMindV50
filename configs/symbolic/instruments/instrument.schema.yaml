@@ -1,0 +1,66 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: InstrumentProfile
+type: object
+required: [name, telescope, spectral_range_um, channels, detectors, modes, pointing, photometry, calibration]
+properties:
+  name: {type: string}
+  telescope:
+    type: object
+    required: [aperture_m, f_number, optical_efficiency]
+    properties:
+      aperture_m: {type: number}
+      f_number: {type: number}
+      optical_efficiency: {type: number, minimum: 0, maximum: 1}
+  spectral_range_um:
+    type: array
+    items: {type: number}
+    minItems: 2
+    maxItems: 2
+  channels:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      required: [name, range_um, resolving_power, dispersion]
+      properties:
+        name: {type: string}
+        range_um:
+          type: array
+          items: {type: number}
+          minItems: 2
+          maxItems: 2
+        resolving_power: {type: number}
+        dispersion: {type: string}
+  detectors:
+    type: object
+    required: [type, pixel_scale_arcsec, read_noise_e, dark_current_e_s, saturation_ke]
+    properties:
+      type: {type: string}
+      pixel_scale_arcsec: {type: number}
+      read_noise_e: {type: number}
+      dark_current_e_s: {type: number}
+      saturation_ke: {type: number}
+  modes:
+    type: array
+    items: {type: string}
+  pointing:
+    type: object
+    required: [rms_jitter_arcsec, long_drift_arcsec]
+    properties:
+      rms_jitter_arcsec: {type: number}
+      long_drift_arcsec: {type: number}
+  photometry:
+    type: object
+    required: [precision_ppm_1hr, cadence_s, throughput_curve]
+    properties:
+      precision_ppm_1hr: {type: number}
+      cadence_s: {type: number}
+      throughput_curve: {type: string}
+  calibration:
+    type: object
+    required: [flat, dark, wavelength]
+    properties:
+      flat: {type: string}
+      dark: {type: string}
+      wavelength: {type: string}
+additionalProperties: false

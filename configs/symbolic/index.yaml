@@ -1,0 +1,7 @@
+# Central alias map for symbolic components (Hydra-safe)
+aliases:
+  # Instrument profiles
+  ariel_airs: instruments/ariel/airs
+  ariel_fgs: instruments/ariel/fgs
+  jwst_nirspec: instruments/jwst/nirspec
+  sim_ideal: instruments/simulated/ideal

@@ -1,0 +1,11 @@
+# Simulate slow thermal drift (e.g., long observation drift)
+defaults:
+  - override /instrument: instruments/ariel/airs
+
+run:
+  mode: "phasecurve"
+  tag: "thermal-drift"
+stress:
+  thermal_drift_arcsec: 0.05
+instrument_tweaks:
+  bin_time_s: 30
