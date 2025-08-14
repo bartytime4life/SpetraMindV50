@@ -1,0 +1,32 @@
+# configs/symbolic/overrides/competition/profiles.yaml
+
+# Symbolic profile catalog for molecule bands / detector regions / priors.
+
+symbolic:
+  profiles:
+    default:
+      description: "Baseline symbolic profile for most targets"
+      molecules: ["H2O", "CO2", "CH4", "CO"]
+      detector_regions:
+        - name: "AIRS_low"
+          bins: [0, 140]
+        - name: "AIRS_mid"
+          bins: [140, 220]
+        - name: "AIRS_high"
+          bins: [220, 283]
+      priors:
+        scale_height_snr_weight: 1.0
+        limb_darkening_weight: 0.3
+        ood_guard_weight: 0.2
+    methane_rich:
+      description: "Assumes stronger CH4 absorption likelihood"
+      molecules: ["H2O", "CO2", "CH4", "CO"]
+      priors:
+        methane_band_boost: 1.3
+        co2_band_penalty: 0.9
+    hazy:
+      description: "Haze continuum likely; smoothness emphasized"
+      molecules: ["H2O", "CO2", "CH4", "CO"]
+      priors:
+        smoothness_emphasis: 1.4
+        highfreq_suppression: 1.2

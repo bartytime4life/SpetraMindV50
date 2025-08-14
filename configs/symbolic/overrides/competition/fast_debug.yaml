@@ -1,0 +1,38 @@
+# configs/symbolic/overrides/competition/fast_debug.yaml
+
+# Fast debug overlay: tiny slices, softer symbolic weights, minimal logging noise.
+
+defaults:
+  - rules_minimal
+  - profiles
+  - uncertainty
+  - calibration
+  - corel
+  - runtime
+
+symbolic:
+  loss:
+    weights:
+      smoothness_l2: 0.15
+      nonnegativity: 0.08
+      fft_asymmetry: 0.03
+      photonic_alignment: 0.08
+      molecule_coherence: 0.03
+
+runtime:
+  logging:
+    level: "INFO"
+    jsonl_events: "runs/events_fast.jsonl"
+    rotate_file:
+      path: "runs/logs/fast_debug.log"
+      max_megabytes: 10
+      backups: 2
+  artifacts:
+    keep_top_n_submissions: 2
+    max_dashboard_html: 3
+
+calibration:
+  temperature_scaling:
+    enabled: true
+  corel:
+    enabled: false
