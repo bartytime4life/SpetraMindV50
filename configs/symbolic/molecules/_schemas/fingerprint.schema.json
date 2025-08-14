@@ -1,0 +1,47 @@
+{
+"$schema": "https://json-schema.org/draft/2020-12/schema",
+"$id": "fingerprint.schema.json",
+"title": "Molecular Fingerprint Schema",
+"type": "object",
+"additionalProperties": false,
+"required": ["name", "mode", "template_wavelength_um", "template_strength"],
+"properties": {
+ "name": {
+   "type": "string",
+   "minLength": 1,
+   "description": "Fingerprint/template label, e.g., 'H2O_wide_1p4um'"
+ },
+ "mode": {
+   "type": "string",
+   "enum": ["lines", "envelope", "impulse", "custom"],
+   "description": "Template construction mode (line list, smoothed envelope, impulses, etc.)"
+ },
+ "template_wavelength_um": {
+   "type": "array",
+   "items": { "type": "number", "exclusiveMinimum": 0.0 },
+   "minItems": 1,
+   "description": "Wavelength sample points (μm) for the template"
+ },
+ "template_strength": {
+   "type": "array",
+   "items": { "type": "number" },
+   "minItems": 1,
+   "description": "Normalized strength values aligned with template_wavelength_um"
+ },
+ "source": {
+   "type": "string",
+   "description": "Reference (e.g., 'HITRAN2016', 'ExoMol-2020', or internal citation)"
+ },
+ "temperature_K": {
+   "type": "number",
+   "minimum": 0.0,
+   "description": "Reference temperature for this fingerprint"
+ },
+ "pressure_bar": {
+   "type": "number",
+   "minimum": 0.0,
+   "description": "Reference pressure for this fingerprint"
+ },
+ "notes": { "type": "string" }
+}
+}

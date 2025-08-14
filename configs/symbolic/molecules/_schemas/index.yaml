@@ -1,0 +1,19 @@
+# Hydra index for symbolic molecule configurations
+index:
+# Map molecule identifiers to config snippets or file basenames (without extension if desired)
+# These IDs should match "species_id" fields inside molecule payloads.
+# Example entries; extend to your full set:
+H2O:
+ file: "H2O"                  # expects configs/symbolic/molecules/H2O.yaml (or in _examples for demo)
+ enabled: true
+ tags: ["volatile", "baseline", "water"]
+CH4:
+ file: "CH4"
+ enabled: true
+ tags: ["hydrocarbon", "methane"]
+
+# Default policy for loading molecules (used by loaders if not overridden)
+policy:
+prefer_repo_dir: "configs/symbolic/molecules"
+allow_examples: true
+fail_on_missing: true

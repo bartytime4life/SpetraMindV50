@@ -1,0 +1,73 @@
+# Example molecule config: Water (H2O)
+species_id: "H2O"
+name: "Water"
+formula: "H2O"
+charge: 0
+is_radiatively_active: true
+
+wavelength_um:
+min: 0.5
+max: 7.8
+
+default_binning:
+n_bins: 283
+
+spectral_regions:
+- name: "H2O_1p4um_band"
+ wavelength_um: { min: 1.30, max: 1.55 }
+ band_center_um: 1.40
+ band_width_um: 0.10
+ priority: 10
+- name: "H2O_1p9um_band"
+ wavelength_um: { min: 1.80, max: 2.05 }
+ band_center_um: 1.92
+ band_width_um: 0.12
+ priority: 9
+
+fingerprints:
+- name: "H2O_envelope_1p3_2p1"
+ mode: "envelope"
+ template_wavelength_um: [1.30, 1.35, 1.40, 1.45, 1.50, 1.55, 1.80, 1.85, 1.90, 1.95, 2.00, 2.05]
+ template_strength:       [0.05, 0.20, 0.65, 0.80, 0.50, 0.10, 0.05, 0.30, 0.75, 0.85, 0.55, 0.15]
+ source: "Composite envelope (curated)"
+ temperature_K: 1000
+ pressure_bar: 0.01
+
+rules:
+- rule_id: "H2O.presence.1p4um"
+ type: "presence_band"
+ severity: "moderate"
+ applies_to: { species_id: "H2O", region_names: ["H2O_1p4um_band"] }
+ params:
+   min_depth: 0.01       # minimum expected absorption depth
+   min_span_um: 0.04
+ notes: "Water band near 1.4μm generally present in warm exoplanet atmospheres."
+- rule_id: "H2O.template_corr.1p3_2p1"
+ type: "template_correlation"
+ severity: "weak"
+ applies_to: { species_id: "H2O", region_names: ["H2O_1p4um_band", "H2O_1p9um_band"] }
+ params:
+   fingerprint: "H2O_envelope_1p3_2p1"
+   min_corr: 0.25
+- rule_id: "H2O.smoothness.local"
+ type: "smoothness_window"
+ severity: "weak"
+ applies_to: { species_id: "H2O", region_names: ["H2O_1p4um_band", "H2O_1p9um_band"] }
+ params:
+   wavelength_um: { min: 1.30, max: 2.05 }
+   l2_lambda: 0.05
+   fft_lambda: 0.00
+- rule_id: "H2O.nonnegativity.core"
+ type: "nonnegativity_window"
+ severity: "hard"
+ applies_to: { species_id: "H2O", region_names: ["H2O_1p4um_band", "H2O_1p9um_band"] }
+ params:
+   wavelength_um: { min: 1.30, max: 2.05 }
+   baseline: 0.0
+
+metadata:
+sources:
+ - "General exoplanet spectroscopy context; astrophysical spectroscopy practice"
+notes: "Starter example for schema validation and symbolic rule wiring."
+version: "1.0.0"
+updated: "2025-08-14"
