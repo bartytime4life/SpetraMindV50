@@ -1,0 +1,6 @@
+# Lightweight bridge so instrument overrides can consume the current symbolic profile key.
+
+symbolic:
+  profiles:
+    # At runtime, Hydra will resolve this to the active profile key from profiles/index.yaml or auto selector.
+    current_ref: "${symbolic.profiles.active}"

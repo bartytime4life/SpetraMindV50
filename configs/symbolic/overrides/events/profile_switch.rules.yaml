@@ -1,0 +1,22 @@
+# Event-driven profile switching rules (consumed by the guardrails/diagnostics CLI).
+
+events:
+  profile_switch:
+    enabled: true
+    rules:
+      - name: "High-entropy detection"
+        when:
+          any:
+            - { key: "diagnostics.entropy", op: ">", value: 1.5 }
+            - { key: "diagnostics.zscore_max", op: ">", value: 3.5 }
+        action:
+          set_profile: "ood_guardrails"
+      - name: "AIRS low-SNR fallback"
+        when:
+          all:
+            - { key: "instrument", op: "==", value: "AIRS" }
+            - { key: "airs_snr", op: "<", value: 4.0 }
+        action:
+          set_profile: "ood_guardrails"
+    on_no_match:
+      keep: true

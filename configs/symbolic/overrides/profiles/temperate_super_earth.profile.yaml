@@ -1,0 +1,36 @@
+# Temperate Super-Earth profile: conservative molecule priors, higher smoothness, robust σ calibration.
+
+symbolic:
+  loss:
+    weights:
+      smooth_l2_mu: 1.6
+      nonneg_mu: 0.7
+      fft_band_limit: 0.30
+      asymmetry_mu: 0.2
+      photonic_alignment: 0.65
+      molecule_region_coherence: 0.9
+      symbol_coverage_penalty: 0.10
+    options:
+      fft:
+        window: "hann"
+        max_rel_band: 0.35
+      molecule_sets:
+        include: ["H2O","CO2","CH4"]  # cautious set; expand only with evidence
+      photonic:
+        use_fgs1_phase_anchor: true
+        jitter_robust: true
+  sigma:
+    calibration:
+      temperature_scaling: 1.1
+      corel_weight: 0.5
+      conformal_coverage_target: 0.68
+      per_bin: true
+  guards:
+    ood:
+      enable_entropy_tripwire: true
+      entropy_threshold: 1.30
+      zscore_threshold: 3.2
+      switch_to_profile: "ood_guardrails"
+  reporting:
+    export_masks: true
+    export_rule_scores: true

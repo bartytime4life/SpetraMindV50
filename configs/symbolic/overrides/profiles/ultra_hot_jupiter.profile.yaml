@@ -1,0 +1,36 @@
+# Ultra-Hot Jupiter profile: supports ion/metal signatures and broader windows; stronger σ-calibration.
+
+symbolic:
+  loss:
+    weights:
+      smooth_l2_mu: 0.7
+      nonneg_mu: 0.3
+      fft_band_limit: 0.18
+      asymmetry_mu: 0.12
+      photonic_alignment: 0.9
+      molecule_region_coherence: 1.4
+      symbol_coverage_penalty: 0.03
+    options:
+      fft:
+        window: "hann"
+        max_rel_band: 0.28
+      molecule_sets:
+        include: ["H2O","CO","CO2","TiO","VO","FeH","SiO"]
+      photonic:
+        use_fgs1_phase_anchor: true
+        jitter_robust: true
+  sigma:
+    calibration:
+      temperature_scaling: 0.85
+      corel_weight: 0.8
+      conformal_coverage_target: 0.80
+      per_bin: true
+  guards:
+    ood:
+      enable_entropy_tripwire: true
+      entropy_threshold: 1.05
+      zscore_threshold: 2.5
+      switch_to_profile: "ood_guardrails"
+  reporting:
+    export_masks: true
+    export_rule_scores: true

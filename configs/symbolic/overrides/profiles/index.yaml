@@ -1,0 +1,24 @@
+# Hydra-safe index of symbolic profiles and the currently active selection.
+#
+# Switch at runtime with: +symbolic.profiles.active=warm_neptune
+
+symbolic:
+  profiles:
+    active: "default"             # active profile key (must exist in available)
+    available:
+      - "default"
+      - "hot_jupiter"
+      - "ultra_hot_jupiter"
+      - "warm_neptune"
+      - "temperate_super_earth"
+      - "ood_guardrails"
+    files:
+      default: "default.profile.yaml"
+      hot_jupiter: "hot_jupiter.profile.yaml"
+      ultra_hot_jupiter: "ultra_hot_jupiter.profile.yaml"
+      warm_neptune: "warm_neptune.profile.yaml"
+      temperate_super_earth: "temperate_super_earth.profile.yaml"
+      ood_guardrails: "ood_guardrails.profile.yaml"
+    auto:
+      enabled: true               # enable profile auto-selection via profile_map.yaml
+      fallback: "default"         # fallback if no rule matches

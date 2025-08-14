@@ -1,0 +1,36 @@
+# Baseline symbolic profile: conservative, physics-informed priors for general use.
+
+symbolic:
+  loss:
+    weights:
+      smooth_l2_mu: 1.0              # spectral smoothness on μ
+      nonneg_mu: 0.5                 # weak nonnegativity unless negative depths are permitted by task
+      fft_band_limit: 0.25           # penalize implausible high-frequency oscillations
+      asymmetry_mu: 0.2              # regularize odd-even bin asymmetry
+      photonic_alignment: 0.6        # align AIRS features with FGS1 transit phase morphology
+      molecule_region_coherence: 0.8 # stabilize known bands (H2O, CO2, CH4, CO, NH3)
+      symbol_coverage_penalty: 0.1   # soft encourage broad coverage, reduce spiky fits
+    options:
+      fft:
+        window: "hann"
+        max_rel_band: 0.35
+      molecule_sets:
+        include: ["H2O","CO2","CH4","CO","NH3"]  # core set; VO/TiO off by default here
+      photonic:
+        use_fgs1_phase_anchor: true
+        jitter_robust: true
+  sigma:
+    calibration:
+      temperature_scaling: 1.0
+      corel_weight: 0.5
+      conformal_coverage_target: 0.68
+      per_bin: true
+  guards:
+    ood:
+      enable_entropy_tripwire: true
+      entropy_threshold: 1.25
+      zscore_threshold: 3.0
+      switch_to_profile: "ood_guardrails"
+  reporting:
+    export_masks: true
+    export_rule_scores: true
