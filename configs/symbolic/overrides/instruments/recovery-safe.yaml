@@ -1,0 +1,12 @@
+# Conservative settings for post-anomaly recovery
+defaults:
+  - override /instrument: instruments/ariel/airs
+
+run:
+  mode: "transit"
+  tag: "recovery-safe"
+recovery:
+  sigma_floor: 0.05
+  temperature_scaling: 1.05
+instrument_tweaks:
+  cadence_s: 12

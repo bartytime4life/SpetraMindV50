@@ -1,0 +1,13 @@
+# Quick quality-assurance checks for calibration pathways
+defaults:
+  - override /instrument: instruments/ariel/airs
+
+run:
+  mode: "transit"
+  tag: "qa-battery"
+qa:
+  enable_linearity_test: true
+  enable_dark_subtraction_test: true
+  enable_wave_regression: true
+instrument_tweaks:
+  cadence_s: 10

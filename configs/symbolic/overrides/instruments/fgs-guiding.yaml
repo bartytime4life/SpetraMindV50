@@ -1,0 +1,9 @@
+# Guiding-focused profile for FGS photometry characterization
+defaults:
+  - override /instrument: instruments/ariel/fgs
+
+run:
+  mode: "guiding"
+  tag: "fgs-guiding"
+instrument_tweaks:
+  cadence_s: 1

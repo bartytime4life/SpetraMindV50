@@ -1,0 +1,11 @@
+# Deliberately add pointing jitter to test robustness
+defaults:
+  - override /instrument: instruments/ariel/airs
+
+run:
+  mode: "transit"
+  tag: "jitter-stress"
+stress:
+  add_jitter_arcsec: 0.15
+instrument_tweaks:
+  extra_white_noise_ppm: 20
