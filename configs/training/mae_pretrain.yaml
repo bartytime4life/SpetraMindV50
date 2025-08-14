@@ -1,0 +1,22 @@
+# Masked Autoencoder pretraining for AIRS/FGS1
+training:
+  seed: 1337
+  epochs: 120
+  amp: true
+  gradient_accumulation: 2
+  optimizer:
+    name: "adamw"
+    lr: 2.0e-4
+    weight_decay: 5.0e-3
+  scheduler:
+    name: "cosine"
+    warmup_epochs: 10
+  mae:
+    enabled: true
+    mask_strategy: "hybrid"          # random | block | hybrid | molecule_aware
+    mask_ratio: 0.35
+    molecule_aware:
+      enabled: true
+      weight_regions: ["H2O","CO2","CH4"]
+    sigma_pretrain: true
+    snr_aware: true

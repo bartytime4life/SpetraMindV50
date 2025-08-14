@@ -1,0 +1,51 @@
+training:
+  seed: 1337
+  epochs: 200
+  gradient_accumulation: 1
+  amp: true             # Automatic Mixed Precision
+  grad_clip_norm: 1.0
+  cudnn_benchmark: true
+
+  optimizer:
+    name: "adamw"
+    lr: 1.0e-4
+    weight_decay: 1.0e-2
+    betas: [0.9, 0.999]
+    eps: 1.0e-8
+
+  scheduler:
+    name: "cosine"
+    warmup_epochs: 5
+    min_lr: 1.0e-6
+
+  checkpoints:
+    save_every: 10
+    keep_last: 3
+    dir: "${paths.root}/artifacts/checkpoints"
+
+  logging:
+    every_steps: 50
+    to_mlflow: true
+    to_jsonl: true
+    jsonl_path: "${paths.root}/artifacts/logs/train_events.jsonl"
+    rotating_file:
+      enabled: true
+      path: "${paths.root}/artifacts/logs/train.log"
+      max_mb: 20
+      backups: 5
+
+  curriculum:
+    phases:
+      - name: "warmup"
+        epochs: 10
+        loss_weights: { gll: 1.0, smooth_fft: 0.02, asymmetry: 0.0, symbolic: 0.10 }
+      - name: "main"
+        epochs: 150
+        loss_weights: { gll: 1.0, smooth_fft: 0.05, asymmetry: 0.02, symbolic: 0.20 }
+      - name: "polish"
+        epochs: 40
+        loss_weights: { gll: 1.2, smooth_fft: 0.06, asymmetry: 0.03, symbolic: 0.15 }
+
+  evaluation:
+    val_every: 1
+    metrics: ["gll","rmse","mae","calibration_mse"]

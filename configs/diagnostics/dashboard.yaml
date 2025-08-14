@@ -1,0 +1,13 @@
+diagnostics:
+  html_dashboard:
+    enabled: true
+    out_dir: "${paths.root}/artifacts/diagnostics"
+    open_browser: false
+    versioned: true
+  include:
+    umap: true
+    tsne: true
+    shap_overlay: true
+    symbolic_leaderboard: true
+    fft_autocorr: true
+    cli_log_heatmaps: true

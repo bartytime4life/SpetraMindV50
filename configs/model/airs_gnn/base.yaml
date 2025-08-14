@@ -1,54 +1,13 @@
-# Canonical AIRS GNN (GAT) configuration — balanced capacity & diagnostics enabled.
-# Backend: Graph Attention Network (attn weights exportable for explainability).
-# Compatible with SpectraMind V50 fusion/decoder contracts.
-
 model:
   encoders:
     airs_gnn:
       enabled: true
-      backend: "gat"                 # ["gat", "rgcn", "nnconv"]
+      in_features: 1
       hidden_dim: 256
-      num_layers: 5
-      attn_heads: 4
-      attn_dropout: 0.10
-      dropout: 0.10
+      num_layers: 4
+      gnn_type: "gat"
+      heads: 4
       residual: true
-      layer_norm: "rms"              # ["layernorm", "rms", "none"]
-      activation: "silu"             # ["relu","gelu","silu"]
-      export_attention: true         # write attention weights for diagnostics
-      jit_scriptable: true           # TorchScript guard for fast inference
-      seed: 1337
-
-      # Node features (per spectral bin)
-      node_features:
-        # Options:
-        #  - "stat": time-statistics features (mean, std, slope)
-        #  - "encoder": upstream temporal encoder projection
-        #  - "learned": learned per-bin embedding (positional)
-        use: ["stat", "learned"]
-        stat_dim: 8
-        learned_dim: 32
-        fuse: "concat"               # ["concat","mlp"]
-        mlp_dim: 128
-
-      # Edge features (merged from physics_edges.yaml)
-      graph:
-        _target_: "merge"            # marker for Hydra; this file expects composition with physics_edges
-        # see physics_edges.yaml
-
-      # Attention / aggregation
-      aggr: "add"                    # ["add","mean","max","sum"]
-      heads_combine: "concat"        # ["concat","mean"] for multi-head combine
-
-      # Regularization & stability
-      epsilon: 1.0e-6
-      init: "kaiming_uniform"        # ["kaiming_uniform","xavier_uniform"]
-      clamp_logits: 15.0             # clamp attention logits for stability
-
-      # Diagnostics toggles
-      diagnostics:
-        save_attention_csv: false
-        save_graphviz: false
-        assert_connected_graph: true
-        log_shapes: true
-
+      dropout: 0.10
+      readout: "mean"
+      edge_features: ["wavelength_proximity","molecule_region","detector_region"]

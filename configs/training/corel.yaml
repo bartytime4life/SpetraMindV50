@@ -1,0 +1,17 @@
+# COREL-style conformal GNN training (binwise coverage)
+training:
+  seed: 1337
+  epochs: 80
+  amp: true
+  optimizer:
+    name: "adamw"
+    lr: 1.0e-4
+    weight_decay: 1.0e-2
+  corel:
+    enabled: true
+    target_coverage: 0.90
+    loss_weight: 1.0
+    graph:
+      use_temporal_edges: true
+      edge_features: ["distance","molecule","detector"]
+      backend: "gat"               # gat | rgcn | nnconv

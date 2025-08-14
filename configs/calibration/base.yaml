@@ -1,0 +1,5 @@
+calibration:
+  enabled: true
+  method: "temperature_scaling"     # "temperature_scaling" | "corel"
+  temperature: 1.0
+  save_dir: "${paths.root}/artifacts/calibration"

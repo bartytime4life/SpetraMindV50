@@ -1,0 +1,15 @@
+# Global symbolic constraint weights
+symbolic:
+  smoothness_weight: 0.10
+  nonnegativity_weight: 0.05
+  molecular_consistency_weight: 0.20
+  photonic_alignment_weight: 0.15
+  fft_asymmetry_weight: 0.02
+
+  # Normalization/aggregation
+  normalize_per_bin: true
+  reduction: "mean"     # "mean" | "sum" | "max"
+
+  # Export/Debug
+  export_dir: "${paths.root}/artifacts/symbolic"
+  log_top_violations: 10

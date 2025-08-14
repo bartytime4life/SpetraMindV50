@@ -1,13 +1,8 @@
----
-
-### `/configs/model/fgs1_mamba/base.yaml`
-```yaml
-# Canonical FGS1 Mamba SSM settings (balanced)
 model:
   encoders:
     fgs1_mamba:
       enabled: true
-      in_features: 6            # [flux, time_norm, centroid_x, centroid_y, jitter_x, jitter_y]
+      in_features: 6
       d_model: 256
       d_state: 64
       d_conv: 4
@@ -15,6 +10,6 @@ model:
       n_layers: 8
       bidirectional: true
       dropout: 0.10
-      layer_norm: "rms"         # ["layernorm", "rms"]
+      layer_norm: "rms"
       proj_out: 256
       export_step_latents: false

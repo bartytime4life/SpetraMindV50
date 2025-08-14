@@ -1,0 +1,9 @@
+# Photonic alignment using FGS1 transit shape as anchor for AIRS timing
+symbolic:
+  rules:
+    - id: align_fgs1_airs
+      description: "AIRS feature timing aligns with FGS1 transit phase anchors"
+      type: "cross_instrument_alignment"
+      anchor: "FGS1"
+      target: "AIRS"
+      weight: 0.15
