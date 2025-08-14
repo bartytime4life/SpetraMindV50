@@ -1,0 +1,24 @@
+# configs/symbolic/overrides/competition/calibration.yaml
+
+# Temperature scaling + COREL calibration options and coverage targets.
+
+calibration:
+  enable: true
+  temperature_scaling:
+    enabled: true
+    search:
+      grid: [0.5, 0.75, 1.0, 1.25, 1.5]
+      fallback: 1.0
+  corel:
+    enabled: true
+    target_coverage: 0.90
+    eval_bins: "all"
+    export_plots: true
+    export_csv: true
+    molecule_region_summary: true
+  coverage_checks:
+    quantile_calibration: [0.1, 0.5, 0.9]
+    z_score_histograms: true
+  reporting:
+    json_summary_path: "runs/calibration/calibration_summary.json"
+    plots_dir: "runs/calibration/plots"

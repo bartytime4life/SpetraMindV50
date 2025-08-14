@@ -1,0 +1,37 @@
+# configs/symbolic/overrides/competition/rules_strict.yaml
+
+# Strict symbolic rule set for leaderboard submissions.
+
+symbolic:
+  mode: "soft"                  # soft | hard (soft recommended for stable gradients)
+  normalize_losses: true
+  loss:
+    weights:
+      smoothness_l2: 0.40       # spectral smoothness (L2 across bins)
+      nonnegativity: 0.20       # clamp or penalize μ < 0
+      fft_asymmetry: 0.08       # discourage non-physical high-frequency asymmetry
+      photonic_alignment: 0.22  # align features to photonic/optical response
+      molecule_coherence: 0.10  # encourage coherent absorption bands by molecule
+  constraints:
+    allow_negative_mu: false
+    max_abs_mu_z: 6.0           # soft cap on |z| outliers for μ normalization checks
+  fft:
+    highfreq_bin_start: 64
+    penalty_scale: 1.0
+  photonic:
+    enable_jitter_injection: true
+    transit_shape_from_fgs1: true
+    align_airs_to_fgs1_phase: true
+  molecules:
+    target_list: ["H2O", "CO2", "CH4", "CO"]
+  coherence:
+    window_bins: 5
+    min_band_strength: 0.5
+  region_weights:
+    H2O: 1.0
+    CO2: 1.0
+    CH4: 1.2
+    CO: 0.8
+  explainability:
+    export_symbolic_maps: true
+    overlay_in_dashboard: true
