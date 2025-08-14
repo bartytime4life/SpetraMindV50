@@ -1,0 +1,13 @@
+groups:
+  - id: hydroxyl
+    pattern: "R-OH"
+    properties: { polarity: high, hydrogen_bond_donor: true }
+  - id: carbonyl
+    pattern: "R-(C=O)-R'"
+    properties: { polarity: high, hydrogen_bond_acceptor: true }
+  - id: carboxyl
+    pattern: "R-COOH"
+    properties: { acidity: weak_acid }
+  - id: amine
+    pattern: "R-NH2"
+    properties: { basicity: weak_base }
