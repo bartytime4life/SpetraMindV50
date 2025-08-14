@@ -1,0 +1,29 @@
+{
+  "molecule": {
+    "id": "MOL-H2O-001",
+    "name": "Water Vapor",
+    "formula": "H2O",
+    "bands_um": [[1.9, 2.1], [2.5, 3.2], [5.5, 7.2]],
+    "overrides": {
+      "symbolic_constraints": {
+        "molecular_coherence_weight": 1.35,
+        "smoothness_weight": 0.9,
+        "nonnegativity_weight": 1.0
+      },
+      "calibration": {
+        "corel_enabled": true,
+        "temperature_scaling": 0.97
+      },
+      "uncertainty": {
+        "band_sigma_scale": 0.9,
+        "sigma_floor": 0.02
+      }
+    },
+    "notes": "Emphasize H2O-sensitive regions; allow slightly lower smoothness to retain narrow lines."
+  },
+  "metadata": {
+    "author": "SpectraMind Architect",
+    "created": "2025-08-14",
+    "schema_version": "1.0"
+  }
+}

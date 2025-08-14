@@ -1,0 +1,40 @@
+{
+  "event": {
+    "id": "EVT-TRANSIT-001",
+    "name": "Hot Jupiter Primary Transit",
+    "description": "Override constraints for high-SNR, feature-rich primary transit",
+    "labels": ["transit", "AIRS", "hot-jupiter"],
+    "trigger_conditions": [
+      { "phase": "primary_transit" },
+      { "instrument": "AIRS" },
+      { "target_type": "Hot Jupiter" },
+      { "wavelength_range_um": [1.95, 7.8] }
+    ],
+    "overrides": {
+      "symbolic_constraints": {
+        "smoothness_weight": 0.7,
+        "molecular_coherence_weight": 1.25,
+        "nonnegativity_weight": 1.0,
+        "asymmetry_weight": 0.9
+      },
+      "calibration": {
+        "corel_enabled": true,
+        "temperature_scaling": 0.95
+      },
+      "uncertainty": {
+        "scale": 0.9,
+        "sigma_floor": 0.02
+      }
+    },
+    "effective_dates": {
+      "start": "2025-08-14T00:00:00Z",
+      "end": "2025-08-14T23:59:59Z"
+    },
+    "priority": 10
+  },
+  "metadata": {
+    "author": "SpectraMind Architect",
+    "created": "2025-08-14",
+    "schema_version": "1.0"
+  }
+}

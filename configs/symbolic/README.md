@@ -1,22 +1,10 @@
-# SpectraMind V50 — configs/symbolic Guide
+# Symbolic Configuration (SpectraMind V50)
 
-## How to use
-- Default entrypoint: `symbolic/base.yaml`
-- Compose with Hydra:
-  - `+symbolic.profile=leaderboard`
-  - `+symbolic.weights=strict`
-  - `+symbolic.regions=airs_regions`
-- Add/remove rules by editing defaults in `base.yaml` or via command-line group overrides.
+This subtree contains symbolic configuration for physics-/logic-aware constraints used across the SpectraMind V50 pipeline.
 
-## Key files
-- `rules/*.yaml` — individual rule configs merged under `symbolic.rules.*`
-- `profiles/*.yaml` — scenario presets; may override weights/toggles/caps
-- `weights/*.yaml` — per-rule weights collections
-- `molecules/*.yaml` — band templates (bins and/or wavelengths)
-- `regions/*.yaml` — named bin ranges used by rules for masking/boosting
-- `export.yaml` — output artifact locations
-- `debug.yaml` — logging verbosity and sampling
-- `schema/symbolic.schema.json` — sanity schema for CI checks
+- `rules/` (if present): Canonical symbolic rule packs (base truths; usually do not mutate frequently)
+- `molecules/`: Molecule-centric metadata/configs and region mappings
+- `overrides/`: Contextual override layers (competition, events, molecules) that are composed over the canonical packs
+- `profiles/` (if present): Profile definitions selecting subsets/weights of rules for different operating modes
 
-## Replace placeholders
-- Update `regions/airs_regions.yaml` and `molecules/lines_h2o_co2_ch4.yaml` with dataset-accurate bin or wavelength ranges once your wavelength↔bin CSV is finalized.
+> Policy: **immutable base + composable overrides**. Always update overrides first for scenario-specific needs.

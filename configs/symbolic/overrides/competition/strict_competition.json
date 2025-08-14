@@ -1,0 +1,48 @@
+{
+  "competition": {
+    "id": "COMP-STRICT-001",
+    "name": "Competition Strict",
+    "description": "Hardened config for leaderboard submissions with maximum determinism",
+    "mode": "strict",
+    "guards": {
+      "determinism": {
+        "seed": 1337,
+        "cudnn_deterministic": true,
+        "cudnn_benchmark": false,
+        "allow_tf32": false,
+        "amp": "fp16"
+      },
+      "runtime": {
+        "max_hours": 9.0,
+        "num_workers": 2,
+        "prefetch_factor": 2,
+        "pin_memory": true,
+        "batch_size_infer": 8,
+        "batch_size_train": 16
+      },
+      "memory": {
+        "gradient_checkpointing": true,
+        "activation_offload": false
+      }
+    },
+    "overrides": {
+      "symbolic_constraints": {
+        "nonnegativity_weight": 1.2,
+        "smoothness_weight": 1.1,
+        "molecular_coherence_weight": 1.0
+      },
+      "calibration": {
+        "corel_enabled": true,
+        "temperature_scaling": 1.0
+      },
+      "uncertainty": {
+        "sigma_floor": 0.03
+      }
+    }
+  },
+  "metadata": {
+    "author": "SpectraMind Architect",
+    "created": "2025-08-14",
+    "schema_version": "1.0"
+  }
+}

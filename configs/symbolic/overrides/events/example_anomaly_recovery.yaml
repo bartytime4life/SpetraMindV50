@@ -1,0 +1,28 @@
+# Event override — Post-anomaly recovery (tighten smoothness, raise sigma floor)
+event:
+  id: EVT-POST-ANOMALY-RECOVERY
+  name: "Post-Anomaly Recovery Window"
+  description: "Temporary conservative settings after instrument anomaly or jitter excursion"
+  labels: ["recovery", "conservative"]
+  trigger_conditions:
+    - pipeline_marker: "anomaly_recovered"
+    - instrument_state: "FGS_LOCK_RESTORED"
+  overrides:
+    symbolic_constraints:
+      smoothness_weight: 1.3
+      molecular_coherence_weight: 0.9
+      nonnegativity_weight: 1.1
+      asymmetry_weight: 1.1
+    calibration:
+      corel_enabled: true
+      temperature_scaling: 1.05
+    uncertainty:
+      scale: 1.1
+      sigma_floor: 0.05
+  effective_dates:
+    start: "2025-08-14T00:00:00Z"
+  priority: 50
+metadata:
+  author: "SpectraMind Architect"
+  created: "2025-08-14"
+  schema_version: "1.0"
