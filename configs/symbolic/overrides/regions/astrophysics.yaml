@@ -1,0 +1,40 @@
+# =================================================================================================
+# File: configs/symbolic/overrides/regions/astrophysics.yaml
+# SpectraMind V50 — Regions Override (Astrophysics)
+# --------------------------------------------------------------------------------
+# Purpose:
+# Weight slope/continuum logic for atmospheric physics analyses and eclipse diagnostics.
+# =================================================================================================
+symbolic:
+  regions:
+    enabled: true
+    packs:
+      base: configs/symbolic/regions/regions_base.yaml
+      molecular: configs/symbolic/regions/molecular_regions.yaml
+      astrophysical: configs/symbolic/regions/astrophysical_regions.yaml
+      telescope: configs/symbolic/regions/telescope_regions.yaml
+      challenge: configs/symbolic/regions/challenge_regions.yaml
+
+    gates:
+      use_astrophysical: true
+      use_molecular: true
+      use_telescope: false
+      use_challenge: false
+
+    weights:
+      molecular_fingerprint: 0.9
+      continuum_reference: 1.5
+      near_ir_baseline: 1.3
+      scattering_reference: 1.6
+      thermal_baseline: 1.6
+      mixed_molecule_test: 0.6
+
+    validation:
+      enforce_schema: true
+      schema_path: configs/symbolic/_schemas/symbolic_region.schema.json
+      on_violation: "error"
+
+    exports:
+      write_masks_csv: true
+      write_masks_json: true
+      export_dir: artifacts/symbolic/regions_astrophysics

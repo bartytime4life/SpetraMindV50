@@ -1,0 +1,50 @@
+# =================================================================================================
+# File: configs/symbolic/regions/regions_base.yaml
+# SpectraMind V50 — Symbolic Region Definitions (Base, Hydra-safe)
+# --------------------------------------------------------------------------------
+# Purpose:
+# Canonical symbolic region definitions used by symbolic logic, diagnostics, masking, and
+# molecular alignment. All region entries adhere to _schemas/symbolic_region.schema.json.
+#
+# Conventions:
+# - wavelength_range_um is [start_um, end_um] inclusive of interior, half-open at end in code.
+# - type ∈ {telescope_band, molecule, astrophysical}
+# - symbolic_role provides semantic routing for rule engines and diagnostics overlays.
+# =================================================================================================
+version: v50
+description: Canonical symbolic region definitions for SpectraMind V50.
+
+regions:
+  - id: VIS
+    name: Visible Light Band
+    wavelength_range_um: [0.50, 0.78]
+    type: telescope_band
+    symbolic_role: continuum_reference
+    notes: Visible photometry baseline and guidance reference.
+  - id: NIR
+    name: Near-Infrared Band
+    wavelength_range_um: [0.78, 2.50]
+    type: telescope_band
+    symbolic_role: near_ir_baseline
+    notes: Overlaps multiple molecular bands; useful for slope and baseline checks.
+  - id: CH4_CORE
+    name: Methane Absorption Core
+    wavelength_range_um: [2.20, 2.50]
+    type: molecule
+    molecule: CH4
+    symbolic_role: molecular_fingerprint
+    notes: Strong CH4 signature region.
+  - id: CO2_PRIMARY
+    name: Carbon Dioxide Primary Band
+    wavelength_range_um: [4.20, 4.40]
+    type: molecule
+    molecule: CO2
+    symbolic_role: molecular_fingerprint
+    notes: High-SNR CO2 window; used in CO2-CH4 logic interplay.
+  - id: H2O_MAIN
+    name: Water Vapor Main Band
+    wavelength_range_um: [1.35, 1.50]
+    type: molecule
+    molecule: H2O
+    symbolic_role: molecular_fingerprint
+    notes: Primary H2O absorption cluster for transmission spectroscopy.

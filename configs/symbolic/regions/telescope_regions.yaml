@@ -1,0 +1,31 @@
+# =================================================================================================
+# File: configs/symbolic/regions/telescope_regions.yaml
+# SpectraMind V50 — Telescope Instrument Regions
+# --------------------------------------------------------------------------------
+# Purpose:
+# Bind ARIEL channels to symbolic regions for unified rule/diagnostics routing.
+# =================================================================================================
+version: v50
+extends: regions_base.yaml
+description: ARIEL FGS/AIRS channel symbolic references.
+
+telescope_regions:
+  FGS1_VIS:
+    wavelength_range_um: [0.50, 0.78]
+    symbolic_ref: VIS
+
+  FGS1_NIR:
+    wavelength_range_um: [0.78, 1.10]
+    symbolic_ref: NIR
+
+  AIRS_CH1:
+    wavelength_range_um: [1.10, 1.95]
+    symbolic_ref: H2O_MAIN
+
+  AIRS_CH2:
+    wavelength_range_um: [1.95, 3.90]
+    symbolic_ref: CH4_CORE
+
+  AIRS_CH3:
+    wavelength_range_um: [3.90, 7.80]
+    symbolic_ref: THERMAL_INFRARED

@@ -1,0 +1,44 @@
+# =================================================================================================
+# File: configs/symbolic/overrides/regions/default.yaml
+# SpectraMind V50 — Regions Override (Default)
+# --------------------------------------------------------------------------------
+# Purpose:
+# Safe baseline that enables region packs with neutral weights. Use this as global default.
+# =================================================================================================
+symbolic:
+  regions:
+    enabled: true
+    packs:
+      base: configs/symbolic/regions/regions_base.yaml
+      molecular: configs/symbolic/regions/molecular_regions.yaml
+      astrophysical: configs/symbolic/regions/astrophysical_regions.yaml
+      telescope: configs/symbolic/regions/telescope_regions.yaml
+      challenge: configs/symbolic/regions/challenge_regions.yaml
+
+    # Global gating
+    gates:
+      use_astrophysical: true
+      use_molecular: true
+      use_telescope: true
+      use_challenge: false
+
+    # Neutral weights; downstream tools may re-weight
+    weights:
+      molecular_fingerprint: 1.0
+      continuum_reference: 1.0
+      near_ir_baseline: 1.0
+      scattering_reference: 1.0
+      thermal_baseline: 1.0
+      mixed_molecule_test: 1.0
+
+    # Validation controls (used by selftest & diagnostics)
+    validation:
+      enforce_schema: true
+      schema_path: configs/symbolic/_schemas/symbolic_region.schema.json
+      on_violation: "warn"   # ["error", "warn", "ignore"]
+
+    # Export hooks (UMAP/t-SNE overlays & HTML dashboard)
+    exports:
+      write_masks_csv: true
+      write_masks_json: true
+      export_dir: artifacts/symbolic/regions
