@@ -1,0 +1,13 @@
+# Local workstation overrides (fast iteration)
+
+calib:
+  paths:
+    root: "${oc.env:SM_ROOT,${hydra:runtime.cwd}}"
+  io:
+    loader_workers: 8
+    prefetch_workers: 4
+  logging:
+    level: "DEBUG"
+  runtime:
+    max_hours: 24
+

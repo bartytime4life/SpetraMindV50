@@ -1,0 +1,10 @@
+# Flat field correction
+
+steps:
+  flat:
+    enable: true
+    master_flat_path: "${calib.paths.root}/refs/calibration/master_flat.fits"
+    normalize: true
+    illumination_correction: true
+    fringe_correction: false
+

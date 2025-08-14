@@ -1,0 +1,13 @@
+# Dark current subtraction
+
+steps:
+  dark:
+    enable: true
+    master_dark_path: "${calib.paths.root}/refs/calibration/master_dark.fits"
+    scale:
+      enable: true
+      method: "exptime"            # scale dark by exposure time
+    hot_pixel_mask:
+      enable: true
+      threshold_e_per_s: 0.5
+

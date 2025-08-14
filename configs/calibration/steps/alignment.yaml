@@ -1,0 +1,17 @@
+# Temporal alignment (FGS1-informed) and phase normalization
+
+steps:
+  alignment:
+    enable: true
+    reference: "FGS1_transit_shape"  # [FGS1_transit_shape|midpoint|header_time]
+    crosscorr:
+      enable: true
+      max_lag_frames: 64
+      window_frames: 512
+    barycentric:
+      apply: false                   # enable if BJD_TDB correction data present
+    resample:
+      enable: true
+      method: "linear"               # [linear|cubic|lanczos]
+      target_grid: "common"
+

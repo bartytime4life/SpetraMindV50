@@ -1,6 +1,0 @@
-calibration:
-  enabled: true
-  method: "corel"
-  target_coverage: 0.90
-  graph_backend: "gat"              # gat | rgcn
-  save_dir: "${paths.root}/artifacts/calibration/corel"

@@ -1,0 +1,28 @@
+# COREL-style conformal calibration via spectral GNN (binwise coverage)
+
+steps:
+  corel:
+    enable: true
+    graph:
+      build: "wavelength_proximity"   # edges link neighboring bins
+      k_neighbors: 4
+      edge_features:
+        - "delta_wavelength"
+        - "molecule_region"          # optional one-hot; if available
+    gnn:
+      backend: "GAT"                 # [GAT|RGCN|NNConv]
+      layers: 3
+      hidden_dim: 64
+      heads: 4
+      dropout: 0.1
+    coverage:
+      target: 0.90
+      metric: "quantile"
+      per_region_summary: true
+    training:
+      epochs: 50
+      batch_size: 8
+      lr: 2.0e-3
+      weight_decay: 1.0e-4
+      early_stop_patience: 8
+

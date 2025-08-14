@@ -1,0 +1,16 @@
+# Flux normalization (out-of-transit / robust detrending)
+
+steps:
+  normalization:
+    enable: true
+    method: "oot_robust"            # [oot_robust|percentile|poly]
+    oot_window:
+      pre_event_frac: 0.3
+      post_event_frac: 0.3
+    robust:
+      iqr_sigma: 2.5
+      max_iter: 3
+    poly:
+      order: 2
+      fit_on_oot: true
+
