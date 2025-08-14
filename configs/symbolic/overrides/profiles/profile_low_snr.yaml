@@ -1,0 +1,15 @@
+# configs/symbolic/overrides/profiles/profile_low_snr.yaml
+
+symbolic:
+  mode: "soft"
+  weights:
+    smoothness_l2: 0.65
+    smoothness_fft: 0.45
+    nonnegativity: 0.25
+    asymmetry: 0.15
+    photonic_alignment: 0.30
+    molecule_consistency: 0.35
+  molecule_windows_scale: 0.9  # shrink ROIs a bit to avoid false positives
+  diagnostics:
+    flags:
+      overlay_noise_floor: true

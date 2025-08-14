@@ -1,0 +1,8 @@
+# configs/symbolic/overrides/events/eclipse_only.yaml
+
+symbolic:
+  events:
+    eclipse:
+      dayside_brightness_consistency: true
+      night_side_floor_nonnegativity: true
+      transit_rules_enable: false

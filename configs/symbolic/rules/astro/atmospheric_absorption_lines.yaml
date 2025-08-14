@@ -1,0 +1,28 @@
+# Rule ID: atmospheric_absorption_lines
+#
+# Description: Reinforce presence/shape consistency of known atmospheric absorbers.
+
+rule:
+  id: "atmospheric_absorption_lines"
+  domain: "astro"
+  kind: "template/spectral_lines"
+  version: "v1"
+  description: >
+    Score consistency of predicted μ with libraries of atmospheric lines
+    (H2O, CO2, CH4, CO, NH3, HCN, TiO/VO where applicable).
+
+  inputs:
+    mu: "mu_spectrum"
+    line_lib: "atmo_line_library_v50.yaml"
+
+  params:
+    line_window_bins: 3
+    min_depth_ppm: 10.0
+    tolerance_ppm: 30.0
+
+  loss:
+    type: "softmatch"
+    aggregation: "weighted_mean_by_line_strength"
+
+  diagnostics:
+    export_line_hits: true

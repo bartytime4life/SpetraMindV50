@@ -1,0 +1,40 @@
+# =================================================================================================
+# File: configs/symbolic/overrides/regions/challenge.yaml
+# SpectraMind V50 — Regions Override (NeurIPS 2025 Challenge Mode)
+# --------------------------------------------------------------------------------
+# Purpose:
+# Leaderboard/CI mode: turn on challenge composites and strict validation for robust submissions.
+# =================================================================================================
+symbolic:
+  regions:
+    enabled: true
+    packs:
+      base: configs/symbolic/regions/regions_base.yaml
+      molecular: configs/symbolic/regions/molecular_regions.yaml
+      astrophysical: configs/symbolic/regions/astrophysical_regions.yaml
+      telescope: configs/symbolic/regions/telescope_regions.yaml
+      challenge: configs/symbolic/regions/challenge_regions.yaml
+
+    gates:
+      use_astrophysical: true
+      use_molecular: true
+      use_telescope: true
+      use_challenge: true
+
+    weights:
+      molecular_fingerprint: 1.35
+      continuum_reference: 1.15
+      near_ir_baseline: 1.15
+      scattering_reference: 1.10
+      thermal_baseline: 1.10
+      mixed_molecule_test: 1.40
+
+    validation:
+      enforce_schema: true
+      schema_path: configs/symbolic/_schemas/symbolic_region.schema.json
+      on_violation: "error"
+
+    exports:
+      write_masks_csv: true
+      write_masks_json: true
+      export_dir: artifacts/symbolic/regions_challenge

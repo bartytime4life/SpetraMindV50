@@ -1,0 +1,48 @@
+# SpectraMind V50 — Symbolic master config (Hydra-composable)
+# This is the single source that downstream code should load by default.
+# Compose with overrides (e.g., profile=leaderboard, weights=strict) at runtime.
+
+defaults:
+  # Rule pack (add/remove to compose your symbolic set)
+  - rules/smoothness@symbolic.rules.smoothness: smoothness
+  - rules/nonnegativity@symbolic.rules.nonnegativity: nonnegativity
+  - rules/fft_bandlimit@symbolic.rules.fft_bandlimit: fft_bandlimit
+  - rules/asymmetry@symbolic.rules.asymmetry: asymmetry
+  - rules/photonic_alignment@symbolic.rules.photonic_alignment: photonic_alignment
+  - rules/molecule_coherence@symbolic.rules.molecule_coherence: molecule_coherence
+  - rules/transit_shape_consistency@symbolic.rules.transit_shape_consistency: transit_shape_consistency
+  - rules/quantile_consistency@symbolic.rules.quantile_consistency: quantile_consistency
+
+  # Common resources
+  - regions@symbolic.regions: airs_regions
+  - molecules@symbolic.molecules: lines_h2o_co2_ch4
+
+  # Behavior layers
+  - profiles@symbolic.profile: default
+  - weights@symbolic.weights: balanced
+
+  # I/O & debugging
+  - export@symbolic.export: export
+  - debug@symbolic.debug: debug
+
+symbolic:
+  # Global symbolic toggles and execution semantics
+  enabled: true                 # master enable for symbolic system
+  mode: "soft"                  # ["soft", "hard"] — soft = differentiable penalties; hard = clamps/masks
+  normalize: true               # normalize per-rule losses before weighting
+  loss_reduction: "mean"        # ["mean","sum","none"] aggregation strategy across bins/planets
+  per_rule_cap: 10.0            # clamp each rule contribution (post-normalization), set 0 to disable
+  epsilon: 1.0e-8               # numerical stability eps
+  clamp_gradients: true         # gradient safety for spiky rules
+  rule_masking: true            # allow per-rule masks (by region/molecule)
+  export_violations: true       # enable JSON export of per-rule maps (also controlled by export section)
+  topk_rules_report: 5          # number of top violated rules to report per-planet
+
+  # Runtime wiring — populated by composed defaults above
+  rules: {}                     # DO NOT hand-edit; filled by defaults list (rules/)
+  regions: {}                   # DO NOT hand-edit; filled by regions/
+  molecules: {}                 # DO NOT hand-edit; filled by molecules/*
+  profile: {}                   # DO NOT hand-edit; filled by profiles/*
+  weights: {}                   # DO NOT hand-edit; filled by weights/*
+  export: {}                    # DO NOT hand-edit; filled by export
+  debug: {}                     # DO NOT hand-edit; filled by debug

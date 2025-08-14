@@ -1,0 +1,11 @@
+# Variance propagation and z-score sanity checks
+
+steps:
+  variance:
+    enable: true
+    propagate_all: true
+    zscore_check:
+      enable: true
+      bins: 50
+      max_outlier_frac: 0.02
+

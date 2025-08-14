@@ -1,0 +1,10 @@
+# Lightning-fast runs with idealized instrument
+defaults:
+  - override /instrument: instruments/simulated/ideal
+
+run:
+  mode: "transit"
+  tag: "fast-sim"
+instrument_tweaks:
+  downsample_R_factor: 0.5
+  bin_time_s: 20

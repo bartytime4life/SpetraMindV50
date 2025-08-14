@@ -1,0 +1,17 @@
+meta:
+  name: "rule_smoothness"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+
+rule:
+  key: "smoothness"
+  description: "Penalize high-frequency roughness in μ across wavelength bins (L2 second-derivative, optional TV)."
+  weight: 1.0
+  terms:
+    - type: "l2_curvature"
+      lambda: "${violations.thresholds.smoothness_l2_lambda}"
+    - type: "tv"
+      lambda: "${violations.thresholds.smoothness_tv_lambda}"
+  constraints:
+    enforce_nonnegativity_before: true

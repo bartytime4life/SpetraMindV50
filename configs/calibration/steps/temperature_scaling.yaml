@@ -1,0 +1,16 @@
+# Temperature scaling for predicted σ calibration
+
+steps:
+  temperature_scaling:
+    enable: true
+    mode: "per-bin"                # [global|per-bin]
+    init_temp: 1.0
+    bounds: [0.2, 5.0]
+    optimizer:
+      type: "lbfgs"
+      max_iter: 200
+      tol: 1.0e-6
+    val_split:
+      method: "time_fold"
+      folds: 5
+

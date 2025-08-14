@@ -1,0 +1,12 @@
+# Residual bias pattern correction
+
+steps:
+  bias:
+    enable: true
+    master_bias_path: "${calib.paths.root}/refs/calibration/master_bias.fits"
+    pattern_remove:
+      enable: true
+      method: "rowcol"           # remove row/col fixed pattern
+      row_strength: 0.8
+      col_strength: 0.8
+

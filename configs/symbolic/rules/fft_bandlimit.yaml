@@ -1,0 +1,19 @@
+# FFT bandlimit / spectral power shaping (controls high-freq noise in μ)
+symbolic:
+  rules:
+    fft_bandlimit:
+      enabled: true
+      name: "fft_bandlimit"
+      lambda: 0.3
+      norm: "l2"                 # ["l1","l2"]
+      freq_unit: "nyquist"       # cutoff in [0..1] where 1.0 = Nyquist
+      low_cut: 0.00              # keep DC
+      high_cut: 0.45             # penalize power above this (tune with dataset)
+      rolloff_order: 4           # smooth transition order for soft masks
+      taper: "hann"              # window to reduce edge effects ["hann","hamming","none"]
+      per_region:
+        enable: true
+        boosts:
+          AIRS_NOISY_EDGE: 0.20
+      export_fft_power: true     # write per-planet power spectra for diagnostics
+      log_tag: "rule_fft"

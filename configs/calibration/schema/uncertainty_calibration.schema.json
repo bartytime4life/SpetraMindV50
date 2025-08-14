@@ -1,0 +1,59 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/uncertainty_calibration.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Uncertainty Calibration (Temperature Scaling + COREL)",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common_defs.schema.json#/$defs/enabled" },
+    {
+      "type": "object",
+      "properties": {
+        "temperature_scaling": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "initial_tau": { "$ref": "common_defs.schema.json#/$defs/positive_number" },
+            "bounds": { "$ref": "common_defs.schema.json#/$defs/bounds_pair" },
+            "opt_method": { "enum": ["grid", "lbfgsb"] }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false
+        },
+        "corel": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "graph": {
+              "type": "object",
+              "properties": {
+                "edge_type": { "enum": ["wavelength", "region", "wavelength+region"] },
+                "add_self_loops": { "type": "boolean", "default": true },
+                "use_edge_features": { "type": "boolean", "default": true }
+              },
+              "required": ["edge_type"],
+              "additionalProperties": false
+            },
+            "training": {
+              "type": "object",
+              "properties": {
+                "epochs": { "type": "integer", "minimum": 1, "maximum": 10000 },
+                "lr": { "$ref": "common_defs.schema.json#/$defs/positive_number" },
+                "weight_decay": { "$ref": "common_defs.schema.json#/$defs/non_negative_number" },
+                "batch_size": { "type": "integer", "minimum": 1, "maximum": 65536 },
+                "backend": { "enum": ["gat", "rgcn", "nnconv", "mpnn"] }
+              },
+              "required": ["epochs", "lr"],
+              "additionalProperties": false
+            },
+            "regularization": { "$ref": "common_defs.schema.json#/$defs/regularization" },
+            "coverage_target": { "$ref": "common_defs.schema.json#/$defs/percent_0_1" }
+          },
+          "required": ["enabled"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    }
+  ]
+}

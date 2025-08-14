@@ -1,0 +1,5 @@
+# paths resolved per profile unless explicitly overridden
+run_dir: ${paths.artifacts_root}/runs
+outputs_dir: ${paths.artifacts_root}/outputs
+# passthroughs that profiles should define:
+# data_root, cache_root, artifacts_root

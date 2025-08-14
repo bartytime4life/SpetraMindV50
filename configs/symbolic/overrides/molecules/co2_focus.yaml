@@ -1,0 +1,24 @@
+# Molecule override — Carbon Dioxide (CO2) emphasis
+molecule:
+  id: MOL-CO2-001
+  name: "Carbon Dioxide"
+  formula: "CO2"
+  bands_um:
+    - [1.95, 2.2]
+    - [4.1, 4.5]
+  overrides:
+    symbolic_constraints:
+      molecular_coherence_weight: 1.3
+      smoothness_weight: 0.95
+      nonnegativity_weight: 1.0
+    calibration:
+      corel_enabled: true
+      temperature_scaling: 0.99
+    uncertainty:
+      band_sigma_scale: 0.92
+      sigma_floor: 0.02
+  notes: "CO2 fundamental near 4.3 μm; adjust weights to respect sharper structure."
+metadata:
+  author: "SpectraMind Architect"
+  created: "2025-08-14"
+  schema_version: "1.0"

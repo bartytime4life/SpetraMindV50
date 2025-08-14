@@ -1,0 +1,35 @@
+# configs/symbolic/overrides/competition/leaderboard.yaml
+
+# Leaderboard-grade overlay: strict rules + full calibration + logging + compact artifacts.
+
+defaults:
+  - rules_strict
+  - profiles
+  - uncertainty
+  - calibration
+  - corel
+  - runtime
+
+symbolic:
+  mode: "soft"
+  loss:
+    weights:
+      smoothness_l2: 0.42
+      nonnegativity: 0.22
+      fft_asymmetry: 0.08
+      photonic_alignment: 0.23
+      molecule_coherence: 0.05
+  explainability:
+    overlay_in_dashboard: true
+
+calibration:
+  corel:
+    target_coverage: 0.90
+    export_plots: true
+    export_csv: true
+
+runtime:
+  logging:
+    level: "INFO"
+  artifacts:
+    keep_top_n_submissions: 8

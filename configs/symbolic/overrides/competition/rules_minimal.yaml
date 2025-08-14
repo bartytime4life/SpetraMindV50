@@ -1,0 +1,36 @@
+# configs/symbolic/overrides/competition/rules_minimal.yaml
+
+# Minimal symbolic rules — safe defaults for fast debugging and local smoke tests.
+
+symbolic:
+  mode: "soft"
+  normalize_losses: true
+  loss:
+    weights:
+      smoothness_l2: 0.20
+      nonnegativity: 0.10
+      fft_asymmetry: 0.05
+      photonic_alignment: 0.10
+      molecule_coherence: 0.05
+  constraints:
+    allow_negative_mu: false
+  fft:
+    highfreq_bin_start: 96
+    penalty_scale: 0.5
+  photonic:
+    enable_jitter_injection: false
+    transit_shape_from_fgs1: true
+    align_airs_to_fgs1_phase: true
+  molecules:
+    target_list: ["H2O", "CO2", "CH4", "CO"]
+  coherence:
+    window_bins: 3
+    min_band_strength: 0.3
+  region_weights:
+    H2O: 1.0
+    CO2: 1.0
+    CH4: 1.0
+    CO: 1.0
+  explainability:
+    export_symbolic_maps: true
+    overlay_in_dashboard: true

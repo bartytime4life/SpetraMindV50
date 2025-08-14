@@ -1,0 +1,31 @@
+# Rule ID: molecular_band_alignment
+#
+# Description: Encourage absorption minima at known molecular bands when SNR permits.
+
+rule:
+  id: "molecular_band_alignment"
+  domain: "physics"
+  kind: "template/multiple_bands"
+  version: "v1"
+  description: >
+    Softly attracts μ local minima toward known centers of H2O/CO2/CH4/CO/NH3 bands
+    with tolerance windows; disabled where SNR is below threshold.
+
+  inputs:
+    mu: "mu_spectrum"
+    snr: "snr_estimate_per_bin"   # optional [B, 283]
+    bands: "molecule_bands_v50.yaml"  # shared resource defining line centers/windows
+
+  params:
+    tol_bins: 2
+    min_snr: 2.0
+    attraction_strength: 0.5
+
+  loss:
+    type: "huber"
+    delta: 0.05
+    aggregation: "mean_over_hits"
+
+  diagnostics:
+    export_hit_table: true
+    overlay_symbols: true

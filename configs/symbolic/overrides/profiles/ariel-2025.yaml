@@ -1,0 +1,26 @@
+name: ariel-2025
+mode: prod
+desc: NeurIPS Ariel Data Challenge 2025 pipeline defaults
+paths:
+  data_root: ${oc.env:ARIEL_DATA,${hydra:runtime.cwd}/data/ariel}
+  cache_root: ${oc.env:ARIEL_CACHE,${hydra:runtime.cwd}/.cache/ariel}
+  artifacts_root: ${oc.env:ARIEL_ARTIFACTS,${hydra:runtime.cwd}/artifacts/ariel}
+  spectra_catalog: ${paths.data_root}/catalogs
+  outputs_dir: ${hydra:runtime.cwd}/outputs
+logging:
+  console_level: INFO
+  file_rotate_mb: 100
+  file_keep: 30
+  jsonl_level: INFO
+tracking:
+  mlflow:
+    enabled: true
+    uri: ${oc.env:MLFLOW_TRACKING_URI,sqlite:///mlruns.db}
+    exp: ariel-2025
+  wandb:
+    enabled: false
+scheduler:
+  type: none
+runtime:
+  num_workers: ${oc.env:SMV50_NUM_WORKERS,8}
+  device: cuda_if_available

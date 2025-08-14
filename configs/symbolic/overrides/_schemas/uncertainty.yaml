@@ -1,0 +1,20 @@
+# Schema: Symbolic overrides for uncertainty-aware training
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Override - Uncertainty Schema"
+type: object
+description: |
+  Modify symbolic loss components that interact with sigma (σ) predictions or calibration objectives.
+properties:
+  id: { type: string }
+  applies_to_sigma: { type: boolean, default: true, description: Whether overrides touch σ-head constraints. }
+  sigma_weight_multiplier: { type: number, default: 1.0, description: Global multiplier for σ-linked symbolic losses. }
+  rules:
+    type: array
+    items:
+      type: object
+      properties:
+        name: { type: string, description: Name of the symbolic rule being overridden. }
+        weight: { type: number, description: New loss weight for this rule. }
+      required: ["name"]
+required: [id, rules]
+additionalProperties: false

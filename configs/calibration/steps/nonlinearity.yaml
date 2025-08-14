@@ -1,0 +1,10 @@
+# Sensor nonlinearity correction
+
+steps:
+  nonlinearity:
+    enable: true
+    model: "poly"                  # [poly|lookup|none]
+    poly_order: 3
+    coeff_path: "${calib.paths.root}/refs/calibration/nonlinearity_coeffs.fits"
+    clip_after: false
+

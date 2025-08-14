@@ -1,0 +1,37 @@
+meta:
+  name: "violations_registry"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  run_hash: "${oc.env:SM_RUN_HASH,not-set}"
+  description: "Index of violation rule packs and context overrides."
+  citations:
+    - "[oai_citation:0]"
+    - "[oai_citation:1]"
+    - "[oai_citation:2]"
+
+includes:
+  base: "base.yaml"
+  rules:
+    - "rules/smoothness.yaml"
+    - "rules/nonnegativity.yaml"
+    - "rules/fft_asymmetry.yaml"
+    - "rules/photonic_alignment.yaml"
+    - "rules/molecule_coherence.yaml"
+  contexts:
+    competition:
+      - "contexts/competition/neurips2025.yaml"
+    instruments:
+      - "contexts/instruments/airs.yaml"
+      - "contexts/instruments/fgs1.yaml"
+    profiles:
+      - "contexts/profiles/hot_jupiter.yaml"
+      - "contexts/profiles/warm_neptune.yaml"
+    events:
+      - "contexts/events/kaggle_runtime_guardrail.yaml"
+
+validation:
+  schemas:
+    violations: "_schemas/violations.schema.yaml"
+    rule: "_schemas/rule.schema.yaml"
+    context_override: "_schemas/context_override.schema.yaml"

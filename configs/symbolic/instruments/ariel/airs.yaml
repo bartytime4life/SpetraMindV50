@@ -1,0 +1,33 @@
+name: "ARIEL AIRS (proto)"
+telescope:
+  aperture_m: 1.0
+  f_number: 13.0
+  optical_efficiency: 0.28
+spectral_range_um: [1.95, 7.8]
+channels:
+  - name: NIR-S
+    range_um: [1.95, 3.9]
+    resolving_power: 100
+    dispersion: prism
+  - name: MIR-S
+    range_um: [3.9, 7.8]
+    resolving_power: 50
+    dispersion: prism
+detectors:
+  type: "HgCdTe"
+  pixel_scale_arcsec: 0.3
+  read_noise_e: 10.0
+  dark_current_e_s: 0.005
+  saturation_ke: 120.0
+modes: ["transit", "eclipse", "phasecurve"]
+pointing:
+  rms_jitter_arcsec: 0.18
+  long_drift_arcsec: 0.07
+photometry:
+  precision_ppm_1hr: 30
+  cadence_s: 10
+  throughput_curve: "cal/throughputs/ariel/airs_throughput.csv"
+calibration:
+  flat: "cal/flat/ariel/airs_flat_v0.fits"
+  dark: "cal/dark/ariel/airs_dark_v0.fits"
+  wavelength: "cal/wave/ariel/airs_wave_v0.json"

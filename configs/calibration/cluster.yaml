@@ -1,0 +1,14 @@
+# Cluster/HPC overlays (parallel IO; large caches)
+
+calib:
+  io:
+    loader_workers: 16
+    prefetch_workers: 8
+    cache:
+      max_gb: 64
+  logging:
+    level: "INFO"
+  runtime:
+    max_hours: 48
+    fail_fast: true
+

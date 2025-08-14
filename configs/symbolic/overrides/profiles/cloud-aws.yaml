@@ -1,0 +1,25 @@
+name: cloud-aws
+mode: cloud
+desc: AWS batch/EC2 + S3 artifact store
+paths:
+  data_root: s3://${oc.env:S3_DATA_BUCKET,ariel-data}/
+  cache_root: /mnt/cache
+  artifacts_root: s3://${oc.env:S3_ARTIFACTS_BUCKET,ariel-artifacts}/
+logging:
+  console_level: INFO
+  file_rotate_mb: 50
+  file_keep: 10
+tracking:
+  mlflow:
+    enabled: true
+    uri: ${oc.env:MLFLOW_TRACKING_URI,https://mlflow.your.domain}
+    exp: ariel-cloud
+  wandb:
+    enabled: true
+    entity: ${oc.env:WANDB_ENTITY,ariel}
+    project: ${oc.env:WANDB_PROJECT,spectramind}
+scheduler:
+  type: none
+runtime:
+  num_workers: ${oc.env:SMV50_NUM_WORKERS,12}
+  device: cuda_if_available

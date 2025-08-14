@@ -1,0 +1,25 @@
+# configs/symbolic/overrides/competition/runtime.yaml
+
+# Guardrails, logging, and artifact quotas. Enforced by CLI and CI when selected.
+
+runtime:
+  guardrails:
+    kaggle:
+      max_hours: 9
+      hard_stop: true
+      gpu_required: true
+  logging:
+    level: "INFO"
+    console_rich: true
+    jsonl_events: "runs/events.jsonl"
+    rotate_file:
+      path: "runs/logs/spectramind.log"
+      max_megabytes: 50
+      backups: 5
+  artifacts:
+    keep_top_n_submissions: 5
+    max_dashboard_html: 10                 # retain last N dashboards
+    prune_old_on_success: true
+  ci:
+    enable_preflight_selftest: true
+    require_diagnostics_snippets: true

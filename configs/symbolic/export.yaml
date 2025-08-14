@@ -1,0 +1,17 @@
+symbolic:
+  export:
+    enabled: true
+    out_dir: "artifacts/symbolic"
+    mkdir: true
+    save_json_summary: true
+    save_rule_maps_npz: true
+    save_html_table: true
+    html_table_name: "symbolic_rule_table.html"
+    link_into_dashboard: true     # if diagnostics dashboard generator is present
+    filenames:
+      summary_json: "violations_summary.json"
+      per_planet_dir: "planets"
+      per_rule_dir: "rules"
+      fft_power_json: "fft_power.json"
+      alignment_json: "alignment_ccf.json"
+      molecule_json: "molecule_violations.json"

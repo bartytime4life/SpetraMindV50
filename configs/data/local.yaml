@@ -1,42 +1,6 @@
-# configs/data/local.yaml
-# Workstation override for paths, IO parallelism, and caching.
-@package _global_
-
+# Local workstation overrides (paths/workers only)
 data:
   paths:
-    root: "${oc.env:SM_ROOT,${hydra:runtime.cwd}}"
-    raw:
-      fgs1: "${data.paths.root}/_local/data/raw/fgs1"
-      airs: "${data.paths.root}/_local/data/raw/airs_ch0"
-      meta: "${data.paths.root}/_local/data/raw/meta"
-    calibrated:
-      fgs1: "${data.paths.root}/_local/data/calibrated/fgs1"
-      airs: "${data.paths.root}/_local/data/calibrated/airs"
-      logs: "${data.paths.root}/_local/data/calibrated/logs"
-    features:
-      fgs1_white: "${data.paths.root}/_local/data/features/fgs1_white"
-      airs_bins:  "${data.paths.root}/_local/data/features/airs_bins"
-      meta:       "${data.paths.root}/_local/data/features/meta"
-    splits:
-      file: "${data.paths.root}/_local/data/splits/groupkfold.json"
-    schemas:
-      submission:  "${data.paths.root}/schemas/submission.schema.json"
-      planet_meta: "${data.paths.root}/schemas/planet_meta.schema.json"
-
+    root: "${oc.env:PROJECT_ROOT, .}"
   io:
-    cache:
-      dvc_track: false
-    mmap:
-      enabled: true
-    telemetry:
-      log_open_close: false
-      log_io_stats: true
-
-  loader:
-    num_workers: 12
-    prefetch_factor: 4
-    pin_memory: true
-    persistent_workers: true
-
-  splits:
-    seed: 20250813   # lock local split materialization
+    num_workers: 8

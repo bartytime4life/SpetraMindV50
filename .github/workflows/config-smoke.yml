@@ -1,0 +1,13 @@
+name: config-smoke
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: List configs
+        run: |
+          ls -R configs
+      - name: Verify symlink
+        run: |
+          test -L configs/profiles/active.yaml

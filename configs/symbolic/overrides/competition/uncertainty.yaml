@@ -1,0 +1,15 @@
+# configs/symbolic/overrides/competition/uncertainty.yaml
+
+# σ decoder and export policy overrides.
+
+uncertainty:
+  flow_head:
+    enable_attention_fusion: true
+    dropout: 0.05
+  export_sigma_maps: true
+  export:
+    format: "csv"               # csv | parquet
+    include_per_bin_sigma: true
+    include_calibrated_sigma: true
+  calibration_link:
+    require_calibrated_for_submission: true

@@ -1,0 +1,19 @@
+name: ci
+mode: ci
+desc: CI runners — strict determinism, reduced logs
+paths:
+  data_root: ${hydra:runtime.cwd}/.ci/data
+  cache_root: ${hydra:runtime.cwd}/.ci/cache
+  artifacts_root: ${hydra:runtime.cwd}/.ci/artifacts
+logging:
+  console_level: WARNING
+  file_rotate_mb: 10
+  file_keep: 3
+tracking:
+  mlflow: {enabled: false}
+  wandb: {enabled: false}
+scheduler:
+  type: none
+runtime:
+  num_workers: 2
+  device: cpu

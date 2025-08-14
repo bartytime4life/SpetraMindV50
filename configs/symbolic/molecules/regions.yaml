@@ -1,0 +1,21 @@
+# =================================================================================================
+# File: configs/symbolic/molecules/regions.yaml
+# SpectraMind V50 — Molecule Registry (Regions X-Ref)
+# --------------------------------------------------------------------------------
+# Purpose:
+# Provide a registry to cross-reference molecule shortcodes to the region pack for tooling.
+# =================================================================================================
+version: v50
+molecules:
+  H2O:
+    display: Water Vapor
+    primary_regions_ref: configs/symbolic/regions/molecular_regions.yaml
+  CO2:
+    display: Carbon Dioxide
+    primary_regions_ref: configs/symbolic/regions/molecular_regions.yaml
+  CH4:
+    display: Methane
+    primary_regions_ref: configs/symbolic/regions/molecular_regions.yaml
+  NH3:
+    display: Ammonia
+    primary_regions_ref: configs/symbolic/regions/molecular_regions.yaml

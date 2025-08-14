@@ -1,0 +1,8 @@
+# configs/symbolic/overrides/instruments/airs_relaxed.yaml
+
+symbolic:
+  instruments:
+    AIRS:
+      spectral_smoothness_bins: 3
+      allow_sparse_bins: true
+      relax_bin_nonnegativity_eps: 5.0e-6

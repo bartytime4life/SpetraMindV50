@@ -1,0 +1,10 @@
+symbolic:
+  weights:
+    smoothness: 0.60
+    nonnegativity: 0.80
+    fft_bandlimit: 0.20
+    asymmetry: 0.10
+    photonic_alignment: 0.25
+    molecule_coherence: 0.25
+    transit_shape_consistency: 0.20
+    quantile_consistency: 0.15

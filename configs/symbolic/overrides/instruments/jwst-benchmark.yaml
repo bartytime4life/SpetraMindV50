@@ -1,0 +1,10 @@
+# Benchmark against JWST NIRSpec-like prism mode
+defaults:
+  - override /instrument: instruments/jwst/nirspec
+
+run:
+  mode: "eclipse"
+  tag: "jwst-bench"
+benchmark:
+  target_mag: 9.5
+  exposure_s: 10

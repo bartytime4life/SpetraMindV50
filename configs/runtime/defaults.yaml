@@ -1,0 +1,2 @@
+num_workers: ${profiles.runtime.num_workers,4}
+device: ${profiles.runtime.device,cuda_if_available}

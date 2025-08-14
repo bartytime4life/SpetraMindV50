@@ -1,0 +1,45 @@
+# configs/symbolic/overrides/routing.yaml
+#
+# Ordered rules; first match wins. Engine should evaluate simple expressions on "meta.*".
+
+routing:
+  policy: "first_match"   # ["first_match", "merge_all_matches"]
+  rules:
+    - name: "fgs1_strict_when_high_jitter"
+      when: 'meta.jitter_rms_px >= 0.80'
+      apply:
+        - configs/symbolic/overrides/profiles/profile_high_jitter
+        - configs/symbolic/overrides/instruments/fgs1_strict
+        - configs/symbolic/overrides/weights/hard
+    - name: "low_snr_relax_molecules"
+      when: 'meta.snr_db < 5.0'
+      apply:
+        - configs/symbolic/overrides/profiles/profile_low_snr
+        - configs/symbolic/overrides/instruments/airs_relaxed
+        - configs/symbolic/overrides/weights/soft
+    - name: "hot_jupiter_defaults"
+      when: 'meta.teq >= 1200'
+      apply:
+        - configs/symbolic/overrides/profiles/profile_hot_jupiter
+        - configs/symbolic/overrides/molecules/h2o_strong
+        - configs/symbolic/overrides/molecules/co2_strong
+    - name: "mini_neptune_haze_bias"
+      when: 'meta.radius_rearth >= 2.0 and meta.radius_rearth <= 4.0'
+      apply:
+        - configs/symbolic/overrides/profiles/profile_mini_neptune
+        - configs/symbolic/overrides/profiles/profile_high_haze
+        - configs/symbolic/overrides/molecules/ch4_strong
+    - name: "transit_only_event"
+      when: 'meta.event == "transit"'
+      apply:
+        - configs/symbolic/overrides/events/transit_only
+    - name: "eclipse_only_event"
+      when: 'meta.event == "eclipse"'
+      apply:
+        - configs/symbolic/overrides/events/eclipse_only
+    - name: "competition_runtime_guard"
+      when: 'meta.runtime_env == "kaggle"'
+      apply:
+        - configs/symbolic/overrides/competition/kaggle_runtime_guardrails
+  default:
+    - configs/symbolic/overrides/base

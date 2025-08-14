@@ -1,0 +1,28 @@
+# Schema: Molecule-region symbolic overrides
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Override - Molecule Region Schema"
+type: object
+description: |
+  Target symbolic overrides to specific molecule absorption regions or wavelength bands.
+properties:
+  id: { type: string, description: Unique identifier for this override set. }
+  target_molecules:
+    type: array
+    description: Molecules whose spectral regions are targeted by these overrides.
+    items: { type: string, enum: ["H2O", "CO2", "CH4", "NH3", "O3", "CO", "Other"] }
+  wavelength_range:
+    type: array
+    description: Two-element array [start_um, end_um] in microns.
+    items: { type: number }
+    minItems: 2
+    maxItems: 2
+  rules:
+    type: array
+    items:
+      type: object
+      properties:
+        name: { type: string, description: Name of the symbolic rule being overridden. }
+        weight: { type: number, description: New loss weight for this rule. }
+      required: ["name"]
+required: [id, target_molecules, wavelength_range, rules]
+additionalProperties: false

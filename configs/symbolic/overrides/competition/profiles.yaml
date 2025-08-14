@@ -1,0 +1,11 @@
+# Competition-mode pinning and audit trail for symbolic profiles
+
+competition:
+  leaderboard_mode: true
+  symbolic:
+    profiles:
+      pinned: "hot_jupiter"         # pin in leaderboard runs (override index.yaml)
+      allow_auto: false
+      audit:
+        write_manifest: true
+        manifest_path: "artifacts/competition_profile_manifest.json"

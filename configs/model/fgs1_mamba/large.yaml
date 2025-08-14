@@ -1,14 +1,7 @@
-# Larger preset for leaderboard training (mind VRAM + runtime)
 model:
   encoders:
     fgs1_mamba:
-      d_model: 320
+      d_model: 384
       d_state: 96
-      d_conv: 4
-      expand: 2
-      n_layers: 10
-      bidirectional: true
+      n_layers: 12
       dropout: 0.10
-      layer_norm: "rms"
-      proj_out: 320
-      export_step_latents: false

@@ -1,0 +1,73 @@
+# JSON Schema for top-level violations configuration (base + merged).
+# Citations for reproducible schema-driven workflows [oai_citation:1] and scientific credibility [oai_citation:0].
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$title: "SpectraMindV50 Violations Config"
+$type: object
+required: [meta, violations, logging]
+properties:
+  meta:
+    type: object
+    required: [name, version, updated]
+    properties:
+      name: { type: string }
+      version: { type: string }
+      updated: { type: string }
+      author: { type: string }
+      run_hash: { type: string }
+  violations:
+    type: object
+    required: [enable, mode, aggregate, default_weights, thresholds]
+    properties:
+      enable: { type: boolean }
+      mode:
+        type: string
+        enum: ["soft", "hard"]
+      aggregate:
+        type: string
+        enum: ["weighted_sum", "max", "p_norm"]
+      p_norm:
+        type: number
+        minimum: 1.0
+      default_weights:
+        type: object
+        additionalProperties: { type: number }
+      thresholds:
+        type: object
+        properties:
+          nonnegativity_eps: { type: number, minimum: 0.0 }
+          smoothness_l2_lambda: { type: number, minimum: 0.0 }
+          smoothness_tv_lambda: { type: number, minimum: 0.0 }
+          fft_asymmetry_ratio_max: { type: number, minimum: 0.0, maximum: 1.0 }
+          photonic_phase_tolerance: { type: number, minimum: 0.0, maximum: 1.0 }
+          molecule_band_tolerance: { type: number, minimum: 0.0 }
+        additionalProperties: false
+      calibration:
+        type: object
+        properties:
+          enable_corel_weighting: { type: boolean }
+          coverage_target:
+            type: number
+            minimum: 0.5
+            maximum: 0.999
+          weight_by_coverage_gap: { type: boolean }
+          max_weight_multiplier: { type: number, minimum: 1.0 }
+        additionalProperties: false
+    additionalProperties: false
+  logging:
+    type: object
+    required: [level, jsonl_stream_path, rotating_file, console]
+    properties:
+      level:
+        type: string
+        enum: ["DEBUG", "INFO", "WARN", "ERROR"]
+      jsonl_stream_path: { type: string }
+      rotating_file:
+        type: object
+        required: [path, max_bytes, backup_count]
+        properties:
+          path: { type: string }
+          max_bytes: { type: integer, minimum: 1024 }
+          backup_count: { type: integer, minimum: 1 }
+        additionalProperties: false
+      console: { type: boolean }
+    additionalProperties: false

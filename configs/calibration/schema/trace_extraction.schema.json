@@ -1,0 +1,33 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/trace_extraction.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AIRS Spectral Trace Extraction",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common_defs.schema.json#/$defs/enabled" },
+    {
+      "type": "object",
+      "properties": {
+        "model": { "$ref": "common_defs.schema.json#/$defs/enum_trace_model" },
+        "polynomial_x_to_row": { "$ref": "common_defs.schema.json#/$defs/polynomial_coeffs" },
+        "spline_knots": { "$ref": "common_defs.schema.json#/$defs/spline_knots" },
+        "width_px": { "type": "integer", "minimum": 1, "maximum": 63 },
+        "bg_strategy": { "enum": ["annulus", "local-median", "none"] },
+        "bg_window_px": { "type": "integer", "minimum": 1, "maximum": 127 },
+        "columns_range": { "$ref": "common_defs.schema.json#/$defs/range_pair_int" }
+      },
+      "required": ["enabled", "model", "width_px"],
+      "allOf": [
+        {
+          "if": { "properties": { "model": { "enum": ["poly1", "poly2", "poly3"] } } },
+          "then": { "required": ["polynomial_x_to_row"] }
+        },
+        {
+          "if": { "properties": { "model": { "const": "spline" } } },
+          "then": { "required": ["spline_knots"] }
+        }
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# AIRS spectral regions (bin indices are placeholders; update with dataset mapping when available)
+symbolic:
+  regions:
+    AIRS_CH4_BAND:         { bins: [20, 60],   weight: 1.0, note: "Methane dominant region (approx.)" }
+    AIRS_H2O_BAND:         { bins: [90, 140],  weight: 1.0, note: "Water vapor complex (approx.)" }
+    AIRS_CO2_BAND:         { bins: [160, 220], weight: 1.0, note: "Carbon dioxide region (approx.)" }
+    AIRS_NOISY_EDGE:       { bins: [0, 10],    weight: 0.5, note: "Short-edge elevated noise" }
+    AIRS_SYSTEMATIC_PRONE: { bins: [250, 282], weight: 0.5, note: "Long-edge systematics prone" }

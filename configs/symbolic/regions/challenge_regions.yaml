@@ -1,0 +1,17 @@
+# =================================================================================================
+# File: configs/symbolic/regions/challenge_regions.yaml
+# SpectraMind V50 — NeurIPS 2025 Challenge Regions
+# --------------------------------------------------------------------------------
+# Purpose:
+# Synthetic / overlapped windows to stress-test disentanglement, calibration, and logic routing.
+# =================================================================================================
+version: v50
+extends: regions_base.yaml
+description: Challenge-focused composite and edge-case regions.
+
+challenge_regions:
+  - id: CHALLENGE_MIXED
+    name: Mixed Molecular Composite
+    wavelength_range_um: [1.95, 2.50]
+    symbolic_role: mixed_molecule_test
+    notes: Overlaps CH4 and CO2 to test rule disentanglement and masking.

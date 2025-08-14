@@ -1,0 +1,8 @@
+# configs/symbolic/overrides/events/transit_only.yaml
+
+symbolic:
+  events:
+    transit:
+      enforce_midpoint_alignment: true
+      ingress_egress_monotonicity: true
+      eclipse_rules_enable: false

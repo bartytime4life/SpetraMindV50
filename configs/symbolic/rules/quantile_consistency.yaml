@@ -1,0 +1,14 @@
+# Quantile consistency — encourages σ and μ to form calibrated quantile envelopes (optional)
+symbolic:
+  rules:
+    quantile_consistency:
+      enabled: true
+      name: "quantile_consistency"
+      lambda: 0.25
+      quantiles: [0.1, 0.5, 0.9]      # evaluate tails + median consistency
+      penalty: "pinball"              # ["pinball","l2"]
+      per_region:
+        enable: false
+        boosts: {}
+      depends_on_sigma: true          # requires σ head; if absent, rule is skipped gracefully
+      log_tag: "rule_quantile"

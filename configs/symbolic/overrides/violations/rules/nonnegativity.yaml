@@ -1,0 +1,16 @@
+meta:
+  name: "rule_nonnegativity"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+
+rule:
+  key: "nonnegativity"
+  description: "Penalize μ < eps to respect physical nonnegativity of absorption/emission features."
+  weight: 2.0
+  terms:
+    - type: "hinge"
+      margin: "${violations.thresholds.nonnegativity_eps}"
+      power: 1.0
+  actions:
+    hard_mode_clamp: true

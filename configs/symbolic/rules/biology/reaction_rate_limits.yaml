@@ -1,0 +1,24 @@
+# Rule ID: reaction_rate_limits
+#
+# Description: Bound reaction rates within physically plausible ranges.
+
+rule:
+  id: "reaction_rate_limits"
+  domain: "biology"
+  kind: "constraint/bounds"
+  version: "v1"
+  description: >
+    Soft bounds on |dx/dt| based on kinetic priors.
+
+  inputs:
+    dxdt: "reaction_rates"
+
+  params:
+    max_abs_rate: 10.0
+
+  loss:
+    type: "hinge_both_sides"
+    aggregation: "mean_over_violations"
+
+  diagnostics:
+    export_mask: false

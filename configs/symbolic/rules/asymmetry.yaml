@@ -1,0 +1,16 @@
+# Asymmetry suppression (discourages unphysical one-sided spikes around local extrema)
+symbolic:
+  rules:
+    asymmetry:
+      enabled: true
+      name: "asymmetry"
+      lambda: 0.2
+      window_bins: 9             # local neighborhood to compare left/right residuals
+      center_search: "peaks"     # ["peaks","all","grid"] where to evaluate symmetry checks
+      center_stride: 3           # stride in "grid" mode
+      norm: "l1"                 # ["l1","l2"]
+      min_prominence: 0.0        # min local prominence to consider a candidate center
+      per_region:
+        enable: false
+        boosts: {}
+      log_tag: "rule_asym"

@@ -1,0 +1,9 @@
+# configs/symbolic/overrides/molecules/co_flag.yaml
+
+symbolic:
+  molecules:
+    CO:
+      roi_bins: [[116,128],[270,282]]
+      min_depth_sigma: 1.15
+      flag_only: true
+      penalty_weight: 0.35

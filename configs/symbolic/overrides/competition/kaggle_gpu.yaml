@@ -1,0 +1,35 @@
+# configs/symbolic/overrides/competition/kaggle_gpu.yaml
+
+# Kaggle GPU overlay: 9h walltime guardrail, compact diagnostics, strict logging.
+
+defaults:
+  - rules_strict
+  - profiles
+  - uncertainty
+  - calibration
+  - corel
+  - runtime
+
+runtime:
+  guardrails:
+    kaggle:
+      max_hours: 9
+      hard_stop: true
+  logging:
+    level: "WARNING"
+    jsonl_events: "runs/events.jsonl"
+    rotate_file:
+      path: "runs/logs/kaggle_run.log"
+      max_megabytes: 25
+      backups: 3
+  artifacts:
+    keep_top_n_submissions: 3
+    max_dashboard_html: 4
+    prune_old_on_success: true
+
+calibration:
+  temperature_scaling:
+    enabled: true
+  corel:
+    enabled: true
+    target_coverage: 0.90

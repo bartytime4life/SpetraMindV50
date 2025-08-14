@@ -1,0 +1,29 @@
+# configs/symbolic/overrides/competition/local_gpu.yaml
+
+# Local GPU overlay: richer diagnostics, verbose logging, developer-friendly.
+
+defaults:
+  - rules_strict
+  - profiles
+  - uncertainty
+  - calibration
+  - corel
+  - runtime
+
+runtime:
+  logging:
+    level: "DEBUG"
+    console_rich: true
+    jsonl_events: "runs/events_local.jsonl"
+    rotate_file:
+      path: "runs/logs/local_dev.log"
+      max_megabytes: 100
+      backups: 10
+  artifacts:
+    keep_top_n_submissions: 10
+    max_dashboard_html: 20
+
+calibration:
+  corel:
+    export_plots: true
+    export_csv: true

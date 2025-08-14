@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Molecule Override Schema",
+  "description": "Validate molecule-centric symbolic overrides",
+  "type": "object",
+  "properties": {
+    "molecule": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "formula": { "type": "string", "minLength": 1 },
+        "bands_um": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 }
+        },
+        "overrides": { "type": "object" },
+        "notes": { "type": "string" }
+      },
+      "required": ["id", "name", "formula", "bands_um", "overrides"]
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "author": { "type": "string" },
+        "created": { "type": "string", "format": "date" },
+        "schema_version": { "type": "string" }
+      },
+      "required": ["schema_version"]
+    }
+  },
+  "required": ["molecule", "metadata"]
+}

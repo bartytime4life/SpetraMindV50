@@ -1,0 +1,52 @@
+# Auto-selection map for symbolic profiles based on planet metadata/instrument context.
+#
+# Evaluated in order; first match wins. Uses simple comparator ops on metadata keys as emitted by pipeline.
+#
+# Supported ops: ==, !=, <=, <, >=, >, in (lists), between (inclusive), regex (for IDs), exists
+#
+# Keys reference canonical metadata: T_eq[K], logg[cgs], R_p[R_earth], M_p[M_earth], star_teff[K], star_fe_h, period[d],
+# instrument ("FGS1"|"AIRS"), and submission_mode ("leaderboard"|"diagnostics").
+#
+# Example CLI to print resolved profile:
+# python -m spectramind diagnose profile --print-active --meta path/to/meta.json
+
+symbolic:
+  profiles:
+    selector:
+      rules:
+        - name: "Ultra-Hot Jupiter (UHJ)"
+          when:
+            all:
+              - { key: "T_eq", op: ">=", value: 2000 }
+              - { key: "R_p", op: ">=", value: 9.0 }       # ~R_Jupiter ~ 11.2 R_earth; this is a soft lower bound
+          use: "ultra_hot_jupiter"
+        - name: "Hot Jupiter (HJ)"
+          when:
+            all:
+              - { key: "T_eq", op: "between", value: [1200, 2000] }
+              - { key: "R_p", op: ">=", value: 7.0 }
+          use: "hot_jupiter"
+        - name: "Warm Neptune"
+          when:
+            all:
+              - { key: "T_eq", op: "between", value: [600, 1200] }
+              - { key: "R_p", op: "between", value: [3.0, 6.0] }
+          use: "warm_neptune"
+        - name: "Temperate Super-Earth"
+          when:
+            all:
+              - { key: "T_eq", op: "between", value: [300, 700] }
+              - { key: "R_p", op: "between", value: [1.2, 2.5] }
+          use: "temperate_super_earth"
+        - name: "Instrument-specific tightening on AIRS if SNR low"
+          when:
+            all:
+              - { key: "instrument", op: "==", value: "AIRS" }
+              - { key: "airs_snr", op: "<", value: 4.0 }
+          use: "ood_guardrails"
+        - name: "Competition pin (leaderboard mode)"
+          when:
+            all:
+              - { key: "submission_mode", op: "==", value: "leaderboard" }
+          use: "hot_jupiter"
+      default: "default"

@@ -1,0 +1,40 @@
+# =================================================================================================
+# File: configs/symbolic/overrides/regions/molecules.yaml
+# SpectraMind V50 — Regions Override (Molecule-Focused)
+# --------------------------------------------------------------------------------
+# Purpose:
+# Emphasize molecular detection windows for SHAP fusion, symbolic ranking, and COREL checks.
+# =================================================================================================
+symbolic:
+  regions:
+    enabled: true
+    packs:
+      base: configs/symbolic/regions/regions_base.yaml
+      molecular: configs/symbolic/regions/molecular_regions.yaml
+      astrophysical: configs/symbolic/regions/astrophysical_regions.yaml
+      telescope: configs/symbolic/regions/telescope_regions.yaml
+      challenge: configs/symbolic/regions/challenge_regions.yaml
+
+    gates:
+      use_astrophysical: false
+      use_molecular: true
+      use_telescope: true
+      use_challenge: true
+
+    weights:
+      molecular_fingerprint: 1.75
+      continuum_reference: 0.75
+      near_ir_baseline: 1.0
+      scattering_reference: 0.5
+      thermal_baseline: 0.9
+      mixed_molecule_test: 1.25
+
+    validation:
+      enforce_schema: true
+      schema_path: configs/symbolic/_schemas/symbolic_region.schema.json
+      on_violation: "error"
+
+    exports:
+      write_masks_csv: true
+      write_masks_json: true
+      export_dir: artifacts/symbolic/regions_molecules

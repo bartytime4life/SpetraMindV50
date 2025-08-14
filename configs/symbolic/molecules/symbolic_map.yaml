@@ -1,0 +1,17 @@
+version: 1
+mappings:
+  # Example: how downstream code should resolve symbolic IDs to engine plugins
+  - symbolic: h2o
+    resolves_to:
+      spectra_provider: "hitran"
+      cross_section_table: "H2O_2024.kxt"
+      opacities_model: "correlated_k"
+  - symbolic: co2
+    resolves_to:
+      spectra_provider: "hitran"
+      cross_section_table: "CO2_2024.kxt"
+      opacities_model: "correlated_k"
+  - symbolic: amino_acids
+    resolves_to:
+      table: "amino_acids.yaml"
+      loader: "biochem.loader:load_amino_acids"

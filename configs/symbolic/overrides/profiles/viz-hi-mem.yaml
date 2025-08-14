@@ -1,0 +1,19 @@
+name: viz-hi-mem
+mode: prod
+desc: Visualization/EDA nodes with large RAM
+paths:
+  data_root: ${oc.env:DATA_ROOT,${hydra:runtime.cwd}/data}
+  cache_root: ${oc.env:CACHE_ROOT,${hydra:runtime.cwd}/.cache}
+  artifacts_root: ${oc.env:ARTIFACTS_ROOT,${hydra:runtime.cwd}/artifacts}
+logging:
+  console_level: INFO
+  file_rotate_mb: 50
+  file_keep: 10
+tracking:
+  mlflow: {enabled: false}
+  wandb: {enabled: false}
+scheduler:
+  type: none
+runtime:
+  num_workers: ${oc.env:SMV50_NUM_WORKERS,4}
+  device: cpu

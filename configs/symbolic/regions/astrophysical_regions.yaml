@@ -1,0 +1,22 @@
+# =================================================================================================
+# File: configs/symbolic/regions/astrophysical_regions.yaml
+# SpectraMind V50 — Astrophysical Symbolic Regions
+# --------------------------------------------------------------------------------
+# Purpose:
+# Regions describing astrophysical continuum or slope behavior used in symbolic rules.
+# =================================================================================================
+version: v50
+extends: regions_base.yaml
+description: Non-molecular regions for scattering and thermal emission constraints.
+
+astrophysical_regions:
+  - id: RAYLEIGH_SLOPE
+    name: Rayleigh Scattering Slope
+    wavelength_range_um: [0.50, 0.78]
+    symbolic_role: scattering_reference
+    notes: Short-λ slope; correlates with aerosols/haze in transmission.
+  - id: THERMAL_INFRARED
+    name: Thermal Emission Continuum
+    wavelength_range_um: [5.00, 7.80]
+    symbolic_role: thermal_baseline
+    notes: Secondary-eclipse dominant continuum for hot planets.

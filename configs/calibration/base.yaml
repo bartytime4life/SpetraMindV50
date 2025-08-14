@@ -1,0 +1,104 @@
+# --------------------------------------------------------------
+# SpectraMind V50 — Calibration Base (canonical structure)
+#
+# This file defines the full tree. Environment overlays may change values
+# but MUST NOT change structure (Hydra-safe).
+# --------------------------------------------------------------
+
+calib:
+  version: "v50"
+  seed: 1337
+
+  # ---- Paths (override in env overlays) ----
+  paths:
+    root: "${oc.env:SM_ROOT,${hydra:runtime.cwd}}"
+    raw:  "${calib.paths.root}/data/raw"
+    work: "${calib.paths.root}/data/work"
+    out:  "${calib.paths.root}/artifacts/calibrated"
+    logs: "${calib.paths.root}/artifacts/logs"
+    cache: "${calib.paths.root}/.cache/calib"
+
+  # ---- IO / Loader ----
+  io:
+    loader_workers: 4
+    prefetch_workers: 2
+    pin_memory: true
+    dtype: "float32"
+    chunks:
+      enable: true
+      size_time: 2048         # chunk length along time
+      overlap: 64
+    cache:
+      enable: true
+      policy: "auto"          # [auto|force|off]
+      max_gb: 12
+
+  # ---- Policies (import defaults; allow overlay) ----
+  policies:
+    target: "include"
+    file: "configs/calibration/policies.yaml"
+
+  # ---- Steps: include per-step configs ----
+  steps:
+    adc:
+      file: "configs/calibration/steps/adc.yaml"
+    nonlinearity:
+      file: "configs/calibration/steps/nonlinearity.yaml"
+    dark:
+      file: "configs/calibration/steps/dark.yaml"
+    flat:
+      file: "configs/calibration/steps/flat.yaml"
+    bias:
+      file: "configs/calibration/steps/bias.yaml"
+    trace_extraction:
+      file: "configs/calibration/steps/trace_extraction.yaml"
+    photometry:
+      file: "configs/calibration/steps/photometry.yaml"
+    normalization:
+      file: "configs/calibration/steps/normalization.yaml"
+    alignment:
+      file: "configs/calibration/steps/alignment.yaml"
+    jitter:
+      file: "configs/calibration/steps/jitter.yaml"
+    variance:
+      file: "configs/calibration/steps/variance.yaml"
+
+    # Uncertainty calibration stack
+    temperature_scaling:
+      _file_: "configs/calibration/steps/temperature_scaling.yaml"
+    corel:
+      _file_: "configs/calibration/steps/corel.yaml"
+    conformal:
+      _file_: "configs/calibration/steps/conformal.yaml"
+
+    diagnostics:
+      _file_: "configs/calibration/steps/diagnostics.yaml"
+
+  # ---- Logging ----
+  logging:
+    level: "INFO"             # [DEBUG|INFO|WARNING|ERROR]
+    console: true
+    file:
+      enable: true
+      path: "${calib.paths.logs}/calibration.log"
+      rotate_mb: 50
+      keep: 5
+    jsonl:
+      enable: true
+      path: "${calib.paths.logs}/calibration_events.jsonl"
+
+  # ---- Runtime Guards ----
+  runtime:
+    max_hours: 9               # Kaggle guardrail; can be >9 elsewhere
+    fail_fast: true
+    dry_run: false
+    deterministic: true
+
+  # ---- Reproducibility ----
+  repro:
+    capture:
+      git: true
+      env: true
+      pip_freeze: true
+      hydra_config_dump: true
+    outputs_manifest: "${calib.paths.out}/calibration_manifest.json"

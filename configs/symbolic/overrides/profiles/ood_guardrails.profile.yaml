@@ -1,0 +1,36 @@
+# OOD Guardrails: highly conservative constraints to prevent overconfident hallucinations on out-of-distribution inputs.
+
+symbolic:
+  loss:
+    weights:
+      smooth_l2_mu: 2.0
+      nonneg_mu: 1.2
+      fft_band_limit: 0.22
+      asymmetry_mu: 0.25
+      photonic_alignment: 0.9
+      molecule_region_coherence: 0.6     # relax molecule push; avoid forcing features
+      symbol_coverage_penalty: 0.2
+    options:
+      fft:
+        window: "hann"
+        max_rel_band: 0.25
+      molecule_sets:
+        include: ["H2O","CO2"]           # strict minimal set unless evidence grows
+      photonic:
+        use_fgs1_phase_anchor: true
+        jitter_robust: true
+  sigma:
+    calibration:
+      temperature_scaling: 1.25
+      corel_weight: 0.9
+      conformal_coverage_target: 0.90
+      per_bin: true
+  guards:
+    ood:
+      enable_entropy_tripwire: true
+      entropy_threshold: 0.0            # already in guardrails; keep on
+      zscore_threshold: 0.0
+      switch_to_profile: "ood_guardrails"
+  reporting:
+    export_masks: true
+    export_rule_scores: true

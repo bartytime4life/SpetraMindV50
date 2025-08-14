@@ -1,0 +1,31 @@
+# Declarative validation list for CI/CLI
+validators:
+- name: "molecule-records"
+ schema: "configs/symbolic/molecules/_schemas/molecules.schema.json"
+ include_globs:
+   - "configs/symbolic/molecules/*.yaml"
+   - "configs/symbolic/molecules/_examples/*.yaml"
+ # Optional excludes for WIP drafts:
+ exclude_globs:
+   - "configs/symbolic/molecules/_examples/*_WIP.yaml"
+
+- name: "region-records"
+ schema: "configs/symbolic/molecules/_schemas/region.schema.json"
+ include_globs:
+   - "configs/symbolic/molecules/*.yaml"
+   - "configs/symbolic/molecules/_examples/*.yaml"
+ nested_path: "$.spectral_regions[*]"  # validate each region object
+
+- name: "fingerprint-records"
+ schema: "configs/symbolic/molecules/_schemas/fingerprint.schema.json"
+ include_globs:
+   - "configs/symbolic/molecules/*.yaml"
+   - "configs/symbolic/molecules/_examples/*.yaml"
+ nested_path: "$.fingerprints[*]"      # validate each fingerprint object
+
+- name: "rule-records"
+ schema: "configs/symbolic/molecules/_schemas/rule.schema.json"
+ include_globs:
+   - "configs/symbolic/molecules/*.yaml"
+   - "configs/symbolic/molecules/_examples/*.yaml"
+ nested_path: "$.rules[*]"             # validate each rule object

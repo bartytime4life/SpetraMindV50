@@ -1,0 +1,90 @@
+# JSON-Schema style validator for *.profile.yaml
+
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Profile Schema"
+type: object
+properties:
+  symbolic:
+    type: object
+    required: ["loss","sigma","guards","reporting"]
+    properties:
+      loss:
+        type: object
+        properties:
+          weights:
+            type: object
+            properties:
+              smooth_l2_mu: { type: number, minimum: 0.0 }
+              nonneg_mu:    { type: number, minimum: 0.0 }
+              fft_band_limit: { type: number, minimum: 0.0, maximum: 1.0 }
+              asymmetry_mu: { type: number, minimum: 0.0 }
+              photonic_alignment: { type: number, minimum: 0.0 }
+              molecule_region_coherence: { type: number, minimum: 0.0 }
+              symbol_coverage_penalty: { type: number, minimum: 0.0 }
+            additionalProperties: false
+          options:
+            type: object
+            properties:
+              fft:
+                type: object
+                properties:
+                  window: { type: string }
+                  max_rel_band: { type: number, minimum: 0.0, maximum: 1.0 }
+                required: ["window","max_rel_band"]
+                additionalProperties: true
+              molecule_sets:
+                type: object
+                properties:
+                  include:
+                    type: array
+                    items: { type: string }
+                required: ["include"]
+                additionalProperties: false
+              photonic:
+                type: object
+                properties:
+                  use_fgs1_phase_anchor: { type: boolean }
+                  jitter_robust: { type: boolean }
+                required: ["use_fgs1_phase_anchor","jitter_robust"]
+                additionalProperties: false
+            additionalProperties: true
+        required: ["weights","options"]
+        additionalProperties: false
+      sigma:
+        type: object
+        properties:
+          calibration:
+            type: object
+            properties:
+              temperature_scaling: { type: number, minimum: 0.0 }
+              corel_weight: { type: number, minimum: 0.0 }
+              conformal_coverage_target: { type: number, minimum: 0.0, maximum: 1.0 }
+              per_bin: { type: boolean }
+            required: ["temperature_scaling","corel_weight","conformal_coverage_target","per_bin"]
+            additionalProperties: false
+        required: ["calibration"]
+        additionalProperties: false
+      guards:
+        type: object
+        properties:
+          ood:
+            type: object
+            properties:
+              enable_entropy_tripwire: { type: boolean }
+              entropy_threshold: { type: number }
+              zscore_threshold: { type: number }
+              switch_to_profile: { type: string }
+            required: ["enable_entropy_tripwire","entropy_threshold","zscore_threshold","switch_to_profile"]
+            additionalProperties: false
+        required: ["ood"]
+        additionalProperties: false
+      reporting:
+        type: object
+        properties:
+          export_masks: { type: boolean }
+          export_rule_scores: { type: boolean }
+        required: ["export_masks","export_rule_scores"]
+        additionalProperties: false
+    additionalProperties: false
+required: ["symbolic"]
+additionalProperties: false

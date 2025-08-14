@@ -1,0 +1,4 @@
+pyyaml>=6.0
+jsonschema>=4.22
+# mlflow>=2.12  # optional
+# wandb>=0.17  # optional

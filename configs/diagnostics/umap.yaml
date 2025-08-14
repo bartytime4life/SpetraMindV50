@@ -1,0 +1,21 @@
+# =====================================================================
+# SpectraMind V50 — UMAP Latent Space Diagnostics Configuration
+# ---------------------------------------------------------------------
+# Purpose:
+#   Project latent vectors into 2D/3D using UMAP for cluster inspection.
+#   Supports symbolic/SHAP overlays and clickable HTML dashboards.
+# =====================================================================
+
+defaults:
+  - base
+
+diagnostics:
+  umap:
+    n_neighbors: 15
+    min_dist: 0.1
+    n_components: 2
+    metric: "euclidean"
+    deduplicate_points: true
+    overlay_symbolic: true
+    overlay_shap: true
+    output_html: true
