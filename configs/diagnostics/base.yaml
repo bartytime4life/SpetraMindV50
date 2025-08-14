@@ -1,21 +1,41 @@
+# =====================================================================
+# SpectraMind V50 — Diagnostics Base Configuration
+# ---------------------------------------------------------------------
+# This is the canonical default diagnostics configuration, imported by
+# all other diagnostics configs (FFT, UMAP, SHAP, symbolic, calibration).
+#
+# Philosophy:
+#   - Documentation-first: fully describe parameters, outputs, and scope.
+#   - Modular: each diagnostic tool can override only what it needs.
+#   - Reproducibility: all settings here are version-controlled and
+#     logged in run manifests + v50_debug_log.md.
+#   - Cross-domain ready: physics, AI, astrophysics, symbolic reasoning.
+#
+# Hydra-safe: all keys have defaults; override via CLI or other configs.
+# =====================================================================
+
 diagnostics:
-  enabled: true
-  html_dashboard:
-    enabled: true
-    out_dir: "${paths.root}/artifacts/diagnostics"
-    open_browser: false
-    versioned: true
-  shap:
-    enabled: true
-    top_k_bins: 20
-    save_json: true
-  symbolic:
-    enabled: true
-    export_masks: true
-    top_rules: 10
-  fft:
-    enabled: true
-    smoothness_map: true
+  version: "v50"
+  output_dir: "${paths.root}/diagnostics"
+  save_plots: true
+  save_csv: true
+  save_json: true
+  plot_backend: "matplotlib"  # [matplotlib, plotly, seaborn]
+  overwrite_existing: false
+  random_seed: 1337
+
   logging:
-    to_jsonl: true
-    jsonl_path: "${paths.root}/artifacts/logs/diagnostics_events.jsonl"
+    enable_cli_log: true
+    enable_file_log: true
+    log_file: "${paths.root}/logs/diagnostics.log"
+    log_level: "INFO"
+
+  runtime:
+    num_workers: 4
+    gpu: true
+    cache_results: true
+
+  references:
+    enable_symbolic_overlay: true
+    enable_shap_overlay: true
+    enable_physics_overlay: true

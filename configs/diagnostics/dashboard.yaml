@@ -1,13 +1,20 @@
+# =====================================================================
+# SpectraMind V50 — Diagnostics Dashboard Configuration
+# ---------------------------------------------------------------------
+# Purpose:
+#   Controls which diagnostics appear in the HTML dashboard.
+#   Versioned output with embedded plots, overlays, and metadata.
+# =====================================================================
+
+defaults:
+  - base
+
 diagnostics:
-  html_dashboard:
-    enabled: true
-    out_dir: "${paths.root}/artifacts/diagnostics"
-    open_browser: false
-    versioned: true
-  include:
-    umap: true
-    tsne: true
-    shap_overlay: true
-    symbolic_leaderboard: true
-    fft_autocorr: true
-    cli_log_heatmaps: true
+  dashboard:
+    include_fft: true
+    include_umap: true
+    include_shap: true
+    include_symbolic: true
+    include_calibration: true
+    include_cli_log_summary: true
+    versioned_output: true

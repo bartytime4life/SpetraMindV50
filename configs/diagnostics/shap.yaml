@@ -1,7 +1,19 @@
+# =====================================================================
+# SpectraMind V50 — SHAP Diagnostics Configuration
+# ---------------------------------------------------------------------
+# Purpose:
+#   Compute SHAP values for μ predictions, overlay symbolic violations,
+#   rank bins by importance, and visualize as heatmaps/bar plots.
+# =====================================================================
+
+defaults:
+  - base
+
 diagnostics:
   shap:
-    enabled: true
-    top_k_bins: 32
-    overlay_entropy: true
-    export_png: true
-    export_html: true
+    model_target: "mu"
+    background_sample_size: 256
+    top_k_bins: 25
+    overlay_symbolic: true
+    normalize_values: true
+    output_heatmap: true
