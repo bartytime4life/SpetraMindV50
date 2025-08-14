@@ -1,0 +1,20 @@
+# =================================================================================================
+# File: configs/symbolic/regions/molecular_regions.yaml
+# SpectraMind V50 — Molecular Symbolic Regions
+# --------------------------------------------------------------------------------
+# Purpose:
+# Defines wavelength sub-regions per molecule for rule masks, SHAP overlays, and fusion plots.
+# =================================================================================================
+version: v50
+extends: regions_base.yaml
+description: Molecular wavelength clusters for symbolic constraints and diagnostics.
+
+molecular_regions:
+  - molecule: H2O
+    regions: [[0.92, 1.15], [1.35, 1.50], [1.80, 2.00]]
+  - molecule: CO2
+    regions: [[1.95, 2.10], [4.20, 4.40]]
+  - molecule: CH4
+    regions: [[1.65, 1.80], [2.20, 2.50], [3.30, 3.50]]
+  - molecule: NH3
+    regions: [[1.50, 1.65], [2.90, 3.10]]
