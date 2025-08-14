@@ -1,0 +1,36 @@
+# Schema: Base symbolic override structure
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Override - Base Schema"
+type: object
+description: |
+  Base schema for symbolic overrides, defining the minimal set of keys required
+  to override default symbolic constraints, loss weights, or rule parameters.
+properties:
+  id:
+    type: string
+    description: Unique identifier for this override set.
+  description:
+    type: string
+    description: Human-readable description of the override purpose/context.
+  enabled:
+    type: boolean
+    default: true
+    description: Whether this override set is active.
+  rules:
+    type: array
+    description: List of rule overrides.
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the symbolic rule being overridden.
+        weight:
+          type: number
+          description: New loss weight for this rule.
+        params:
+          type: object
+          description: Optional rule-specific parameters to override.
+      required: ["name"]
+required: [id, rules]
+additionalProperties: false

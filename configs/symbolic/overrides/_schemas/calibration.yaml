@@ -1,0 +1,20 @@
+# Schema: Symbolic overrides for calibration/training phases
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Override - Calibration Schema"
+type: object
+description: |
+  Apply override rules conditionally in phases (pretrain, contrastive, finetune, calibration, corel).
+properties:
+  id: { type: string }
+  phase: { type: string, enum: ["pretrain", "contrastive", "finetune", "calibration", "corel"] }
+  rules:
+    type: array
+    items:
+      type: object
+      properties:
+        name: { type: string, description: Name of the symbolic rule being overridden. }
+        weight: { type: number, description: New loss weight for this rule. }
+        params: { type: object, description: Optional rule-specific parameter overrides. }
+      required: ["name"]
+required: [id, phase, rules]
+additionalProperties: false

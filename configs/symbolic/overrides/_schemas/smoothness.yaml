@@ -1,0 +1,21 @@
+# Schema: Symbolic overrides for spectral smoothness constraints
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Override - Smoothness Schema"
+type: object
+description: |
+  Adjust smoothness loss terms globally or per-targeted bin ranges.
+properties:
+  id: { type: string }
+  global_weight: { type: number, description: Default smoothness weight across all bins. }
+  targeted_ranges:
+    type: array
+    description: Optional bin ranges with custom weights.
+    items:
+      type: object
+      properties:
+        start_bin: { type: integer }
+        end_bin: { type: integer }
+        weight: { type: number }
+      required: ["start_bin", "end_bin", "weight"]
+required: [id, global_weight]
+additionalProperties: false
