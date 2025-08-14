@@ -1,0 +1,32 @@
+# Rule ID: stellar_baseline_stability
+#
+# Description: Constrain out-of-transit baseline drift/jitter for photometry time series.
+
+rule:
+  id: "stellar_baseline_stability"
+  domain: "astro"
+  kind: "time_series/stability"
+  version: "v1"
+  description: >
+    Penalize low-frequency drift and excessive RMS in out-of-transit segments,
+    accounting for known pointing jitter regressors if provided.
+
+  inputs:
+    flux_ts: "fgs1_flux_timeseries"     # [B, T]
+    oot_mask: "out_of_transit_mask"     # [B, T]
+    jitter: "pointing_jitter_ts"        # optional [B, T, 2]
+
+  params:
+    max_rms_ppm: 100.0
+    max_drift_ppm_per_hr: 50.0
+
+  loss:
+    type: "composite"
+    terms:
+      - name: "rms"
+        weight: 0.6
+      - name: "drift"
+        weight: 0.4
+
+  diagnostics:
+    export_timeplots: true

@@ -1,0 +1,25 @@
+# Rule ID: conservation_of_mass
+#
+# Description: Enforce ∑inflows ≈ ∑outflows in closed system (demo).
+
+rule:
+  id: "conservation_of_mass"
+  domain: "biology"
+  kind: "conservation"
+  version: "v1"
+  description: >
+    Penalize mass imbalance given stoichiometry and closed-system assumption.
+
+  inputs:
+    inflow: "mass_in"
+    outflow: "mass_out"
+
+  params:
+    tolerance: 1.0e-6
+
+  loss:
+    type: "L2"
+    aggregation: "mean"
+
+  diagnostics:
+    export_mask: false

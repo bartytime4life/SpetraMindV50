@@ -1,0 +1,32 @@
+# Rule ID: smoothness_constraint
+#
+# Description: Penalize large second-derivative curvature in μ across wavelength bins
+# to enforce physically plausible smooth spectra while allowing sharp, known lines.
+
+rule:
+  id: "smoothness_constraint"
+  domain: "physics"
+  kind: "regularizer/laplacian"
+  version: "v1"
+  description: >
+    L2 penalty on discrete second differences of μ[λ] with optional
+    relaxed weighting inside registered molecular line windows.
+
+  inputs:
+    target: "mu_spectrum"     # [B, 283] predicted mean spectrum
+    mask: "valid_bins_mask"   # optional [B, 283]
+    aux:
+      molecular_windows: "molecule_windows_v50.yaml"  # optional path (Hydra-resolved)
+
+  params:
+    lambda: 1.0
+    line_window_relax: 0.5    # scale multiplier within known line windows
+    eps: 1.0e-12
+
+  loss:
+    type: "L2"
+    aggregation: "mean_over_valid"
+
+  diagnostics:
+    export_binwise_map: true
+    overlay_umap: true

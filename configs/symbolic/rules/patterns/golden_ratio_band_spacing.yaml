@@ -1,0 +1,25 @@
+# Rule ID: golden_ratio_band_spacing
+#
+# Description: Optional heuristic spacing prior for clustered band centers.
+
+rule:
+  id: "golden_ratio_band_spacing"
+  domain: "patterns"
+  kind: "heuristic/spacing"
+  version: "v1"
+  description: >
+    When band centers are detected, prefer successive spacing ratios ~φ.
+
+  inputs:
+    band_centers: "detected_band_centers"  # indices
+
+  params:
+    phi: 1.61803398875
+    tolerance: 0.25
+
+  loss:
+    type: "robust_l1"
+    aggregation: "mean_over_pairs"
+
+  diagnostics:
+    export_band_table: true

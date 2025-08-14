@@ -1,0 +1,42 @@
+# SpectraMind V50 — Default Patterns & Algorithms Symbolic Profile
+#
+# Pattern-theoretic constraints on spectra and latent embeddings.
+
+defaults:
+  - base
+
+profile:
+  name: "patterns_default"
+  description: >
+    Pattern-formation, symmetry, and scaling rules for spectral sequences
+    and latent spaces, supporting anomaly detection and shape priors.
+
+  domains: ["patterns"]
+
+  rules:
+    include:
+      - enforce_symmetry
+      - fractal_scaling
+      - golden_ratio_band_spacing
+    exclude: []
+
+  weights:
+    default: 1.0
+    overrides:
+      enforce_symmetry: 1.2
+      fractal_scaling: 1.0
+      golden_ratio_band_spacing: 0.8
+
+  diagnostics:
+    symbolic_overlay: true
+    shap_fusion: true
+    export_masks: true
+
+  training:
+    loss_mode: "soft"
+    normalize_losses: true
+    curriculum:
+      enabled: true
+      warmup_epochs: 2
+      max_weight: 1.6
+      schedule: "linear"

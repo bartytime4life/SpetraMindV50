@@ -1,0 +1,26 @@
+# Rule ID: non_negativity_flux
+#
+# Description: Enforce μ and μ±kσ remain within non-negative physical flux domain.
+
+rule:
+  id: "non_negativity_flux"
+  domain: "physics"
+  kind: "constraint/inequality"
+  version: "v1"
+  description: >
+    Penalize negative μ and negative μ-κσ predictions; softly clamp with hinge loss.
+
+  inputs:
+    mu: "mu_spectrum"
+    sigma: "sigma_spectrum"      # [B, 283]
+
+  params:
+    kappa: 1.0
+    margin: 0.0
+
+  loss:
+    type: "hinge"
+    aggregation: "mean_over_valid"
+
+  diagnostics:
+    export_binwise_map: true

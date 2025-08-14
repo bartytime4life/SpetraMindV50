@@ -1,0 +1,25 @@
+# Rule ID: enforce_symmetry
+#
+# Description: Symmetry prior on paired spectral regions or latent pairs.
+
+rule:
+  id: "enforce_symmetry"
+  domain: "patterns"
+  kind: "shape/symmetry"
+  version: "v1"
+  description: >
+    Penalize asymmetry across configured mirror indices or latent pairings.
+
+  inputs:
+    x: "mu_spectrum"
+    symmetry_map: "symmetry_pairs_v50.yaml"  # list of index pairs
+
+  params:
+    norm: "l2"
+
+  loss:
+    type: "L2"
+    aggregation: "mean_over_pairs"
+
+  diagnostics:
+    export_pairwise_diff: true

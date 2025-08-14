@@ -1,0 +1,26 @@
+# Rule ID: fft_bandlimit
+#
+# Description: Penalize high-frequency energy beyond configured cutoff in spectral domain.
+
+rule:
+  id: "fft_bandlimit"
+  domain: "physics"
+  kind: "regularizer/fft"
+  version: "v1"
+  description: >
+    Apply FFT to μ across wavelength index; penalize power above normalized cutoff.
+
+  inputs:
+    mu: "mu_spectrum"
+
+  params:
+    cutoff_frac: 0.35      # normalized Nyquist fraction
+    power_norm: "l2"       # ["l1","l2"]
+
+  loss:
+    type: "L2"
+    aggregation: "mean"
+
+  diagnostics:
+    export_power_spectrum: true
+    overlay_html_dashboard: true
