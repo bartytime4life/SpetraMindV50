@@ -1,0 +1,11 @@
+# configs/symbolic/overrides/weights/soft.yaml
+
+symbolic:
+  mode: "soft"
+  weights:
+    smoothness_l2: 0.40
+    smoothness_fft: 0.28
+    nonnegativity: 0.22
+    asymmetry: 0.15
+    photonic_alignment: 0.30
+    molecule_consistency: 0.30

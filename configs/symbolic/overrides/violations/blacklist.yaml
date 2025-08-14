@@ -1,0 +1,7 @@
+# configs/symbolic/overrides/violations/blacklist.yaml
+
+violations:
+  blacklist_rules:
+    - "negative_continuum_over_roi"
+    - "non_monotonic_ingress_egress"
+    - "phase_offset_gt_max"

@@ -1,0 +1,13 @@
+# configs/symbolic/overrides/competition/kaggle_runtime_guardrails.yaml
+
+runtime:
+  env: "kaggle"
+  budget_hours: 9.0
+  safeguards:
+    disable_expensive_plots: true
+    downsample_debug_artifacts: true
+    restrict_shap_samples: 128
+    restrict_umap_points: 3000
+  logging:
+    console_level: "INFO"
+    file_level: "DEBUG"

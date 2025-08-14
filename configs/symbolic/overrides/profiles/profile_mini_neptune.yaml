@@ -1,0 +1,11 @@
+# configs/symbolic/overrides/profiles/profile_mini_neptune.yaml
+
+symbolic:
+  mode: "soft"
+  weights:
+    smoothness_l2: 0.55
+    smoothness_fft: 0.38
+    nonnegativity: 0.32
+    asymmetry: 0.20
+    photonic_alignment: 0.42
+    molecule_consistency: 0.52

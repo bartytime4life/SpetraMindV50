@@ -1,0 +1,9 @@
+# configs/symbolic/overrides/molecules/nh3_flag.yaml
+
+symbolic:
+  molecules:
+    NH3:
+      roi_bins: [[94,101],[206,214]]
+      min_depth_sigma: 1.10
+      flag_only: true
+      penalty_weight: 0.30

@@ -1,0 +1,9 @@
+# configs/symbolic/overrides/molecules/h2o_strong.yaml
+
+symbolic:
+  molecules:
+    H2O:
+      roi_bins: [[12,28],[46,63],[102,120],[182,205]]
+      min_depth_sigma: 1.25
+      allow_overlap_with: ["CH4", "CO2"]
+      penalty_weight: 0.50

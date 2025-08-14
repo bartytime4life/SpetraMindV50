@@ -1,0 +1,28 @@
+# configs/symbolic/overrides/_schemas/overrides.schema.yaml
+#
+# Soft schema (advisory) for static checking or CI lints.
+
+type: object
+required: [symbolic]
+properties:
+  symbolic:
+    type: object
+    properties:
+      mode: { type: string, enum: ["soft", "hard"] }
+      weights:
+        type: object
+        properties:
+          smoothness_l2:        { type: number, minimum: 0.0 }
+          smoothness_fft:       { type: number, minimum: 0.0 }
+          nonnegativity:        { type: number, minimum: 0.0 }
+          asymmetry:            { type: number, minimum: 0.0 }
+          photonic_alignment:   { type: number, minimum: 0.0 }
+          molecule_consistency: { type: number, minimum: 0.0 }
+      thresholds:
+        type: object
+        properties:
+          violation:
+            type: object
+            properties:
+              warn:  { type: number, minimum: 0.0, maximum: 1.0 }
+              error: { type: number, minimum: 0.0, maximum: 1.0 }

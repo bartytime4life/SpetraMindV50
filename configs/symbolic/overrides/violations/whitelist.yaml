@@ -1,0 +1,6 @@
+# configs/symbolic/overrides/violations/whitelist.yaml
+
+violations:
+  whitelist_rules:
+    - "minor_bin_negativity_if_sigma<2"
+    - "weak_overlap_CH4_H2O"

@@ -1,0 +1,13 @@
+# configs/symbolic/overrides/profiles/profile_high_haze.yaml
+
+symbolic:
+  mode: "soft"
+  weights:
+    smoothness_l2: 0.70
+    smoothness_fft: 0.50
+    nonnegativity: 0.28
+    asymmetry: 0.12
+    photonic_alignment: 0.28
+    molecule_consistency: 0.30
+  haze:
+    continuum_bias_sigma: 0.15
