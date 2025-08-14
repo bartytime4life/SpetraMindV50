@@ -1,0 +1,12 @@
+# Local development: crank up debug and full exports
+symbolic:
+  profile:
+    export_detail: "full"
+    caps:
+      per_rule_cap: 12.0
+  debug:
+    log_level: "DEBUG"
+    sample_planets_for_logs: 12
+  export:
+    save_rule_maps_npz: true
+    save_html_table: true

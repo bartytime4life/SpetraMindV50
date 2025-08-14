@@ -1,0 +1,9 @@
+symbolic:
+  debug:
+    log_level: "INFO"             # ["DEBUG","INFO","WARN","ERROR"]
+    log_to_file: true
+    log_file: "artifacts/symbolic/symbolic_debug.log"
+    include_normed_values: true
+    include_raw_values: true
+    sample_planets_for_logs: 8    # cap how many planets to dump per batch
+    seed: 1337

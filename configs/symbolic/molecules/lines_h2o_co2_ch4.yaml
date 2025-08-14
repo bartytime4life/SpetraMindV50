@@ -1,0 +1,23 @@
+# Molecule band templates for symbolic rules. Two mapping strategies:
+# 1) direct bins (fast): provide [start_bin, end_bin] inclusive ranges
+# 2) wavelength map: provide [start_um, end_um] and a path to wavelength↔bin CSV to resolve
+symbolic:
+  molecules:
+    mapping:
+      method: "bins"                         # ["bins","wavelengths"]
+      wavelengths_csv: "data/wavelengths_airs.csv"  # used if method == "wavelengths"
+      wavelength_col: "wavelength_um"
+      bin_col: "bin"
+    templates:
+      H2O:
+        bands:
+          - { bins: [90, 120],   start_um: 1.30, end_um: 1.80, label: "H2O-1" }
+          - { bins: [120, 140],  start_um: 1.80, end_um: 2.10, label: "H2O-2" }
+      CO2:
+        bands:
+          - { bins: [160, 190],  start_um: 2.00, end_um: 2.70, label: "CO2-1" }
+          - { bins: [190, 220],  start_um: 2.70, end_um: 3.30, label: "CO2-2" }
+      CH4:
+        bands:
+          - { bins: [20, 40],    start_um: 0.90, end_um: 1.20, label: "CH4-1" }
+          - { bins: [40, 60],    start_um: 1.20, end_um: 1.50, label: "CH4-2" }

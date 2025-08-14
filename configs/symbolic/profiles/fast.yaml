@@ -1,0 +1,23 @@
+symbolic:
+  profile:
+    name: "fast"
+    description: "Minimal overhead for quick iterations / Kaggle 9h guardrail practice runs."
+    normalize: true
+    mode: "soft"
+    export_detail: "none"
+    toggles:
+      export_fft_power: false
+      export_alignment: false
+      export_per_molecule: false
+      export_violation_maps: false
+    caps:
+      per_rule_cap: 8.0
+    weights:
+      smoothness: 0.70
+      nonnegativity: 0.80
+      fft_bandlimit: 0.20
+      asymmetry: 0.10
+      photonic_alignment: 0.20
+      molecule_coherence: 0.20
+      transit_shape_consistency: 0.20
+      quantile_consistency: 0.10

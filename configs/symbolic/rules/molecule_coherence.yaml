@@ -1,0 +1,19 @@
+# Molecule coherence — encourages consistent absorption morphology within known molecular bands
+symbolic:
+  rules:
+    molecule_coherence:
+      enabled: true
+      name: "molecule_coherence"
+      lambda: 0.4
+      target_sign: "absorption"  # ["absorption","emission","auto"] auto infers dominant sign
+      intra_band_smoothness: 0.5 # additional smoothing within each molecular band
+      inter_band_consistency: 0.3 # consistency of band depths across same molecule bands
+      min_band_bins: 3           # skip tiny bands
+      weighting: "snr"           # ["uniform","snr","region"] combine with regions config SNR if available
+      per_region:
+        enable: true
+        boosts:
+          AIRS_H2O_BAND: 0.15
+          AIRS_CO2_BAND: 0.10
+      export_per_molecule: true  # JSON with per-molecule violation summaries
+      log_tag: "rule_molecule"

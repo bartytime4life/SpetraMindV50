@@ -1,0 +1,23 @@
+symbolic:
+  profile:
+    name: "diagnostics"
+    description: "Diagnostics-rich profile: full exports and looser caps for probing behavior."
+    normalize: true
+    mode: "soft"
+    export_detail: "full"
+    toggles:
+      export_fft_power: true
+      export_alignment: true
+      export_per_molecule: true
+      export_violation_maps: true
+    caps:
+      per_rule_cap: 12.0
+    weights:
+      smoothness: 0.90
+      nonnegativity: 1.00
+      fft_bandlimit: 0.40
+      asymmetry: 0.35
+      photonic_alignment: 0.55
+      molecule_coherence: 0.45
+      transit_shape_consistency: 0.35
+      quantile_consistency: 0.35
