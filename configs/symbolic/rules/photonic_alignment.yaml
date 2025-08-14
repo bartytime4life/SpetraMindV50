@@ -1,0 +1,18 @@
+# Photonic alignment — aligns AIRS spectral features with FGS1 transit timing / phase cues
+symbolic:
+  rules:
+    photonic_alignment:
+      enabled: true
+      name: "photonic_alignment"
+      lambda: 0.5
+      use_fgs1_anchor: true      # penalize misalignment vs FGS1 transit shape
+      crosscorr_window: 64       # time bins for cross-correlation
+      max_phase_lag: 8           # allowed lag (± bins); penalties beyond this grow sharply
+      lag_penalty: "quadratic"   # ["linear","quadratic","huber"]
+      huber_delta: 2.0
+      per_region:
+        enable: true
+        boosts:
+          AIRS_SYSTEMATIC_PRONE: 0.15
+      export_alignment: true     # dump per-planet lag estimates and CCF curves
+      log_tag: "rule_align"

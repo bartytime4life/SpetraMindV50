@@ -1,0 +1,18 @@
+# Smoothness (spectral L2/TV; supports multi-order differences and windowing)
+symbolic:
+  rules:
+    smoothness:
+      enabled: true
+      name: "smoothness"
+      kind: "l2"                 # ["l2","tv"] tv = total-variation (L1 on first derivative)
+      order: 2                   # derivative order (1..3). Higher = stronger high-freq suppression
+      lambda: 1.0                # base scaling before profile/weights
+      window_bins: 0             # optional moving window; 0 disables windowing
+      boundary: "reflect"        # ["reflect","replicate","circular"]
+      per_region:
+        enable: true             # allow region-specific boosts (e.g., high-noise bands)
+        boosts:                  # additive factor to lambda per named region (see regions config)
+          AIRS_CH4_BAND: 0.25
+          AIRS_H2O_BAND: 0.10
+      normalize_by_bins: true    # divide by #bins to keep loss scale stable across length
+      log_tag: "rule_smoothness"

@@ -1,0 +1,15 @@
+# Transit shape consistency — enforces relation between μ spectrum and FGS1 transit
+symbolic:
+  rules:
+    transit_shape_consistency:
+      enabled: true
+      name: "transit_shape_consistency"
+      lambda: 0.35
+      fgs1_phase_window: [-16, 16]  # phase bins around mid-transit to evaluate
+      depth_scaler: "learned"         # ["fixed","learned","median"] how to scale AIRS depth vs FGS1
+      fixed_scale: 1.0
+      penalty: "huber"                # ["l1","l2","huber"]
+      huber_delta: 0.02
+      ignore_out_of_transit: true
+      export_depth_maps: true
+      log_tag: "rule_transit_shape"

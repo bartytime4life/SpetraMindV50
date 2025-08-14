@@ -1,0 +1,13 @@
+# Non-negativity (μ >= 0), with soft penalty or hard clamp
+symbolic:
+  rules:
+    nonnegativity:
+      enabled: true
+      name: "nonnegativity"
+      kind: "soft"               # ["soft","hard"] hard = clamp μ<0 to 0 (non-diff), soft = hinge loss
+      lambda: 1.0
+      margin: 0.0                # allow tiny negatives within margin before penalizing
+      per_region:
+        enable: false
+        boosts: {}
+      log_tag: "rule_nonneg"

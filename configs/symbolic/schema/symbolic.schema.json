@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SpectraMind V50 Symbolic Config Schema",
+  "type": "object",
+  "properties": {
+    "defaults": { "type": "array" },
+    "symbolic": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "mode": { "type": "string", "enum": ["soft","hard"] },
+        "normalize": { "type": "boolean" },
+        "loss_reduction": { "type": "string", "enum": ["mean","sum","none"] },
+        "per_rule_cap": { "type": "number" },
+        "epsilon": { "type": "number" },
+        "rules": { "type": "object" },
+        "weights": { "type": "object" },
+        "profile": { "type": "object" },
+        "regions": { "type": "object" },
+        "molecules": { "type": "object" },
+        "export": { "type": "object" },
+        "debug": { "type": "object" }
+      },
+      "required": ["enabled","mode","rules","weights","profile"]
+    }
+  },
+  "required": ["defaults","symbolic"]
+}
