@@ -1,0 +1,17 @@
+# Spectral trace extraction (AIRS) and aperture definition (FGS1/photometry)
+
+steps:
+  trace_extraction:
+    enable: true
+    instrument: "AIRS"              # [AIRS|FGS1]
+    method: "optimal"               # [sum|optimal]
+    profile_sigma_pix: 2.0
+    trace_poly:
+      enable: true
+      order: 3
+      fit_window_px: 15
+    background:
+      method: "local_median"
+      windows_px: 20
+      robust: true
+

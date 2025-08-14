@@ -1,0 +1,28 @@
+# Calibration diagnostics: CSV/PNG/HTML outputs for quick verification
+
+steps:
+  diagnostics:
+    enable: true
+    outputs:
+      dir: "${calib.paths.out}/diagnostics"
+      csv: true
+      png: true
+      html: true
+    plots:
+      time_series:
+        enable: true
+        sample_every: 10
+      fft_power:
+        enable: true
+        window: 1024
+        overlap: 256
+      zscore_hist:
+        enable: true
+        bins: 50
+      coverage_heatmap:
+        enable: true
+        source: "corel"               # [corel|conformal|none]
+    logging:
+      timing_table: true
+      memory_peaks: true
+

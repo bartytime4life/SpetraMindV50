@@ -1,0 +1,11 @@
+# Non-parametric conformal fallback if COREL disabled/unavailable
+
+steps:
+  conformal:
+    enable: false
+    method: "inductive"               # [inductive|split]
+    alpha: 0.10
+    calibration_strategy: "per-bin"   # [global|per-bin]
+    smoothing: "moving_avg"
+    window_bins: 5
+

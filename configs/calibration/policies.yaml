@@ -1,0 +1,25 @@
+# Centralized IO / caching / safety policies for calibration.
+
+policies:
+  overwrite:
+    calibrated_frames: "auto"     # [always|never|auto]
+    intermediate: "auto"
+  variance:
+    propagate: true               # always carry variance channels forward
+    dtype: "float32"
+    epsilon: 1.0e-8
+  bounds:
+    clip_negatives: false         # scientific policy: never clip; analyze downstream
+    saturate_high_sigma: false
+  caching:
+    read_through: true
+    write_back: true
+  integrity:
+    checksum:
+      enable: true
+      algo: "blake2b"
+  logging:
+    step_timing: true
+    memory: true
+    per_file_summary: true
+

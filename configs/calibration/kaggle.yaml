@@ -1,0 +1,21 @@
+# Kaggle runner overlays (tight resources and wall-time)
+
+calib:
+  paths:
+    root: "${hydra:runtime.cwd}"
+  io:
+    loader_workers: 2
+    prefetch_workers: 1
+    cache:
+      max_gb: 6
+  logging:
+    level: "INFO"
+    file:
+      enable: true
+  runtime:
+    max_hours: 9
+    fail_fast: true
+  repro:
+    capture:
+      pip_freeze: false   # keep light on Kaggle if storage constrained
+

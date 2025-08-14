@@ -1,0 +1,15 @@
+# Analog-to-Digital Conversion correction
+
+steps:
+  adc:
+    enable: true
+    method: "gain_map"               # [gain_map|polynomial|none]
+    gain_map_path: "${calib.paths.root}/refs/calibration/adc_gain_map.fits"
+    bias_level_subtract: true
+    bias_level_method: "per-row"     # [global|per-row|per-col]
+    saturation_level_adu: 65535
+    outlier_mask:
+      enable: true
+      sigma: 6.0
+      dilate: 1
+

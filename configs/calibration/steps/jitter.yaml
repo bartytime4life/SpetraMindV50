@@ -1,0 +1,16 @@
+# Pointing jitter correction (decorrelation vs centroid/time)
+
+steps:
+  jitter:
+    enable: true
+    regressors:
+      - "centroid_x"
+      - "centroid_y"
+      - "time"
+    model: "ridge"                  # [ols|ridge|lasso]
+    alpha: 1.0
+    interaction_terms: true
+    rolling_window:
+      enable: true
+      frames: 256
+
