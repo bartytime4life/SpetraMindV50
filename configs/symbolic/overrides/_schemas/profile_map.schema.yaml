@@ -1,0 +1,46 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+title: "Symbolic Profile Selector Schema"
+type: object
+properties:
+  symbolic:
+    type: object
+    properties:
+      profiles:
+        type: object
+        properties:
+          selector:
+            type: object
+            properties:
+              rules:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    when:
+                      type: object
+                      properties:
+                        all:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key: { type: string }
+                              op:  { type: string }
+                              value: {}
+                            required: ["key","op"]
+                            additionalProperties: false
+                      required: ["all"]
+                      additionalProperties: false
+                    use: { type: string }
+                  required: ["name","when","use"]
+                  additionalProperties: false
+              default: { type: string }
+            required: ["rules","default"]
+            additionalProperties: false
+        required: ["selector"]
+        additionalProperties: false
+    required: ["profiles"]
+    additionalProperties: false
+required: ["symbolic"]
+additionalProperties: false
