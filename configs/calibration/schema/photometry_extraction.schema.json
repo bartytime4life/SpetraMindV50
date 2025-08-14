@@ -1,0 +1,52 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/photometry_extraction.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Photometry Extraction",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common_defs.schema.json#/$defs/enabled" },
+    {
+      "type": "object",
+      "properties": {
+        "method": { "enum": ["aperture", "psf"] },
+        "aperture_radius_px": { "$ref": "common_defs.schema.json#/$defs/positive_number" },
+        "annulus_inner_px": { "$ref": "common_defs.schema.json#/$defs/non_negative_number" },
+        "annulus_outer_px": { "$ref": "common_defs.schema.json#/$defs/positive_number" },
+        "centroid": {
+          "type": "object",
+          "properties": {
+            "mode": { "enum": ["2d-moments", "gauss-fit", "brightest"] },
+            "ref_center_px": { "$ref": "common_defs.schema.json#/$defs/center_xy" },
+            "refine_iterations": { "$ref": "common_defs.schema.json#/$defs/non_negative_integer" }
+          },
+          "required": ["mode"],
+          "additionalProperties": false
+        },
+        "jitter_feed": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "columns": {
+              "type": "array",
+              "items": { "$ref": "common_defs.schema.json#/$defs/enum_regressor" },
+              "minItems": 0
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": ["enabled", "method"],
+      "allOf": [
+        {
+          "if": {
+            "properties": { "method": { "const": "aperture" } }
+          },
+          "then": {
+            "required": ["aperture_radius_px", "annulus_inner_px", "annulus_outer_px"]
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

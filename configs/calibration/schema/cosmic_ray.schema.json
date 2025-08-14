@@ -1,0 +1,22 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/cosmic_ray.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cosmic Ray Detection and Rejection",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common_defs.schema.json#/$defs/enabled" },
+    {
+      "type": "object",
+      "properties": {
+        "method": { "enum": ["simple-sigma", "lacosmic", "wavelet"] },
+        "sigma_clip": { "type": "number", "minimum": 0.0, "default": 5.0 },
+        "max_frac_flagged": { "$ref": "common_defs.schema.json#/$defs/percent_0_1" },
+        "inpaint": { "type": "boolean", "default": true },
+        "inpaint_method": { "enum": ["median", "gaussian", "bilateral"] },
+        "threads": { "$ref": "common_defs.schema.json#/$defs/threads" }
+      },
+      "required": ["enabled", "method", "sigma_clip"],
+      "additionalProperties": false
+    }
+  ]
+}

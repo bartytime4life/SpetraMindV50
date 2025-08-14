@@ -1,0 +1,25 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/products_manifest.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Calibration Products Manifest",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common_defs.schema.json#/$defs/enabled" },
+    {
+      "type": "object",
+      "properties": {
+        "out_dir": { "$ref": "common_defs.schema.json#/$defs/path" },
+        "write_intermediate": { "type": "boolean", "default": true },
+        "save_formats": {
+          "type": "array",
+          "items": { "enum": ["fits", "npy", "parquet", "csv"] },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "n_threads_io": { "$ref": "common_defs.schema.json#/$defs/threads" }
+      },
+      "required": ["enabled", "out_dir"],
+      "additionalProperties": false
+    }
+  ]
+}
