@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-toolsai.jupyter",
+    "ms-python.black-formatter",
+    "ms-azuretools.vscode-docker",
+    "redhat.vscode-yaml",
+    "ms-toolsai.data-science",
+    "njpwerner.autodocstring",
+    "ms-vsliveshare.vsliveshare",
+    "mhutchie.git-graph",
+    "eamodio.gitlens"
+  ]
+}
