@@ -1,0 +1,14 @@
+meta:
+  name: "override_profile_warm_neptune"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  applies_to: "profile:warm_neptune"
+
+overrides:
+  violations:
+    default_weights:
+      molecule_coherence: 1.5
+      smoothness: 1.1
+    thresholds:
+      molecule_band_tolerance: 0.7

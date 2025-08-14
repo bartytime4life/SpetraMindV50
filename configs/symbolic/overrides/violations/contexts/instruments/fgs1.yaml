@@ -1,0 +1,15 @@
+meta:
+  name: "override_instrument_fgs1"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  applies_to: "instrument:FGS1"
+
+overrides:
+  violations:
+    default_weights:
+      smoothness: 1.2
+      nonnegativity: 2.0
+      fft_asymmetry: 0.5
+      photonic_alignment: 1.5
+      molecule_coherence: 1.2

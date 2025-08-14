@@ -1,0 +1,17 @@
+meta:
+  name: "override_instrument_airs"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  applies_to: "instrument:AIRS"
+
+overrides:
+  violations:
+    default_weights:
+      smoothness: 1.0
+      nonnegativity: 2.0
+      fft_asymmetry: 0.8
+      photonic_alignment: 1.0
+      molecule_coherence: 1.6
+    thresholds:
+      molecule_band_tolerance: 0.6

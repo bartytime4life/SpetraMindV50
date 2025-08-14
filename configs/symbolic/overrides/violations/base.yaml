@@ -1,0 +1,43 @@
+meta:
+  name: "violations_base_defaults"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  run_hash: "${oc.env:SM_RUN_HASH,not-set}"
+  notes: "Hydra-safe defaults for symbolic violation handling."
+
+violations:
+  enable: true
+  mode: "soft"
+  aggregate: "weighted_sum"
+  p_norm: 2.0
+
+  default_weights:
+    smoothness: 1.0
+    nonnegativity: 2.0
+    fft_asymmetry: 0.6
+    photonic_alignment: 1.2
+    molecule_coherence: 1.4
+
+  thresholds:
+    nonnegativity_eps: 1.0e-9
+    smoothness_l2_lambda: 0.01
+    smoothness_tv_lambda: 0.0
+    fft_asymmetry_ratio_max: 0.15
+    photonic_phase_tolerance: 0.02
+    molecule_band_tolerance: 0.5
+
+  calibration:
+    enable_corel_weighting: true
+    coverage_target: 0.90
+    weight_by_coverage_gap: true
+    max_weight_multiplier: 2.5
+
+logging:
+  level: "INFO"
+  jsonl_stream_path: "logs/violations_events.jsonl"
+  rotating_file:
+    path: "logs/violations_validator.log"
+    max_bytes: 10485760
+    backup_count: 3
+  console: true

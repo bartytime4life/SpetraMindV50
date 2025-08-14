@@ -1,0 +1,16 @@
+meta:
+  name: "override_event_kaggle_runtime_guardrail"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  applies_to: "event:kaggle_runtime_guardrail"
+
+overrides:
+  violations:
+    aggregate: "max"
+    default_weights:
+      smoothness: 0.8
+      nonnegativity: 2.5
+      fft_asymmetry: 0.4
+      photonic_alignment: 1.0
+      molecule_coherence: 1.2

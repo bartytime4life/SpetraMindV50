@@ -1,0 +1,17 @@
+meta:
+  name: "example_override_hot_neptune_neurips"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  applies_to: "competition:neurips2025,profile:warm_neptune"
+
+overrides:
+  violations:
+    default_weights:
+      molecule_coherence: 1.6
+      smoothness: 1.15
+    thresholds:
+      molecule_band_tolerance: 0.65
+    calibration:
+      coverage_target: 0.91
+      enable_corel_weighting: true

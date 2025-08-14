@@ -1,0 +1,24 @@
+meta:
+  name: "override_competition_neurips2025"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+  applies_to: "competition:neurips2025"
+
+overrides:
+  violations:
+    mode: "soft"
+    aggregate: "weighted_sum"
+    default_weights:
+      smoothness: 1.1
+      nonnegativity: 2.2
+      fft_asymmetry: 0.7
+      photonic_alignment: 1.3
+      molecule_coherence: 1.5
+    thresholds:
+      smoothness_l2_lambda: 0.02
+      fft_asymmetry_ratio_max: 0.12
+      photonic_phase_tolerance: 0.018
+    calibration:
+      enable_corel_weighting: true
+      coverage_target: 0.92

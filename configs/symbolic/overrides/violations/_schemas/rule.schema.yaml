@@ -1,0 +1,54 @@
+# Schema for individual violation rules.
+# References reproducible research templates [oai_citation:1].
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$title: "SpectraMindV50 Single Rule Schema"
+$type: object
+required: [meta, rule]
+properties:
+  meta:
+    type: object
+    required: [name, version, updated]
+    properties:
+      name: { type: string }
+      version: { type: string }
+      updated: { type: string }
+      author: { type: string }
+  rule:
+    type: object
+    required: [key, description, weight, terms]
+    properties:
+      key: { type: string }
+      description: { type: string }
+      weight: { type: number }
+      terms:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required: [type]
+          properties:
+            type:
+              type: string
+              enum: ["l2_curvature", "tv", "hinge", "fft_parity_ratio", "phase_alignment", "band_consistency"]
+            lambda: { type: [number, string] }
+            margin: { type: [number, string] }
+            power: { type: [number, string] }
+            max_ratio: { type: [number, string] }
+            penalty: { type: string }
+            tolerance: { type: [number, string] }
+            reference: { type: string }
+            band_tolerance_bins: { type: [number, string] }
+            molecules:
+              type: array
+              items: { type: string }
+      constraints:
+        type: object
+        properties:
+          enforce_nonnegativity_before: { type: boolean }
+        additionalProperties: false
+      actions:
+        type: object
+        properties:
+          hard_mode_clamp: { type: boolean }
+        additionalProperties: false
+    additionalProperties: false

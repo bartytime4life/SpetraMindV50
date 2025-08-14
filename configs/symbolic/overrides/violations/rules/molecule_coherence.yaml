@@ -1,0 +1,22 @@
+meta:
+  name: "rule_molecule_coherence"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+
+rule:
+  key: "molecule_coherence"
+  description: "Encourage coherent molecular absorption bands (e.g., H2O, CO2, CH4) within tolerance windows."
+  weight: 1.4
+  terms:
+    - type: "band_consistency"
+      band_tolerance_bins: "${violations.thresholds.molecule_band_tolerance}"
+      molecules:
+        - "H2O"
+        - "CO2"
+        - "CH4"
+        - "CO"
+        - "NH3"
+      references:
+        - "instrument_response_curves"
+        - "line_lists"
