@@ -1,0 +1,42 @@
+# SpectraMind V50 — Symbolic Profiles Base Configuration
+#
+# Canonical schema for symbolic profile definitions.
+# Hydra-compatible; extend in domain-specific profiles via:
+# defaults:
+#   - base
+#
+# Fields are read by symbolic_logic_engine.py and training/diagnostics CLIs.
+
+profile:
+  version: "v50"
+  name: "base"
+  description: >
+    Root schema for symbolic profile definitions.
+    Profiles declare the symbolic rule set(s) and metadata controlling
+    how symbolic constraints are applied in training, calibration,
+    diagnostics, and explainability.
+
+  domains: []
+
+  rules:
+    include: []  # IDs of rules to enable (must exist under configs/symbolic/rules/**)
+    exclude: []  # IDs of rules to force-disable (wins over include)
+
+  weights:
+    default: 1.0         # Fallback weight if not overridden
+    overrides: {}        # Map: rule_id -> float
+
+  diagnostics:
+    symbolic_overlay: true   # Include symbolic overlays in dashboards/HTML
+    shap_fusion: true        # Fuse SHAP with symbolic rule heatmaps
+    export_masks: true       # Persist per-rule/bin masks for downstream tools
+    log_topk_rules: 5        # Log top-K contributing rules per sample
+
+  training:
+    loss_mode: "soft"        # "soft" or "hard"
+    normalize_losses: true   # Normalize per-rule losses by rule scale
+    curriculum:
+      enabled: true
+      warmup_epochs: 5
+      max_weight: 2.0
+      schedule: "linear"     # ["linear","cosine","step"]

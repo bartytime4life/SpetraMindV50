@@ -1,0 +1,28 @@
+# Rule ID: rayleigh_slope_consistency
+#
+# Description: In blue/short λ regime, enforce approximate λ^-4 scattering slope when applicable.
+
+rule:
+  id: "rayleigh_slope_consistency"
+  domain: "astro"
+  kind: "shape/rayleigh"
+  version: "v1"
+  description: >
+    Fit local slope over short-λ segment; penalize deviations from expected trend
+    if atmosphere flagged as Rayleigh-dominated (metadata/flag).
+
+  inputs:
+    mu: "mu_spectrum"
+    wavelength: "wavelength_bins"   # [283] in microns
+    flags: "atmo_flags"             # contains rayleigh_candidate: bool
+
+  params:
+    lambda_max_um: 0.8
+    tolerance_ppm_per_um: 50.0
+
+  loss:
+    type: "robust_l1"
+    aggregation: "mean_over_flagged"
+
+  diagnostics:
+    overlay_html_dashboard: true

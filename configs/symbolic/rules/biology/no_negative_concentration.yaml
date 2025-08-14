@@ -1,0 +1,24 @@
+# Rule ID: no_negative_concentration
+#
+# Description: Non-negativity of species concentrations (demo cross-domain constraint).
+
+rule:
+  id: "no_negative_concentration"
+  domain: "biology"
+  kind: "constraint/inequality"
+  version: "v1"
+  description: >
+    Penalize negative predicted concentrations or derived quantities.
+
+  inputs:
+    x: "state_concentrations"   # placeholder tensor name
+
+  params:
+    margin: 0.0
+
+  loss:
+    type: "hinge"
+    aggregation: "mean"
+
+  diagnostics:
+    export_mask: false

@@ -1,0 +1,25 @@
+# Rule ID: transit_depth_physical_range
+#
+# Description: Enforce 0 <= depth(λ) <= depth_max from stellar/planet radius priors.
+
+rule:
+  id: "transit_depth_physical_range"
+  domain: "astro"
+  kind: "constraint/bounds"
+  version: "v1"
+  description: >
+    Depth bounds derived from (R_p/R_*)^2 ± uncertainty; softly penalize violations.
+
+  inputs:
+    depth_mu: "mu_spectrum"              # interpreted as depth(λ) in ppm or fraction
+    priors: "planet_star_radius_priors"  # provides depth_max per target
+
+  params:
+    margin_frac: 0.05        # allow small tolerance
+
+  loss:
+    type: "hinge_both_sides"
+    aggregation: "mean_over_violations"
+
+  diagnostics:
+    export_binwise_map: true

@@ -1,0 +1,42 @@
+# SpectraMind V50 — Default Biology Symbolic Profile
+#
+# Cross-domain example profile for biological plausibility rules.
+
+defaults:
+  - base
+
+profile:
+  name: "biology_default"
+  description: >
+    Demonstration of biology-style constraints (mass balance, non-negativity,
+    kinetic limits) for cross-domain neuro-symbolic evaluation.
+
+  domains: ["biology"]
+
+  rules:
+    include:
+      - no_negative_concentration
+      - reaction_rate_limits
+      - conservation_of_mass
+    exclude: []
+
+  weights:
+    default: 1.0
+    overrides:
+      no_negative_concentration: 2.0
+      reaction_rate_limits: 1.5
+      conservation_of_mass: 2.5
+
+  diagnostics:
+    symbolic_overlay: true
+    shap_fusion: true
+    export_masks: true
+
+  training:
+    loss_mode: "soft"
+    normalize_losses: true
+    curriculum:
+      enabled: true
+      warmup_epochs: 4
+      max_weight: 2.0
+      schedule: "step"

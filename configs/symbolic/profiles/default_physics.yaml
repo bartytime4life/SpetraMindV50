@@ -1,0 +1,45 @@
+# SpectraMind V50 — Default Physics Symbolic Profile
+#
+# Physics-informed rules for atmospheric spectroscopy and transit modeling.
+
+defaults:
+  - base
+
+profile:
+  name: "physics_default"
+  description: >
+    Physics-informed constraints ensuring μ/σ predictions remain
+    physically plausible for exoplanetary spectra and time-series.
+
+  domains: ["physics", "astro"]
+
+  rules:
+    include:
+      - smoothness_constraint
+      - non_negativity_flux
+      - fft_bandlimit
+      - molecular_band_alignment
+    exclude: []
+
+  weights:
+    default: 1.0
+    overrides:
+      smoothness_constraint: 1.5
+      non_negativity_flux: 2.0
+      fft_bandlimit: 1.2
+      molecular_band_alignment: 1.0
+
+  diagnostics:
+    symbolic_overlay: true
+    shap_fusion: true
+    export_masks: true
+    log_topk_rules: 8
+
+  training:
+    loss_mode: "soft"
+    normalize_losses: true
+    curriculum:
+      enabled: true
+      warmup_epochs: 5
+      max_weight: 2.5
+      schedule: "cosine"

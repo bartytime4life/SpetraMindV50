@@ -1,0 +1,29 @@
+# Rule ID: fractal_scaling
+#
+# Description: Encourage multi-scale consistency via downsampled self-similarity.
+
+rule:
+  id: "fractal_scaling"
+  domain: "patterns"
+  kind: "multiscale/self_similarity"
+  version: "v1"
+  description: >
+    Compare μ to pooled/downsampled versions; penalize large divergences.
+
+  inputs:
+    x: "mu_spectrum"
+
+  params:
+    scales: [2, 4]
+    metric: "cosine"    # ["l2","cosine"]
+
+  loss:
+    type: "composite"
+    terms:
+      - name: "scale2"
+        weight: 0.5
+      - name: "scale4"
+        weight: 0.5
+
+  diagnostics:
+    export_multiscale_curves: true

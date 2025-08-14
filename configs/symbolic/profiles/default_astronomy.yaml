@@ -1,0 +1,45 @@
+# SpectraMind V50 — Default Astronomy Symbolic Profile
+#
+# Astronomy-grounded constraints tailored to Ariel-like transit spectroscopy.
+
+defaults:
+  - base
+
+profile:
+  name: "astronomy_default"
+  description: >
+    Astronomy-driven rules for space-based transit spectroscopy:
+    stellar baseline stability, physical transit depth bounds,
+    atmospheric absorption consistency, and Rayleigh slope behavior.
+
+  domains: ["astro"]
+
+  rules:
+    include:
+      - stellar_baseline_stability
+      - atmospheric_absorption_lines
+      - transit_depth_physical_range
+      - rayleigh_slope_consistency
+    exclude: []
+
+  weights:
+    default: 1.0
+    overrides:
+      stellar_baseline_stability: 1.5
+      atmospheric_absorption_lines: 2.0
+      transit_depth_physical_range: 1.8
+      rayleigh_slope_consistency: 1.0
+
+  diagnostics:
+    symbolic_overlay: true
+    shap_fusion: true
+    export_masks: true
+
+  training:
+    loss_mode: "soft"
+    normalize_losses: true
+    curriculum:
+      enabled: true
+      warmup_epochs: 3
+      max_weight: 2.2
+      schedule: "linear"
