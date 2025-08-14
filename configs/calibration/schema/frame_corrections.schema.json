@@ -1,0 +1,105 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/frame_corrections.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Frame Corrections (ADC, bias, dark, flat, nonlinearity, ramp)",
+  "type": "object",
+  "properties": {
+    "adc": {
+      "allOf": [
+        { "$ref": "common_defs.schema.json#/$defs/enabled" },
+        {
+          "type": "object",
+          "properties": {
+            "bits": { "type": "integer", "enum": [12, 14, 16, 18] },
+            "saturation_adu": { "type": "integer", "minimum": 1024, "maximum": 1048575 },
+            "clip_saturated": { "type": "boolean", "default": true }
+          },
+          "required": ["enabled", "bits", "saturation_adu"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "bias": {
+      "allOf": [
+        { "$ref": "common_defs.schema.json#/$defs/enabled" },
+        {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "method": { "enum": ["constant", "map"] },
+            "offset_adu": { "type": "number" },
+            "reference_map": { "$ref": "common_defs.schema.json#/$defs/path" }
+          },
+          "required": ["enabled", "method"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "dark": {
+      "allOf": [
+        { "$ref": "common_defs.schema.json#/$defs/enabled" },
+        {
+          "type": "object",
+          "properties": {
+            "reference_map": { "$ref": "common_defs.schema.json#/$defs/path" },
+            "scale_mode": { "enum": ["none", "exptime", "temperature"] },
+            "detector": { "$ref": "common_defs.schema.json#/$defs/enum_detectors" }
+          },
+          "required": ["enabled", "reference_map", "scale_mode"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "flat": {
+      "allOf": [
+        { "$ref": "common_defs.schema.json#/$defs/enabled" },
+        {
+          "type": "object",
+          "properties": {
+            "reference_map": { "$ref": "common_defs.schema.json#/$defs/path" },
+            "normalize": { "$ref": "common_defs.schema.json#/$defs/enum_normalize" }
+          },
+          "required": ["enabled", "reference_map"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "nonlinearity": {
+      "allOf": [
+        { "$ref": "common_defs.schema.json#/$defs/enabled" },
+        {
+          "type": "object",
+          "properties": {
+            "model": { "enum": ["poly2", "poly3", "poly4", "lut"] },
+            "coeffs": { "$ref": "common_defs.schema.json#/$defs/polynomial_coeffs" },
+            "lut_path": { "$ref": "common_defs.schema.json#/$defs/path" },
+            "valid_range_adu": { "$ref": "common_defs.schema.json#/$defs/range_pair_int" }
+          },
+          "required": ["enabled", "model"],
+          "allOf": [
+            { "if": { "properties": { "model": { "const": "lut" } } }, "then": { "required": ["lut_path"] } },
+            { "if": { "properties": { "model": { "enum": ["poly2", "poly3", "poly4"] } } }, "then": { "required": ["coeffs"] } }
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ramp": {
+      "allOf": [
+        { "$ref": "common_defs.schema.json#/$defs/enabled" },
+        {
+          "type": "object",
+          "properties": {
+            "method": { "enum": ["up-the-ramp", "cds", "median"] },
+            "reject_outliers": { "type": "boolean", "default": true },
+            "sigma_clip": { "type": "number", "minimum": 0.0, "default": 5.0 }
+          },
+          "required": ["enabled", "method"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

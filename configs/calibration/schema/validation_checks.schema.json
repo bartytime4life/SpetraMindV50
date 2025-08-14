@@ -1,0 +1,28 @@
+{
+  "$id": "https://spectramind.v50/schema/calibration/validation_checks.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Calibration QA Thresholds and Gating Rules",
+  "type": "object",
+  "allOf": [
+    { "$ref": "common_defs.schema.json#/$defs/enabled" },
+    {
+      "type": "object",
+      "properties": {
+        "thresholds": {
+          "type": "object",
+          "properties": {
+            "max_bad_pixels_frac": { "$ref": "common_defs.schema.json#/$defs/percent_0_1" },
+            "max_rms_e2e": { "$ref": "common_defs.schema.json#/$defs/non_negative_number" },
+            "max_shift_frames": { "$ref": "common_defs.schema.json#/$defs/non_negative_integer" },
+            "max_cr_frac": { "$ref": "common_defs.schema.json#/$defs/percent_0_1" }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "fail_policy": { "enum": ["warn", "fail", "skip"] }
+      },
+      "required": ["enabled"],
+      "additionalProperties": false
+    }
+  ]
+}
