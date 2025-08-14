@@ -1,0 +1,47 @@
+{
+"$schema": "https://json-schema.org/draft/2020-12/schema",
+"$id": "region.schema.json",
+"title": "Spectral Region Schema",
+"type": "object",
+"additionalProperties": false,
+"required": ["name", "wavelength_um", "band_center_um", "band_width_um"],
+"properties": {
+ "name": {
+   "type": "string",
+   "minLength": 1,
+   "description": "Human-friendly label (e.g., 'H2O_1p4um_band')"
+ },
+ "wavelength_um": {
+   "type": "object",
+   "required": ["min", "max"],
+   "additionalProperties": false,
+   "properties": {
+     "min": { "type": "number", "exclusiveMinimum": 0.0 },
+     "max": { "type": "number", "exclusiveMinimum": 0.0 }
+   },
+   "description": "Inclusive bounds in microns for this region"
+ },
+ "band_center_um": {
+   "type": "number",
+   "exclusiveMinimum": 0.0,
+   "description": "Approximate absorption band center (μm)"
+ },
+ "band_width_um": {
+   "type": "number",
+   "exclusiveMinimum": 0.0,
+   "description": "Approximate full feature width around band center (μm)"
+ },
+ "bin_indices": {
+   "type": "array",
+   "items": { "type": "integer", "minimum": 0 },
+   "description": "Optional explicit bin indices (0-based) aligning to 283-bin decoder"
+ },
+ "priority": {
+   "type": "integer",
+   "minimum": 0,
+   "default": 0,
+   "description": "Relative diagnostic priority (higher = earlier checks/plots)"
+ },
+ "notes": { "type": "string" }
+}
+}

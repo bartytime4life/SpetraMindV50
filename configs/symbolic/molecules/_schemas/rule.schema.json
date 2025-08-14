@@ -1,0 +1,57 @@
+{
+"$schema": "https://json-schema.org/draft/2020-12/schema",
+"$id": "rule.schema.json",
+"title": "Symbolic Rule Schema",
+"type": "object",
+"additionalProperties": false,
+"required": ["rule_id", "type", "severity"],
+"properties": {
+ "rule_id": { "type": "string", "minLength": 1 },
+ "type": {
+   "type": "string",
+   "enum": [
+     "presence_band",           /* band presence required in region(s) */
+     "absence_window",          /* band must be absent in window(s)    */
+     "ratio_between_bands",     /* ratio constraints across two+ bands  */
+     "mutual_exclusion",        /* molecule A vs B exclusivity regions  */
+     "smoothness_window",       /* local smoothness (FFT/L2) constraint */
+     "nonnegativity_window",    /* μ >= 0 in window (or ≥ baseline)    */
+     "template_correlation",    /* corr(μ, fingerprint) ≥ threshold     */
+     "coabsorption_consistency" /* if A present then B in adj. region   */
+   ]
+ },
+ "severity": {
+   "type": "string",
+   "enum": ["info", "weak", "moderate", "strong", "hard"],
+   "description": "Strength of constraint; training uses to weight symbolic loss"
+ },
+ "applies_to": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+     "species_id": { "type": "string" },
+     "region_names": {
+       "type": "array",
+       "items": { "type": "string" }
+     }
+   },
+   "description": "Target molecule and/or named regions to which the rule applies"
+ },
+ "params": {
+   "type": "object",
+   "description": "Rule-specific parameters (see below)",
+   "additionalProperties": true
+ },
+ "notes": { "type": "string" }
+},
+
+"$comment": "Rule-specific params guidance:\n\
+• presence_band: { min_depth: float, min_span_um: float }\n\
+• absence_window: { max_depth: float, span_um: float }\n\
+• ratio_between_bands: { band_a: 'name', band_b: 'name', ratio_min: float, ratio_max: float }\n\
+• mutual_exclusion: { other_species_id: 'CH4', overlap_um: [min, max], max_joint_depth: float }\n\
+• smoothness_window: { wavelength_um: {min, max}, l2_lambda: float, fft_lambda: float }\n\
+• nonnegativity_window: { wavelength_um: {min, max}, baseline: float }\n\
+• template_correlation: { fingerprint: 'name', min_corr: float }\n\
+• coabsorption_consistency: { partner_species_id: 'CO2', lag_um: float, min_pair_presence: int }"
+}

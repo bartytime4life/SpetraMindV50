@@ -1,0 +1,26 @@
+# Canonical units and conversions for symbolic molecule schemas (Hydra-safe)
+units:
+wavelength:
+ canonical: "um"        # microns for wavelength
+ accepted: ["um", "micron", "microns"]
+wavenumber:
+ canonical: "cm^-1"
+ accepted: ["cm^-1"]
+strength:
+ canonical: "arb"       # arbitrary normalized line/feature strength for templates
+ accepted: ["arb"]
+temperature:
+ canonical: "K"
+ accepted: ["K", "kelvin"]
+pressure:
+ canonical: "bar"
+ accepted: ["bar", "Pa"]
+
+# Optional simple factors (for lightweight conversion when needed in CLI tools)
+conversions:
+# wavelengths
+"um->nm": 1000.0
+"nm->um": 0.001
+# pressure (illustrative; prefer a proper phys-constants lib in code)
+"bar->Pa": 100000.0
+"Pa->bar": 1.0e-5

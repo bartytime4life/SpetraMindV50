@@ -1,0 +1,81 @@
+# Example molecule config: Methane (CH4)
+species_id: "CH4"
+name: "Methane"
+formula: "CH4"
+charge: 0
+is_radiatively_active: true
+
+wavelength_um:
+min: 0.5
+max: 7.8
+
+default_binning:
+n_bins: 283
+
+spectral_regions:
+- name: "CH4_1p66um_band"
+ wavelength_um: { min: 1.60, max: 1.72 }
+ band_center_um: 1.66
+ band_width_um: 0.08
+ priority: 10
+- name: "CH4_2p3um_band"
+ wavelength_um: { min: 2.25, max: 2.38 }
+ band_center_um: 2.30
+ band_width_um: 0.10
+ priority: 9
+
+fingerprints:
+- name: "CH4_envelope_1p6_2p4"
+ mode: "envelope"
+ template_wavelength_um: [1.60, 1.63, 1.66, 1.69, 1.72, 2.25, 2.28, 2.30, 2.33, 2.36, 2.38, 2.40]
+ template_strength:       [0.10, 0.35, 0.85, 0.60, 0.15, 0.10, 0.45, 0.90, 0.70, 0.30, 0.15, 0.05]
+ source: "Composite envelope (curated)"
+ temperature_K: 1000
+ pressure_bar: 0.01
+
+rules:
+- rule_id: "CH4.presence.1p66um"
+ type: "presence_band"
+ severity: "moderate"
+ applies_to: { species_id: "CH4", region_names: ["CH4_1p66um_band"] }
+ params:
+   min_depth: 0.012
+   min_span_um: 0.03
+- rule_id: "CH4.template_corr"
+ type: "template_correlation"
+ severity: "weak"
+ applies_to: { species_id: "CH4", region_names: ["CH4_1p66um_band", "CH4_2p3um_band"] }
+ params:
+   fingerprint: "CH4_envelope_1p6_2p4"
+   min_corr: 0.25
+- rule_id: "CH4.vs.H2O.exclusion_1p60_1p72"
+ type: "mutual_exclusion"
+ severity: "info"
+ applies_to: { species_id: "CH4", region_names: ["CH4_1p66um_band"] }
+ params:
+   other_species_id: "H2O"
+   overlap_um: [1.60, 1.72]
+   max_joint_depth: 0.02
+ notes: "Heuristic: discourage spurious co-detection when both templates weakly align in overlap."
+- rule_id: "CH4.smoothness.local"
+ type: "smoothness_window"
+ severity: "weak"
+ applies_to: { species_id: "CH4", region_names: ["CH4_1p66um_band", "CH4_2p3um_band"] }
+ params:
+   wavelength_um: { min: 1.60, max: 2.38 }
+   l2_lambda: 0.05
+   fft_lambda: 0.00
+- rule_id: "CH4.nonnegativity.core"
+ type: "nonnegativity_window"
+ severity: "hard"
+ applies_to: { species_id: "CH4", region_names: ["CH4_1p66um_band", "CH4_2p3um_band"] }
+ params:
+   wavelength_um: { min: 1.60, max: 2.38 }
+   baseline: 0.0
+
+metadata:
+sources:
+ - "General exoplanet spectroscopy context; astrophysical spectroscopy practice"
+notes: "Starter example for schema validation and symbolic rule wiring."
+version: "1.0.0"
+updated: "2025-08-14"
