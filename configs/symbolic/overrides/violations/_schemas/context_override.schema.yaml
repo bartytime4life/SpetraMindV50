@@ -1,0 +1,49 @@
+# Schema for context-specific overrides of violations configuration.
+# Aligns with NASA M&S credibility guidance [oai_citation:0].
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$title: "SpectraMindV50 Context Override Schema"
+$type: object
+required: [meta, overrides]
+properties:
+  meta:
+    type: object
+    required: [name, version, updated, applies_to]
+    properties:
+      name: { type: string }
+      version: { type: string }
+      updated: { type: string }
+      author: { type: string }
+      applies_to: { type: string }
+  overrides:
+    type: object
+    properties:
+      violations:
+        type: object
+        properties:
+          enable: { type: boolean }
+          mode:
+            type: string
+            enum: ["soft", "hard"]
+          aggregate:
+            type: string
+            enum: ["weighted_sum", "max", "p_norm"]
+          p_norm: { type: [number, string] }
+          default_weights:
+            type: object
+            additionalProperties: { type: number }
+          thresholds:
+            type: object
+            properties:
+              nonnegativity_eps: { type: [number, string], minimum: 0.0 }
+              smoothness_l2_lambda: { type: [number, string], minimum: 0.0 }
+              smoothness_tv_lambda: { type: [number, string], minimum: 0.0 }
+              fft_asymmetry_ratio_max: { type: [number, string], minimum: 0.0, maximum: 1.0 }
+              photonic_phase_tolerance: { type: [number, string], minimum: 0.0, maximum: 1.0 }
+              molecule_band_tolerance: { type: [number, string], minimum: 0.0 }
+            additionalProperties: false
+          calibration:
+            $ref: "violations.schema.yaml#/properties/violations/properties/calibration"
+        additionalProperties: false
+      calibration:
+        $ref: "violations.schema.yaml#/properties/violations/properties/calibration"
+    additionalProperties: false

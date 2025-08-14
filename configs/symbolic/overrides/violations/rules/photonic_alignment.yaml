@@ -1,0 +1,16 @@
+meta:
+  name: "rule_photonic_alignment"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+
+rule:
+  key: "photonic_alignment"
+  description: "Enforce phase alignment of spectroscopic features with FGS1-derived photometric transit timing."
+  weight: 1.2
+  terms:
+    - type: "phase_alignment"
+      tolerance: "${violations.thresholds.photonic_phase_tolerance}"
+      reference: "FGS1"
+      sources:
+        - "fgs1_transit_shape"

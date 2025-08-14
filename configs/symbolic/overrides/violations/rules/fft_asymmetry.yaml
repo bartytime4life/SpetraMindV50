@@ -1,0 +1,14 @@
+meta:
+  name: "rule_fft_asymmetry"
+  version: "v1.0.0"
+  updated: "2025-08-14T00:00:00Z"
+  author: "SpectraMind Architect"
+
+rule:
+  key: "fft_asymmetry"
+  description: "Discourage unphysical odd/even FFT power asymmetry in μ spectra."
+  weight: 0.6
+  terms:
+    - type: "fft_parity_ratio"
+      max_ratio: "${violations.thresholds.fft_asymmetry_ratio_max}"
+      penalty: "quadratic"
