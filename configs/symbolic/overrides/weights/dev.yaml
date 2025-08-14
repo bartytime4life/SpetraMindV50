@@ -1,0 +1,18 @@
+meta:
+  profile: dev
+  version: "1.0.0"
+  description: Developer exploration; looser guardrails + richer logs.
+
+weights:
+  spectral_consistency: 0.8
+  line_id_confidence: 0.8
+  residual_penalty: 0.9
+  prior_chemistry: 0.6
+  instrument_systematics: 0.4
+  nan_guard: 5.0
+  outlier_guard: 3.0
+
+constraints:
+  min: -12.0
+  max:  12.0
+  clip: false
