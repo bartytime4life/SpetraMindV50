@@ -1,0 +1,11 @@
+# configs/symbolic/overrides/weights/hard.yaml
+
+symbolic:
+  mode: "hard"
+  weights:
+    smoothness_l2: 1.00
+    smoothness_fft: 0.85
+    nonnegativity: 0.70
+    asymmetry: 0.55
+    photonic_alignment: 0.80
+    molecule_consistency: 0.75

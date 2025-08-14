@@ -1,0 +1,13 @@
+# configs/symbolic/overrides/profiles/profile_hot_jupiter.yaml
+
+symbolic:
+  mode: "soft"
+  weights:
+    smoothness_l2: 0.45
+    smoothness_fft: 0.30
+    nonnegativity: 0.28
+    asymmetry: 0.18
+    photonic_alignment: 0.50
+    molecule_consistency: 0.55
+  photonic_alignment:
+    max_phase_offset: 0.010

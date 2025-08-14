@@ -1,0 +1,17 @@
+# configs/symbolic/overrides/profiles/profile_high_jitter.yaml
+
+symbolic:
+  mode: "hard"
+  weights:
+    smoothness_l2: 0.80
+    smoothness_fft: 0.55
+    nonnegativity: 0.40
+    asymmetry: 0.30
+    photonic_alignment: 0.60
+    molecule_consistency: 0.50
+  smoothing:
+    mu_l2_window_bins: 9
+    mu_fft_min_ratio: 0.08
+  diagnostics:
+    flags:
+      overlay_centroid_jitter: true

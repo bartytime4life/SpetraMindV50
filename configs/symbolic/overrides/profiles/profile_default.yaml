@@ -1,0 +1,11 @@
+# configs/symbolic/overrides/profiles/profile_default.yaml
+
+symbolic:
+  mode: "soft"
+  weights:
+    smoothness_l2: 0.50
+    smoothness_fft: 0.35
+    nonnegativity: 0.30
+    asymmetry: 0.20
+    photonic_alignment: 0.40
+    molecule_consistency: 0.45

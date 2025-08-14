@@ -1,0 +1,9 @@
+# configs/symbolic/overrides/instruments/fgs1_strict.yaml
+
+symbolic:
+  instruments:
+    FGS1:
+      transit_shape_coherence: true
+      time_smoothness_window: 11
+      centroid_jitter_penalty: 0.40
+      ramp_correction_required: true
