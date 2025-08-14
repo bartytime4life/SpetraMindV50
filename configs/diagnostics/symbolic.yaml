@@ -1,0 +1,6 @@
+diagnostics:
+  symbolic:
+    enabled: true
+    export_masks: true
+    top_rules: 15
+    overlay_shap: true

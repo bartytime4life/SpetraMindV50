@@ -1,0 +1,21 @@
+diagnostics:
+  enabled: true
+  html_dashboard:
+    enabled: true
+    out_dir: "${paths.root}/artifacts/diagnostics"
+    open_browser: false
+    versioned: true
+  shap:
+    enabled: true
+    top_k_bins: 20
+    save_json: true
+  symbolic:
+    enabled: true
+    export_masks: true
+    top_rules: 10
+  fft:
+    enabled: true
+    smoothness_map: true
+  logging:
+    to_jsonl: true
+    jsonl_path: "${paths.root}/artifacts/logs/diagnostics_events.jsonl"

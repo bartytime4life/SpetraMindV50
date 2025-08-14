@@ -1,67 +1,10 @@
-# Canonical μ (mean) decoder — SpectraMind V50
-#
-# Hydra path: model/mu_decoder/base
-#
-# Compose via: defaults: [ model/mu_decoder@model.decoders.mu_decoder: base ]
-
 model:
   decoders:
-    mu_decoder:
-      enabled: true
-
-      # --- I/O & shape -------------------------------------------------------------------------
-      # in_dim should match the fused latent dimension coming out of encoders.
-      # For SpectraMind V50 defaults, 256 or 384 are common; keep in sync with encoder projections.
-      in_dim: 256
+    mu:
+      type: "multi_scale"
+      hidden_dim: 256
       out_bins: 283
-
-      # --- MLP body -----------------------------------------------------------------------------
-      # A robust, shallow-to-medium MLP typically balances accuracy and runtime on Kaggle GPUs.
-      hidden:
-        dims: [512, 512]
-        activation: "silu"        # ["relu", "gelu", "silu", "mish"]
-        dropout: 0.10
-        normalization: "layernorm" # ["none", "layernorm", "rmsnorm"]
-        residual: true
-
-      # --- Output head --------------------------------------------------------------------------
-      # Keep linear output for μ; clamp in training loop if needed (e.g., non-negativity).
-      head:
-        type: "linear"            # ["linear"]
-        final_activation: "none"  # ["none"]  (do not use softplus here—use symbolic/loss for constraints)
-        init: "xavier_uniform"    # ["xavier_uniform", "kaiming_uniform"]
-
-      # --- Loss pack (μ-specific) ---------------------------------------------------------------
-      loss:
-        type: "gll"               # Gaussian log-likelihood with σ from separate head
-        weight: 1.0
-
-        # Physical/symbolic auxiliaries — tune per-ablation:
-        smooth:
-          l2_weight: 0.010        # L2(∇μ) in wavelength space
-          window: 5               # smoothing window (bins) for finite-diff approx or SavGol in code
-        fft_smooth:
-          weight: 0.000           # frequency-domain smoothness regularizer
-          max_freq: null          # optional low-pass (Hz in normalized bin space); null = auto
-        asymmetry:
-          weight: 0.000           # penalize unphysical asymmetric patterns if enabled in code
-        nonneg:
-          weight: 0.000           # encourage μ >= 0 without hard clamp (symbolic-friendly)
-
-      # --- Multiscale input fusion (disabled in base) -------------------------------------------
-      multiscale:
-        enabled: false
-        # If later enabled, see multiscale.yaml for full knobs.
-
-      # --- MoE routing (disabled in base) -------------------------------------------------------
-      moe:
-        enabled: false
-        # If later enabled, see moe.yaml for full knobs.
-
-      # --- Export & logging ---------------------------------------------------------------------
-      export:
-        save_intermediate: false
-        save_dir: "artifacts/mu_decoder"
-      log:
-        level: "INFO"             # ["DEBUG","INFO","WARNING","ERROR"]
-        include_shapes: true
+      n_scales: 3
+      scale_factors: [1,2,4]
+      activation: "silu"
+      smoothing_penalty: 0.001

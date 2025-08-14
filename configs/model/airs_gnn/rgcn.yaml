@@ -1,25 +1,9 @@
-# Relational GCN backend — treats edge categories as relations (RGCNConv-like).
-# Good when molecule/seam semantics matter as distinct relations.
-
 model:
   encoders:
     airs_gnn:
-      enabled: true
-      backend: "rgcn"
-      hidden_dim: 224
+      gnn_type: "rgcn"
+      hidden_dim: 256
       num_layers: 5
       dropout: 0.10
-      residual: true
-      layer_norm: "rms"
-      activation: "silu"
-      # Edge type mapping (derived from physics_edges):
-      relations:
-        - "adjacency"
-        - "molecule"
-        - "seam"
-      edge_type_strategy: "priority"     # ["priority","multi-hot-to-id"]
-      export_attention: false            # not applicable, but keep flag for interface parity
-      jit_scriptable: true
-      diagnostics:
-        assert_connected_graph: true
-        log_shapes: true
+      # Optional: typed edges for molecule regions / detector lanes
+      relation_types: ["band_gap","molecule","detector"]

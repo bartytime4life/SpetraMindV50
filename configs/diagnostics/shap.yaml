@@ -1,0 +1,7 @@
+diagnostics:
+  shap:
+    enabled: true
+    top_k_bins: 32
+    overlay_entropy: true
+    export_png: true
+    export_html: true

@@ -1,151 +1,39 @@
-# configs/data/base.yaml
-# Canonical, Hydra-safe data configuration for SpectraMind V50.
-
+# Canonical, Hydra-safe data configuration for SpectraMind V50
 data:
   version: "v50"
   seed: 1337
 
-  # -------------------- Paths & Layout --------------------
-  # Override these in platform-specific files (e.g., local.yaml, kaggle.yaml).
-  paths:
-    # Project-root-relative default layout; can be absolute.
-    root: "${oc.env:SM_ROOT,${hydra:runtime.cwd}}"
-    raw:
-      fgs1: "${data.paths.root}/data/raw/fgs1"
-      airs: "${data.paths.root}/data/raw/airs_ch0"
-      meta: "${data.paths.root}/data/raw/meta"
-    calibrated:
-      fgs1: "${data.paths.root}/data/calibrated/fgs1"
-      airs: "${data.paths.root}/data/calibrated/airs"
-      logs: "${data.paths.root}/data/calibrated/logs"
-    features:
-      fgs1_white: "${data.paths.root}/data/features/fgs1_white"
-      airs_bins:  "${data.paths.root}/data/features/airs_bins"
-      meta:       "${data.paths.root}/data/features/meta"
-    splits:
-      file: "${data.paths.root}/data/splits/groupkfold.json"
-    schemas:
-      submission:  "${data.paths.root}/schemas/submission.schema.json"
-      planet_meta: "${data.paths.root}/schemas/planet_meta.schema.json"
+paths:
+  # Project-root-relative by default; can be absolute with env overrides.
+  root: "${oc.env:PROJECT_ROOT, .}"
+  raw: "${paths.root}/data/raw"
+  processed: "${paths.root}/data/processed"
+  cache: "${paths.root}/data/cache"
+  submissions: "${paths.root}/submissions"
+  artifacts: "${paths.root}/artifacts"
 
-  # -------------------- IO & Caching --------------------
-  io:
-    # File formats for persisted tensors and logs.
-    format:
-      frames: "npz"       # npz with {frames, variance, mask}
-      features: "npz"
-      logs: "jsonl"
-    # Compression and chunking strategies.
-    compression:
-      npz: {allow_pickle: false, compress_level: 4}  # zlib level 0–9
-    # Memory-mapped access for big arrays (experimental).
-    mmap:
-      enabled: true
-      mode: "r"          # read-only during training / inference
-    # Caching policy for repeated reuse.
-    cache:
-      calibrated: true
-      features: true
-      integrity_check: true   # verify keys & shapes on load
-    # Optional DVC/lakeFS: when enabled, data artifacts are tracked upstream.
-    dvc_track: false          # set true in CI or heavy runs
-    # Telemetry and audits for IO hotpaths.
-    telemetry:
-      log_open_close: false
-      log_io_stats: true
+io:
+  num_workers: 8
+  pin_memory: true
+  persistent_workers: true
+  prefetch_factor: 2
 
-  # -------------------- Loaders & Batching --------------------
-  loader:
-    num_workers: 8
-    prefetch_factor: 4
-    pin_memory: true
-    persistent_workers: true
-    drop_last: false
-    shuffle:
-      train: true
-      eval: false
-    batch:
-      train: 16
-      eval: 16
-    # Planet-level grouping to avoid leakage; implemented in sampler.
-    group_by_planet: true
+loader:
+  batch_size: 32
+  shuffle: true
+  drop_last: false
 
-  # -------------------- Splits & Folds --------------------
-  splits:
-    strategy: "GroupKFold"
-    n_splits: 5
-    group_key: "planet_id"
-    stratify_by: null
-    seed: "${data.seed}"
+features:
+  normalize_flux: true
+  center_time: true
+  include_centroids: true
+  include_jitter: true
+  # FGS1 first: assist AIRS alignment with FGS1 transit cues
+  fgs1_time_anchor: true
+  # Optional on-the-fly spectral standardization (AIRS)
+  airs_spectral_standardize: false
 
-  # -------------------- Calibration Kill-Chain Flags --------------------
-  # Each step logs JSON entries with timing, parameter deltas, and variance propagation.
-  calibration:
-    keep_negatives: true
-    adc_reversal:
-      enabled: true
-      bias_key: "bias"
-      gain_key: "gain"
-    bad_pixels:
-      enabled: true
-      mask_sources: ["hot", "cold", "nan", "sat", "persistence", "cosmic"]
-      interp_kernel: "spatio_temporal"
-      interp_eps2: 1.0e-6
-    nonlinearity:
-      enabled: true
-      model: "poly"        # "poly" | "lut"
-      max_order: 3
-    dark_subtraction:
-      enabled: true
-      method: "median_frame"   # or "per_pixel_map"
-    flat_field:
-      enabled: true
-      normalize_to_median: true
-    cds_trace:
-      enabled: true
-      fgs1:
-        aperture_radius_px: 8
-        annulus_inner_px: 12
-        annulus_outer_px: 20
-      airs:
-        optimal_extraction: true
-        seam_mask_value: 1
-        dispersion_poly_order: 3
-
-  # -------------------- Feature Cache --------------------
-  features:
-    fgs1_white:
-      compute: true
-      include: [flux, time, centroid, jitter]
-      detrend:
-        poly_order: 2
-        highpass_window: 0       # 0 disables
-    airs_bins:
-      compute: true
-      n_bins: 283
-      align_to_fgs1_phase: true
-      jitter_regression: true    # decorrelate flux using jitter/centroids
-
-  # -------------------- Instrument Settings --------------------
-  instruments:
-    fgs1:
-      channels: 1
-      input_stack: ["flux", "time_norm", "centroid_x", "centroid_y", "jitter_x", "jitter_y"]
-      export_latents: false
-    airs:
-      bins: 283
-      molecule_windows: ["H2O", "CO2", "CH4"]   # symbolic regions
-      include_seam_flags: true
-
-  # -------------------- Diagnostics & Logs --------------------
-  diagnostics:
-    write_stage_logs: true
-    stage_log_path: "${data.paths.calibrated.logs}/calibration_events.jsonl"
-    write_feature_logs: true
-    feature_log_path: "${data.paths.features.meta}/feature_events.jsonl"
-    shape_checks: true
-    # On read, assert keys in persisted npz.
-    required_keys:
-      frames: ["frames", "variance", "mask"]
-      features_fgs1_white: ["flux", "time", "centroid", "jitter"]
-      features_airs_bins: ["flux", "time"]
+validation:
+  split: "official"          # "official" | "random_kfold" | "by_star"
+  kfolds: 5
+  stratify_by: "planet"      # or "host_star", "instrument"

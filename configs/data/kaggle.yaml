@@ -1,63 +1,9 @@
-# configs/data/kaggle.yaml
-# Kaggle runtime guardrails — fewer workers, reduced IO overhead, explicit container paths.
-
-@package _global_
-
+# Kaggle runtime overrides (fewer workers, constrained IO)
 data:
   paths:
-    root: "${hydra:runtime.cwd}"
-    raw:
-      fgs1: "/kaggle/input/ariel/raw/fgs1"
-      airs: "/kaggle/input/ariel/raw/airs_ch0"
-      meta: "/kaggle/input/ariel/raw/meta"
-    calibrated:
-      fgs1: "/kaggle/working/calibrated/fgs1"
-      airs: "/kaggle/working/calibrated/airs"
-      logs: "/kaggle/working/calibrated/logs"
-    features:
-      fgs1_white: "/kaggle/working/features/fgs1_white"
-      airs_bins:  "/kaggle/working/features/airs_bins"
-      meta:       "/kaggle/working/features/meta"
-    splits:
-      file: "/kaggle/input/ariel/splits/groupkfold.json"
-    schemas:
-      submission:  "/kaggle/working/schemas/submission.schema.json"
-      planet_meta: "/kaggle/working/schemas/planet_meta.schema.json"
-
+    root: "/kaggle/working"
   io:
-    cache:
-      calibrated: true
-      features: true
-      integrity_check: true
-    dvc_track: false
-    mmap:
-      enabled: false        # Kaggle FS often slower for mmap
-    telemetry:
-      log_open_close: false
-      log_io_stats: true
-    compression:
-      npz: {allow_pickle: false, compress_level: 3}
-
-  loader:
-    num_workers: 2
-    prefetch_factor: 2
-    pin_memory: true
+    num_workers: 4
     persistent_workers: false
-    batch:
-      train: 32
-      eval: 32
-
-  features:
-    fgs1_white:
-      detrend:
-        poly_order: 1
-        highpass_window: 0
-
-  splits:
-    seed: 1337
-
-  diagnostics:
-    write_stage_logs: true
-    stage_log_path: "/kaggle/working/calibrated/logs/calibration_events.jsonl"
-    write_feature_logs: true
-    feature_log_path: "/kaggle/working/features/meta/feature_events.jsonl"
+  loader:
+    batch_size: 16

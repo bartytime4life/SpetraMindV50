@@ -1,0 +1,8 @@
+# Canonical composition: override with `+group=name` or `group=name` on CLI as needed.
+defaults:
+  - data: base
+  - model: base
+  - training: base
+  - calibration: base
+  - diagnostics: base
+  - symbolic: base

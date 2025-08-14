@@ -1,0 +1,14 @@
+# AIRS↔FGS1 contrastive alignment
+training:
+  seed: 1337
+  epochs: 60
+  amp: true
+  optimizer:
+    name: "adamw"
+    lr: 1.5e-4
+    weight_decay: 1.0e-2
+  contrastive:
+    enabled: true
+    temperature: 0.07
+    projection_dim: 128
+    weight: 0.2

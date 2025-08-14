@@ -1,0 +1,21 @@
+# Molecule-region expectations (illustrative)
+symbolic:
+  rules:
+    - id: mol_h2o_coherence
+      description: "H2O band bins display coherent absorption morphology"
+      type: "region_coherence"
+      region: "H2O"
+      weight: 0.12
+
+    - id: mol_co2_presence
+      description: "CO2 region should not be entirely flat (encourage informative structure)"
+      type: "min_variance"
+      region: "CO2"
+      min_var: 1.0e-5
+      weight: 0.06
+
+    - id: mol_ch4_sparsity
+      description: "CH4 region tends to have sparse strong lines; discourage diffuse noise"
+      type: "l1_sparsity"
+      region: "CH4"
+      weight: 0.04
