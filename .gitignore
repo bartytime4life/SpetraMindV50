@@ -14,10 +14,7 @@ venv/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
-!.vscode/launch.json
-!.vscode/tasks.json
-!.vscode/snippets/
-!.vscode/snippets/**
+
 .idea/
 
 # Data / Artifacts
