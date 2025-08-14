@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MoleculeDefinition",
+  "type": "object",
+  "required": ["id", "name", "formula"],
+  "properties": {
+    "id":      { "type": "string", "pattern": "^[a-z0-9_\\-]+$" },
+    "name":    { "type": "string" },
+    "formula": { "type": "string" },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "properties": {
+      "type": "object",
+      "properties": {
+        "molar_mass_g_mol": { "type": "number" },
+        "state_ambient":    { "type": "string", "enum": ["solid","liquid","gas","plasma","unknown"] },
+        "notes":            { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "spectral": {
+      "type": "object",
+      "properties": {
+        "bands_um":      { "type": "array", "items": { "type": "number" } },
+        "lines_nm":      { "type": "array", "items": { "type": "number" } },
+        "windows_um":    { "type": "array", "items": { "type": "number" } },
+        "references":    { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "tags":    { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

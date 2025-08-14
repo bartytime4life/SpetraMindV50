@@ -1,0 +1,41 @@
+amino_acids:
+  - code: G
+    name: Glycine
+    formula: C2H5NO2
+    mass_g_mol: 75.07
+  - code: A
+    name: Alanine
+    formula: C3H7NO2
+    mass_g_mol: 89.09
+  - code: S
+    name: Serine
+    formula: C3H7NO3
+    mass_g_mol: 105.09
+  - code: T
+    name: Threonine
+    formula: C4H9NO3
+    mass_g_mol: 119.12
+  - code: C
+    name: Cysteine
+    formula: C3H7NO2S
+    mass_g_mol: 121.16
+  - code: M
+    name: Methionine
+    formula: C5H11NO2S
+    mass_g_mol: 149.21
+  - code: P
+    name: Proline
+    formula: C5H9NO2
+    mass_g_mol: 115.13
+  - code: F
+    name: Phenylalanine
+    formula: C9H11NO2
+    mass_g_mol: 165.19
+  - code: W
+    name: Tryptophan
+    formula: C11H12N2O2
+    mass_g_mol: 204.23
+  - code: Y
+    name: Tyrosine
+    formula: C9H11NO3
+    mass_g_mol: 181.19

@@ -1,0 +1,38 @@
+# Minimal, extendable subset for symbolic mapping in pipelines.
+elements:
+  - Z: 1
+    symbol: H
+    name: Hydrogen
+    group: 1
+    period: 1
+    molar_mass_g_mol: 1.00784
+  - Z: 6
+    symbol: C
+    name: Carbon
+    group: 14
+    period: 2
+    molar_mass_g_mol: 12.011
+  - Z: 7
+    symbol: N
+    name: Nitrogen
+    group: 15
+    period: 2
+    molar_mass_g_mol: 14.007
+  - Z: 8
+    symbol: O
+    name: Oxygen
+    group: 16
+    period: 2
+    molar_mass_g_mol: 15.999
+  - Z: 16
+    symbol: S
+    name: Sulfur
+    group: 16
+    period: 3
+    molar_mass_g_mol: 32.06
+  - Z: 26
+    symbol: Fe
+    name: Iron
+    group: 8
+    period: 4
+    molar_mass_g_mol: 55.845
