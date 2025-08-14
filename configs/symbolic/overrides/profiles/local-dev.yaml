@@ -1,0 +1,21 @@
+name: local-dev
+mode: dev
+desc: Local workstation, fast iteration, rich logs
+paths:
+  data_root: ${oc.env:DATA_ROOT,${hydra:runtime.cwd}/data}
+  cache_root: ${oc.env:CACHE_ROOT,${hydra:runtime.cwd}/.cache}
+  artifacts_root: ${oc.env:ARTIFACTS_ROOT,${hydra:runtime.cwd}/artifacts}
+logging:
+  console_level: DEBUG
+  file_rotate_mb: 20
+  file_keep: 5
+tracking:
+  mlflow:
+    enabled: false
+  wandb:
+    enabled: false
+scheduler:
+  type: none
+runtime:
+  num_workers: ${oc.env:SMV50_NUM_WORKERS,8}
+  device: ${oc.env:SMV50_DEVICE,cuda_if_available}

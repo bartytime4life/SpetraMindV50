@@ -1,0 +1,12 @@
+console:
+  level: ${logging.console_level}
+files:
+  rotate_mb: ${profiles.logging.file_rotate_mb,50}
+  keep: ${profiles.logging.file_keep,10}
+  dir: var/logs
+jsonl:
+  level: ${logging.jsonl_level}
+  path: var/events/events.jsonl
+format:
+  human: "[%(asctime)s] %(levelname)s %(name)s: %(message)s"
+  jsonl_keys: [ts, level, name, msg, run, git, profile, env]

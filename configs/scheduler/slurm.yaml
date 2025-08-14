@@ -1,0 +1,6 @@
+type: slurm
+account: ${profiles.scheduler.account,default}
+qos: ${profiles.scheduler.qos,normal}
+partition: ${profiles.scheduler.partition,gpu}
+gpus_per_task: ${profiles.scheduler.gpus_per_task,1}
+time: ${profiles.scheduler.time,08:00:00}

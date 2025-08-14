@@ -1,0 +1,6 @@
+mlflow:
+  enabled: ${profiles.tracking.mlflow.enabled,true}
+  uri: ${profiles.tracking.mlflow.uri,sqlite:///mlruns.db}
+  exp: ${profiles.tracking.mlflow.exp,default}
+wandb:
+  enabled: false

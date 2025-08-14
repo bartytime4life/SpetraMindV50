@@ -1,0 +1,28 @@
+name: hpc-slurm
+mode: hpc
+desc: SLURM cluster, checkpointing, minimized console
+paths:
+  data_root: /fsx/data
+  cache_root: /fsx/cache
+  artifacts_root: /fsx/artifacts
+logging:
+  console_level: INFO
+  file_rotate_mb: 100
+  file_keep: 20
+tracking:
+  mlflow:
+    enabled: true
+    uri: ${oc.env:MLFLOW_TRACKING_URI,sqlite:///mlruns.db}
+    exp: ${oc.env:MLFLOW_EXPERIMENT,ariel}
+  wandb:
+    enabled: false
+scheduler:
+  type: slurm
+  account: ${oc.env:SLURM_ACCOUNT,default}
+  qos: ${oc.env:SLURM_QOS,normal}
+  partition: ${oc.env:SLURM_PARTITION,gpu}
+  gpus_per_task: 1
+  time: "8:00:00"
+runtime:
+  num_workers: ${oc.env:SMV50_NUM_WORKERS,16}
+  device: cuda

@@ -1,0 +1,5 @@
+mlflow: {enabled: false}
+wandb:
+  enabled: ${profiles.tracking.wandb.enabled,true}
+  entity: ${profiles.tracking.wandb.entity,ariel}
+  project: ${profiles.tracking.wandb.project,spectramind}
