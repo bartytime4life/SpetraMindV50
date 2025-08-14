@@ -1,0 +1,26 @@
+meta:
+  profile: default
+  version: "1.0.0"
+  description: Baseline symbolic weights; conservative, CI-safe.
+
+weights:
+  # scoring mix
+  spectral_consistency: 1.0
+  line_id_confidence: 0.9
+  residual_penalty: 1.2
+  prior_chemistry: 0.8
+  instrument_systematics: 0.5
+
+  # safety rails
+  nan_guard: 10.0
+  outlier_guard: 5.0
+
+constraints:
+  min: -10.0
+  max:  10.0
+  clip: true
+
+notes:
+  spectral_consistency: "Downstream fit stability"
+  residual_penalty: "Higher discourages overfitting residuals"
+  instrument_systematics: "Weight for de-trending terms"
