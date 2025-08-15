@@ -1,7 +1,92 @@
+# Baseline, ready-to-use symbolic profiles for SpectraMind V50.
+# These IDs align with symbolic engine rule names discussed in V50 architecture.
+---
 profiles:
-  default:
-    description: Default symbolic profile for SpectraMind V50.
+  - id: hot_jupiter_core
+    name: Hot Jupiter — Core
+    description: >
+      Emphasizes high-temperature gas giant atmospheric constraints:
+      smoothness, non-negativity, molecular band coherence (H2O/CO/CO2),
+      FFT smoothness in spectral continuum, and eclipse/phase alignment priors.
+    tags: [hot, gas_giant, core, baseline]
+    metadata:
+      temperature_K: {min: 1000, max: 3000}
+      planet_classes: [hot_jupiter, ultra_hot_jupiter]
+      notes: "Baselined for ARIEL warm/hot giants with prominent IR features."
     rules:
-      - nonnegativity_all
-      - smoothness_core
-    weights: src/spectramind/symbolic/weights/default_weights.yaml
+      - id: smoothness_l2
+        weight: 1.0
+        priority: 5
+        conditions: {window_bins: "all"}
+      - id: nonnegativity_mu
+        weight: 1.0
+        priority: 10
+      - id: fft_continuum_suppress
+        weight: 0.6
+        priority: 2
+      - id: molecule_band_coherence_H2O
+        weight: 1.2
+        priority: 6
+      - id: molecule_band_coherence_CO
+        weight: 1.1
+        priority: 6
+      - id: molecule_band_coherence_CO2
+        weight: 1.1
+        priority: 6
+      - id: eclipse_phase_alignment_prior
+        weight: 0.5
+        priority: 1
+
+  - id: warm_neptune_core
+    name: Warm Neptune — Core
+    description: >
+      Focuses on Neptune-class atmospheres with moderate temperatures,
+      prioritizing water/methane bands, smoothness, and detector-region coherence.
+    tags: [warm, neptune, core, baseline]
+    metadata:
+      temperature_K: {min: 600, max: 1200}
+      planet_classes: [warm_neptune]
+      notes: "Suitable for ARIEL warm Neptune cohort."
+    rules:
+      - id: smoothness_l2
+        weight: 1.1
+        priority: 5
+      - id: nonnegativity_mu
+        weight: 1.0
+        priority: 10
+      - id: molecule_band_coherence_H2O
+        weight: 1.3
+        priority: 6
+      - id: molecule_band_coherence_CH4
+        weight: 1.2
+        priority: 6
+      - id: detector_region_coherence
+        weight: 0.8
+        priority: 3
+
+  - id: super_earth_survey
+    name: Super-Earth — Survey
+    description: >
+      Survey-grade constraints for super-Earth candidates with uncertain cloud/haze,
+      emphasizing non-negativity, mild smoothness, and cautious molecular priors.
+    tags: [super_earth, survey, conservative]
+    metadata:
+      temperature_K: {min: 300, max: 900}
+      planet_classes: [super_earth, rocky]
+      notes: "Designed for robust, conservative inference under higher uncertainty."
+    rules:
+      - id: nonnegativity_mu
+        weight: 1.0
+        priority: 10
+      - id: smoothness_l2
+        weight: 0.8
+        priority: 4
+      - id: soft_molecule_prior_H2O
+        weight: 0.6
+        priority: 2
+      - id: soft_molecule_prior_CO2
+        weight: 0.5
+        priority: 2
+      - id: outlier_bin_suppression
+        weight: 0.5
+        priority: 1

@@ -1,0 +1,56 @@
+# Lightweight schema constraints for Symbolic Profiles (validated in Python without jsonschema dep).
+#
+# Top-level (YAML document) MUST be a mapping with:
+#   profiles: list[Profile]
+#
+# Profile:
+#   id: str (required, slug-like)
+#   name: str (required)
+#   description: str (required)
+#   tags: list[str] (optional)
+#   metadata: dict (optional) — recommended keys:
+#     temperature_K: {min: float, max: float}
+#     planet_classes: list[str]
+#     notes: str
+#   rules: list[RuleRef] (required, >=1)
+#
+# RuleRef:
+#   id: str (required)
+#   weight: float (optional, default 1.0)
+#   priority: int (optional, default 0)
+#   conditions: dict (optional)
+#
+# Overrides semantics (applied by loader, not schema):
+#   - Override files can contain profiles: (full or partial), and optionally:
+#       extends: "<profile_id>"  # if present, merge with a base profile from defaults or previous overrides
+#   - If extends missing and profile id collides, later wins (replace).
+---
+spec:
+  document_type: symbolic_profiles
+  version: 1
+  required:
+    - profiles
+  rules:
+    profiles:
+      type: list
+      min_len: 1
+      item_required:
+        - id
+        - name
+        - description
+        - rules
+      item_fields:
+        id: {type: str, pattern: "^[a-z0-9_\-]+$"}
+        name: {type: str}
+        description: {type: str}
+        tags: {type: list, item_type: str}
+        metadata: {type: dict}
+        rules:
+          type: list
+          min_len: 1
+          item_required: [id]
+          item_fields:
+            id: {type: str}
+            weight: {type: number}
+            priority: {type: int}
+            conditions: {type: dict}

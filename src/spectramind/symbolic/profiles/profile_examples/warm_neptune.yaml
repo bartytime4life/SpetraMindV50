@@ -1,0 +1,18 @@
+profiles:
+  - id: warm_neptune_cloudaware
+    name: Warm Neptune — Cloud-Aware
+    description: >
+      Extends warm_neptune_core by adding detector-region coherence and
+      cloud/haze tolerant smoothness to mitigate band damping.
+    extends: warm_neptune_core
+    tags: [warm, neptune, clouds]
+    rules:
+      - id: detector_region_coherence
+        weight: 1.0
+        priority: 4
+      - id: smoothness_l2
+        weight: 0.9
+        priority: 4
+      - id: molecule_band_coherence_CH4
+        weight: 1.25
+        priority: 7
