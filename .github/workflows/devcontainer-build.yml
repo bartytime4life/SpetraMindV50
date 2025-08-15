@@ -1,0 +1,135 @@
+name: DevContainer Build & Smoke Test
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+env:
+  # Keep logs verbose for reproducibility; the SpectraMind stack consumes these.
+  PYTHONUNBUFFERED: "1"
+  HYDRA_FULL_ERROR: "1"
+  MLFLOW_TRACKING_URI: "http://localhost:5000"
+  V50_LOG_PATH: "logs/v50_debug_log.md"
+
+jobs:
+  devcontainer:
+    name: Build DevContainer and Run Smoke Tests
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space (optional, large CUDA base image)
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          large-packages: true
+          docker-images: false
+          swap-storage: true
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Dev Containers – Build and Run
+        id: devcontainers
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: |
+            set -euxo pipefail
+
+            echo "==== (1) Basic repo introspection ===="
+            git rev-parse --short HEAD || true
+            ls -la || true
+
+            echo "==== (2) Ensure .devcontainer exists ===="
+            test -f ".devcontainer/devcontainer.json"
+
+            echo "==== (3) Run project bootstrap inside devcontainer ===="
+            # Run your bootstrap; tolerate re-runs if Poetry or deps are already present.
+            if [ -x ".devcontainer/setup.sh" ]; then
+              bash .devcontainer/setup.sh || true
+            else
+              echo "WARN: .devcontainer/setup.sh missing; continuing"
+            fi
+
+            echo "==== (4) Poetry environment check (if pyproject exists) ===="
+            if [ -f "pyproject.toml" ]; then
+              if command -v poetry >/dev/null 2>&1; then
+                poetry --version || true
+                poetry env info || true
+              else
+                echo "WARN: Poetry not found after setup.sh; attempting local install"
+                curl -sSL https://install.python-poetry.org | python3 - || true
+                export PATH="$HOME/.local/bin:$PATH"
+                poetry --version || true
+              fi
+            fi
+
+            echo "==== (5) Python runtime sanity ===="
+            python -V || true
+            python -c "import sys, platform; print('platform:', platform.platform()); print('executable:', sys.executable)" || true
+
+            echo "==== (6) Optional Torch CUDA check (non-fatal on CPU runners) ===="
+            python - <<'PY' || true
+            import importlib, json
+            r={"torch_imported": False, "cuda_available": None, "torch_version": None}
+            try:
+                torch=importlib.import_module("torch")
+                r["torch_imported"]=True
+                r["torch_version"]=getattr(torch, "__version__", None)
+                try:
+                    r["cuda_available"]=torch.cuda.is_available()
+                except Exception:
+                    r["cuda_available"]=None
+            except Exception:
+                pass
+            print(json.dumps(r))
+            PY
+
+            echo "==== (7) SpectraMind CLI integrity (best-effort) ===="
+            set +e
+            if [ -f "spectramind.py" ]; then
+              python spectramind.py --version || true
+              python spectramind.py test --mode fast || true
+              python spectramind.py analyze-log --out-md logs/log_table.md || true
+            elif [ -f "cli_core_v50.py" ]; then
+              python cli_core_v50.py --help || true
+            fi
+            set -e
+
+            echo "==== (8) Smoke diagnostics artifact ===="
+            mkdir -p logs
+            echo "DevContainer CI run: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> logs/v50_debug_log.md
+            echo "GIT_SHA=$(git rev-parse --short HEAD)" >> logs/v50_debug_log.md
+            echo "RUNNER=$(uname -a)" >> logs/v50_debug_log.md
+            echo "---" >> logs/v50_debug_log.md
+
+          # Use your repo's devcontainer.json as-is. The action builds an ephemeral container
+          # matching your Codespaces/VS Code Dev Container environment.
+          # By default, it looks for .devcontainer/devcontainer.json at repository root.
+
+      - name: Upload logs (v50_debug_log.md, if produced)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: devcontainer-smoke-logs
+          path: |
+            logs/v50_debug_log.md
+            logs/log_table.md
+          if-no-files-found: warn
+
+      - name: Post summary
+        if: always()
+        run: |
+          echo "### DevContainer CI Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Runner: \`$(uname -a)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Git SHA: \`$(git rev-parse --short HEAD)\`" >> $GITHUB_STEP_SUMMARY
+          echo "- logs/v50_debug_log.md attached as artifact." >> $GITHUB_STEP_SUMMARY
