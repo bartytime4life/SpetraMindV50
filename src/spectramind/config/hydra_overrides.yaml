@@ -1,4 +1,0 @@
-# Standard Hydra runtime overrides for local runs
-defaults:
-  - override hydra.run.dir=outputs/${now:%Y-%m-%d_%H-%M-%S}
-  - override hydra.job.chdir=True

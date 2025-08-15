@@ -1,5 +1,8 @@
-# paths resolved per profile unless explicitly overridden
-run_dir: ${paths.artifacts_root}/runs
-outputs_dir: ${paths.artifacts_root}/outputs
-# passthroughs that profiles should define:
-# data_root, cache_root, artifacts_root
+# Paths group: default
+
+project_root: .
+runs_dir: runs
+logs_dir: logs
+artifacts_dir: artifacts
+reports_dir: reports
+checkpoints_dir: checkpoints

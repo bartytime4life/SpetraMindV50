@@ -1,19 +1,27 @@
-# SpectraMind V50 – Hydra/OmegaConf config (calibration-focused)
-# This file provides minimal defaults so the calibration CLI runs immediately.
+# Root Hydra configuration for SpectraMind V50.
 
-paths:
-  raw_data: data/raw
-  calibrated_output: outputs/calibrated
+# Compose with: model/v50, training/default, data/ariel, logging/default, paths/default
 
-calibration_pipeline:
-  photometry:
-    random_seed: 1337
-    planets: ["planet_001", "planet_002", "planet_003", "planet_004"]
-    samples_per_planet: 1024
-  calibration:
-    default_sigma: 0.02
-    corel:
-      coverage_quantile: 0.9
-      min_sigma: 0.0001
-  checker:
-    z_hist_bins: 60
+# This file is the single entry-point for CLI tools: --config-name config_v50
+
+defaults:
+  - model: v50
+  - training: default
+  - data: ariel
+  - logging: default
+  - paths: default
+  - hydra/job_logging: rich
+  - hydra/hydra_logging: rich
+
+# Freeform extras for experiment tagging; preserved in Config.extras
+extras:
+  experiment_tag: "v50_default"
+  purpose: "neurips_2025_ariel_data_challenge"
+
+# Optional global overrides (rarely used; prefer group files)
+hydra:
+  run:
+    dir: ${paths.runs_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}${oc.env:USER,unknown}${hydra.job.name}_${hydra.job.num}
+  sweep:
+    dir: ${paths.runs_dir}/multirun/${now:%Y-%m-%d}_${now:%H-%M-%S}
+    subdir: ${hydra.job.num}_${hydra.runtime.choices}
