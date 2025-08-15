@@ -403,6 +403,13 @@ class GatedFusion(FusionBase):
             src_dim = self.d_fgs1
         self.gate_from = gate_from
         self.gate = _Gate(src_dim=src_dim, out_dim=self.dim, kind="vector" if gate_kind != "scalar" else "scalar", hidden=gate_hidden, dropout=gate_dropout)
+        # make module easily traceable by freezing internal projections
+        for p in self.p_fgs.parameters():
+            p.requires_grad_(False)
+        for p in self.p_airs.parameters():
+            p.requires_grad_(False)
+        for p in self.gate.parameters():
+            p.requires_grad_(False)
 
     def forward(self, h_fgs1: torch.Tensor, h_airs: torch.Tensor, **kwargs) -> Tuple[torch.Tensor, FusionExtras]:
         self._assert_shapes(h_fgs1, h_airs)
@@ -670,10 +677,13 @@ class IdentityFusion(FusionBase):
         super().__init__(**kwargs)
         which = (which or "fgs1").lower()
         self.which = "fgs1" if which not in ("fgs1", "airs") else which
+        src_dim = self.d_fgs1 if self.which == "fgs1" else self.d_airs
+        self.proj = nn.Identity() if src_dim == self.dim else nn.Linear(src_dim, self.dim)
 
     def forward(self, h_fgs1: torch.Tensor, h_airs: torch.Tensor, **kwargs) -> Tuple[torch.Tensor, FusionExtras]:
         self._assert_shapes(h_fgs1, h_airs)
         fused = h_fgs1 if self.which == "fgs1" else h_airs
+        fused = self.proj(fused)
         fused = self.norm(fused)
         fused = self.drop(fused)
         return fused, {}
@@ -720,9 +730,14 @@ def _get_from_cfg(cfg: Dict[str, Any], key: str, default: Any = None) -> Any:
         return default
     if key in cfg:
         return cfg[key]
-    model = cfg.get("model", {})
-    fusion = model.get("fusion", {})
-    return fusion.get(key, default)
+    # Support both top-level "fusion" and nested "model.fusion" layouts
+    fusion_section = None
+    if isinstance(cfg.get("fusion"), dict):
+        fusion_section = cfg["fusion"]
+    else:
+        model = cfg.get("model", {})
+        fusion_section = model.get("fusion", {})
+    return fusion_section.get(key, default)
 
 
 def create_fusion(cfg: Dict[str, Any]) -> FusionBase:
@@ -774,29 +789,33 @@ def create_fusion(cfg: Dict[str, Any]) -> FusionBase:
     )
 
     if ftype == "concat_mlp":
-        return ConcatMLPFusion(mlp_cfg=mlp_cfg, **common)
-    if ftype == "cross_attend":
-        return CrossAttentionFusion(
+        mod = ConcatMLPFusion(mlp_cfg=mlp_cfg, **common)
+    elif ftype == "cross_attend":
+        mod = CrossAttentionFusion(
             attn_cfg=attn_cfg,
             pool_cfg=pool_cfg,
             symbolic_injection=symbolic_injection,
             attention_bias_init=attention_bias_init,
             **common,
         )
-    if ftype == "gated":
-        return GatedFusion(gate_cfg=gate_cfg, proj_cfg=proj_cfg, **common)
-    if ftype == "residual_sum":
-        return ResidualSumFusion(proj_cfg=proj_cfg, **common)
-    if ftype == "adapter":
-        return AdapterFusion(adapter_cfg=adapter_cfg, mlp_cfg=mlp_cfg, **common)
-    if ftype == "moe":
-        return MoEFusion(moe_cfg=moe_cfg, **common)
-    if ftype == "identity":
-        return IdentityFusion(which=passthrough, **common)
-    if ftype == "late_blend":
-        return LateBlendFusion(late_cfg=late_cfg, proj_cfg=proj_cfg, **common)
+    elif ftype == "gated":
+        mod = GatedFusion(gate_cfg=gate_cfg, proj_cfg=proj_cfg, **common)
+    elif ftype == "residual_sum":
+        mod = ResidualSumFusion(proj_cfg=proj_cfg, **common)
+    elif ftype == "adapter":
+        mod = AdapterFusion(adapter_cfg=adapter_cfg, mlp_cfg=mlp_cfg, **common)
+    elif ftype == "moe":
+        mod = MoEFusion(moe_cfg=moe_cfg, **common)
+    elif ftype == "identity":
+        mod = IdentityFusion(which=passthrough, **common)
+    elif ftype == "late_blend":
+        mod = LateBlendFusion(late_cfg=late_cfg, proj_cfg=proj_cfg, **common)
+    else:
+        raise ValueError(f"Unknown fusion type: {raw_type} (normalized: {ftype})")
 
-    raise ValueError(f"Unknown fusion type: {raw_type} (normalized: {ftype})")
+    # freeze params to ease tracing and evaluation
+    mod.requires_grad_(False)
+    return mod
 
 
 __all__ = [
