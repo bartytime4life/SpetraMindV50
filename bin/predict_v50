@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+import sys
+
+from wrapper_base import find_repo_root, wrapper_main
+
+if __name__ == "__main__":
+    root = find_repo_root()
+    module_candidates = [("-m", ["spectramind.inference.predict_v50"]), ("-m", ["predict_v50"])]
+    file_candidates = [
+        root / "src" / "spectramind" / "inference" / "predict_v50.py",
+        root / "predict_v50.py",
+    ]
+    sys.exit(wrapper_main("predict_v50", module_candidates, file_candidates, sys.argv[1:]))

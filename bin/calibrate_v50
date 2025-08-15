@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+import sys
+
+from wrapper_base import find_repo_root, wrapper_main
+
+if __name__ == "__main__":
+    root = find_repo_root()
+    module_candidates = [
+        ("-m", ["spectramind.calibration.pipeline"]),
+        ("-m", ["calibration.pipeline"]),
+        ("-m", ["cli_calibrate"]),
+    ]
+    file_candidates = [
+        root / "src" / "spectramind" / "calibration" / "pipeline.py",
+        root / "cli_calibrate.py",
+    ]
+    sys.exit(wrapper_main("calibrate_v50", module_candidates, file_candidates, sys.argv[1:]))

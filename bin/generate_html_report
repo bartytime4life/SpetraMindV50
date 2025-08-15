@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+import sys
+
+from wrapper_base import find_repo_root, wrapper_main
+
+if __name__ == "__main__":
+    root = find_repo_root()
+    module_candidates = [
+        ("-m", ["generate_html_report"]),
+        ("-m", ["spectramind.diagnostics.generate_html_report"]),
+    ]
+    file_candidates = [
+        root / "generate_html_report.py",
+        root / "src" / "spectramind" / "diagnostics" / "generate_html_report.py",
+        root / "tools" / "generate_html_report.py",
+    ]
+    sys.exit(wrapper_main("generate_html_report", module_candidates, file_candidates, sys.argv[1:]))
