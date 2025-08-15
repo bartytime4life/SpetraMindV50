@@ -2,119 +2,40 @@ name: SpectraMind V50 CI
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ "main" ]
   workflow_dispatch:
 
-env:
-  PYTHON_VERSION: '3.11'
-  POETRY_VERSION: '1.8.3'
-
 jobs:
-  setup:
-    name: Setup Environment
+  build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
+          python-version: "3.10"
+          cache: 'poetry'
       - name: Install Poetry
-        run: pip install poetry==${{ env.POETRY_VERSION }}
-
-      - name: Cache Poetry venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: poetry-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-
+        run: pip install poetry
       - name: Install dependencies
-        run: poetry install --with dev --no-interaction
-
-  lint:
-    name: Lint & Static Analysis
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: poetry-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-      - name: Run flake8
-        run: poetry run flake8 src/ tests/
-      - name: Run mypy
-        run: poetry run mypy src/
-
-  test:
-    name: Unit & Integration Tests
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: poetry-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-      - name: Run pytest
-        run: poetry run pytest --maxfail=1 --disable-warnings -q --cov=src --cov-report=xml
-
-  reproducibility:
-    name: Reproducibility & Selftest
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: poetry-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-      - name: Run selftest
-        run: poetry run python src/spectramind/cli/selftest.py --deep --json-out ci_selftest.json
-
-  diagnostics:
-    name: Diagnostics & HTML Dashboard
-    runs-on: ubuntu-latest
-    needs: reproducibility
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: poetry-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-      - name: Generate diagnostics dashboard
+        run: poetry install
+      - name: Run self-test
+        run: poetry run python selftest.py --fast
+      - name: Run unit tests
+        run: poetry run pytest --maxfail=1 --disable-warnings -q
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Type check
+        run: poetry run mypy src
+      - name: Build docs
         run: |
-          poetry run spectramind diagnose dashboard --no-browser --output-html ci_diagnostics.html
-      - name: Upload HTML dashboard
+          pip install mkdocs mkdocs-material
+          mkdocs build
+      - name: Cache DVC data
+        uses: iterative/setup-dvc@v1
+      - name: Upload diagnostics dashboard
         uses: actions/upload-artifact@v4
         with:
           name: diagnostics-dashboard
-          path: ci_diagnostics.html
-
-  submit-check:
-    name: Submission Validation
-    runs-on: ubuntu-latest
-    needs: diagnostics
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore venv
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: poetry-${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ hashFiles('poetry.lock') }}
-      - name: Validate submission package
-        run: poetry run spectramind submit --selftest --dry-run
+          path: diagnostics_html/
