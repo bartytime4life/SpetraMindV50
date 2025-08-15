@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+import sys
+
+from wrapper_base import find_repo_root, wrapper_main
+
+if __name__ == "__main__":
+    root = find_repo_root()
+    module_candidates = [("-m", ["spectramind"])]
+    file_candidates = [root / "spectramind.py"]
+    sys.exit(wrapper_main("spectramind", module_candidates, file_candidates, sys.argv[1:]))

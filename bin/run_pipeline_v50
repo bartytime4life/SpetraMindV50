@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""Run SpectraMind V50 pipeline: train -> predict -> calibrate -> diagnose -> report."""
+
+import os
+import shlex
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+from wrapper_base import append_events_jsonl, append_markdown_log, find_repo_root, now_iso
+
+STAGES = [
+    ("train_v50", "--no-train"),
+    ("predict_v50", "--no-predict"),
+    ("calibrate_v50", "--no-calibrate"),
+    ("diagnose_v50", "--no-diagnose"),
+    ("generate_html_report", "--no-report"),
+]
+
+
+def run_bin(root: Path, name: str, argstr: str) -> int:
+    exe = root / "bin" / name
+    if not exe.exists():
+        sys.stderr.write(f"[run_pipeline_v50] missing {exe}\n")
+        return 2
+    cmd = [str(exe)] + (shlex.split(argstr) if argstr else [])
+    env = os.environ.copy()
+    env.setdefault("HYDRA_FULL_ERROR", "1")
+    t0 = time.time()
+    rc = subprocess.run(cmd, env=env, cwd=str(root), check=False).returncode
+    dur = round(time.time() - t0, 3)
+    append_events_jsonl(
+        root,
+        {
+            "ts": now_iso(),
+            "tool": "run_pipeline_v50",
+            "stage": name,
+            "cmd": cmd,
+            "rc": rc,
+            "duration_s": dur,
+        },
+    )
+    return rc
+
+
+def main(argv):
+    root = find_repo_root()
+    flags = {name: True for name, _ in STAGES}
+    arg_map = {name: "" for name, _ in STAGES}
+    for a in argv:
+        handled = False
+        for name, disable_flag in STAGES:
+            if a == disable_flag:
+                flags[name] = False
+                handled = True
+                break
+            prefix = f"--{name.replace('_','-')}-args="
+            if a.startswith(prefix):
+                arg_map[name] = a.split("=", 1)[1]
+                handled = True
+                break
+        if not handled:
+            sys.stderr.write(f"[run_pipeline_v50] Unknown arg: {a}\n")
+    ts = now_iso()
+    stages = [n for n in flags if flags[n]]
+    append_markdown_log(
+        root,
+        f"\n### {ts} — run_pipeline_v50 starting\n- stages: {', '.join(stages)}\n- root: `{root}`\n",
+    )
+    for name in stages:
+        rc = run_bin(root, name, arg_map[name])
+        if rc != 0:
+            append_markdown_log(root, f"- stage `{name}` FAILED rc={rc} — aborting pipeline\n")
+            return rc
+    append_markdown_log(root, "- pipeline SUCCESS — all stages completed\n")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

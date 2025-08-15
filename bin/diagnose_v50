@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+import sys
+
+from wrapper_base import find_repo_root, wrapper_main
+
+if __name__ == "__main__":
+    root = find_repo_root()
+    module_candidates = [("-m", ["cli_diagnose"]), ("-m", ["spectramind.cli_diagnose"])]
+    file_candidates = [root / "cli_diagnose.py", root / "src" / "spectramind" / "cli_diagnose.py"]
+    sys.exit(wrapper_main("diagnose_v50", module_candidates, file_candidates, sys.argv[1:]))
