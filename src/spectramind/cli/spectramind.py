@@ -6,7 +6,7 @@ from typing import Optional
 
 import typer
 
-from ..conf_helpers.run_hash import config_hash
+from ..conf_helpers.hashing import config_hash
 from ..train.trainer import train_v50
 from ..utils.git_env import capture_git_env
 from ..utils.hydra_safe import load_yaml
