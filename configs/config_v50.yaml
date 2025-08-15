@@ -1,70 +1,79 @@
+# ===================================================================
 # SpectraMind V50 — Master Hydra Config
-# This file composes defaults from the data/, model/, and train/ subconfigs.
+# -------------------------------------------------------------------
+# Canonical import point for the entire pipeline. Compose with
+# `python spectramind.py ... +data=local +train=supervised` etc.
+# ===================================================================
 
 defaults:
-  - data: local         # default data paths; can override with `data=kaggle`
-  - model: default      # model architecture settings
-  - train: default      # training hyperparameters
+  - data: base
+  - model: base
+  - train: base
+  - diagnostics: base
+  - symbolic: base
   - _self_
 
-# Project metadata
 project:
-  name: spectramind-v50
-  seed: 133742
-  author: "SpectraMind Team"
+  name: "SpectraMind V50"
+  version: "v50"
+  seed: 1337
+  timezone: "UTC"
 
-# Runtime settings
-runtime:
-  device: auto          # auto-select GPU if available
-  num_workers: 4        # DataLoader workers
-  fp16: true            # mixed precision
-  kaggle_budget_hours: 9
-  log_level: INFO
+reproducibility:
+  capture_git: true      # record git commit/branch/dirty flag
+  capture_env: true      # snapshot environment variables
+  deterministic: true
+  benchmark: false
+  numpy_seed: 1337
+  torch_seed: 1337
+  python_hash_seed: "0"
 
-# Logging & audit
+io_policy:
+  safe_writes: true
+  atomic_writes: true
+  fsync_on_close: false
+
 logging:
-  rich: true
+  # Console + rotating file logs, plus JSONL event stream
   level: INFO
-  audit_path: v50_debug_log.md
-  jsonl_path: events.jsonl
+  fmt: "[%(asctime)s][%(levelname)s][%(name)s] %(message)s"
+  datefmt: "%Y-%m-%d %H:%M:%S"
+  console: true
+  file:
+    enabled: true
+    path: runs/logs/v50.log
+    max_bytes: 10485760
+    backup_count: 5
+  jsonl:
+    enabled: true
+    path: runs/logs/v50_events.jsonl
 
-# Diagnostics configuration
-diagnostics:
-  enable: true
-  shap: true
-  umap: true
-  tsne: true
-  fft: true
-  smoothness: true
-  html_report: true
-  report_version: v1
+experiment_tracking:
+  mlflow:
+    enabled: true
+    tracking_uri: "file:./runs/mlflow"
+    experiment: "spectramind_v50"
+    nested_runs: true
+  wandb:
+    enabled: false
+    entity: "your-wandb-entity"
+    project: "spectramind-v50"
+    tags: ["v50", "neurips-2025"]
 
-# Calibration configuration
-calibration:
-  temperature_scaling: true
-  corel:
-    enable: true
-    coverage_target: 0.9
-    per_bin: true
-    output_plots: true
+runtime:
+  device: cuda      # "cuda" | "cpu" | "auto"
+  amp: true
+  grad_accum_steps: 1
+  workers: 8
+  pin_memory: true
 
-# Symbolic constraints
-symbolic:
-  smoothness_lambda: 0.1
-  nonnegativity_lambda: 0.05
-  molecular_coherence_lambda: 0.05
-  seam_continuity_lambda: 0.01
-  ratio_constraints_lambda: 0.02
-  quantile_monotonicity_lambda: 0.02
-  enabled_rules:
-    - smoothness
-    - nonnegativity
-    - molecular_coherence
-    - seam_continuity
-    - ratio_constraints
-    - quantile_monotonicity
+hydra:
+  run:
+    dir: runs/${project.version}/${now:%Y-%m-%d}_${now:%H-%M-%S}
+  sweep:
+    dir: runs/${project.version}/sweeps
+    subdir: ${hydra.job.num}
+  job:
+    chdir: true
+    verbose: false
 
-# CLI presets (can be overridden at runtime)
-cli:
-  fast_mode: false
-  resume: false

@@ -1,0 +1,23 @@
+# ===================================================================
+# Training — Supervised (GLL + symbolic)
+# ===================================================================
+
+defaults:
+  - override /train: base
+
+train:
+  task: supervised
+  epochs: 80
+  batch_size: 8
+  losses:
+    gll_weight: 1.0
+    symbolic_weight: 0.3
+    smoothness_weight: 0.05
+    asymmetry_weight: 0.01
+  uncertainty:
+    temperature_scaling: true
+    corel:
+      enabled: true
+      coverage_target: 0.68
+      validate: true
+

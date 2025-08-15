@@ -1,0 +1,44 @@
+# ===================================================================
+# Training — Base
+# ===================================================================
+
+train:
+  task: supervised           # "mae_pretrain"|"contrastive"|"supervised"
+  seed: 1337
+  epochs: 50
+  batch_size: 8
+  optimizer:
+    name: adamw
+    lr: 3.0e-4
+    betas: [0.9, 0.999]
+    weight_decay: 0.01
+  scheduler:
+    name: cosine
+    warmup_epochs: 2
+    min_lr: 1.0e-6
+  amp: true
+  grad_accum_steps: 1
+  checkpoint:
+    enabled: true
+    dir: runs/checkpoints
+    every_n_epochs: 5
+    save_best: true
+  early_stop:
+    enabled: true
+    patience: 8
+    monitor: val/gll
+    mode: min
+  losses:
+    gll_weight: 1.0
+    symbolic_weight: 0.2
+    smoothness_weight: 0.05
+    asymmetry_weight: 0.0
+  evaluation:
+    val_every_n_epochs: 1
+    metrics: [gll, rmse, mae, nll]
+  logging:
+    log_every_n_steps: 50
+    histogram_params: false
+  export:
+    submission_ready: false
+

@@ -1,0 +1,28 @@
+# ===================================================================
+# Training — MAE Pretraining
+# ===================================================================
+
+defaults:
+  - override /train: base
+
+train:
+  task: mae_pretrain
+  epochs: 150
+  batch_size: 16
+  optimizer:
+    lr: 2.0e-4
+  scheduler:
+    warmup_epochs: 10
+  mae:
+    masking:
+      scheme: symbolic_aware  # "random"|"block"|"fixed"|"snr_aware"|"symbolic_aware"
+      ratio: 0.25
+      molecule_regions: [H2O, CO2, CH4]
+      snr_threshold: 5.0
+    curriculum:
+      enable: true
+      ramp_epochs: 30
+      min_ratio: 0.10
+      max_ratio: 0.40
+    decoder_loss_weight: 1.0
+
