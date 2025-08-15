@@ -1,0 +1,11 @@
+# Per-molecule and region weights; used by molecule-region symbolic constraints
+
+H2O: 1.20
+CH4: 1.00
+CO2: 1.10
+CO: 0.90
+NH3: 1.00
+HCN: 0.80
+VO: 0.70
+TiO: 0.70
+region_seam: 0.50

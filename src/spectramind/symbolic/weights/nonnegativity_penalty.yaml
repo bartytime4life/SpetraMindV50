@@ -1,0 +1,4 @@
+# Nonnegativity constraints for μ (penalize sub-zero predictions)
+
+negative_bin_penalty: 3.00
+epsilon_tolerance: 1.0e-6

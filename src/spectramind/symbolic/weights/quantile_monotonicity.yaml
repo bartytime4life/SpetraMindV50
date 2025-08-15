@@ -1,0 +1,4 @@
+# Quantile monotonicity constraints for distributional decoders
+
+q05_q50_violation: 1.50
+q50_q95_violation: 1.50
