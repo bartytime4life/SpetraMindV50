@@ -1,29 +1,24 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Install Environment",
-      "type": "shell",
-      "command": "poetry install --no-root",
-      "group": "build"
-    },
-    {
-      "label": "Run Selftest",
-      "type": "shell",
-      "command": "python selftest.py --mode fast",
-      "group": "test"
-    },
-    {
-      "label": "Run Full Diagnostics",
-      "type": "shell",
-      "command": "python cli_diagnose.py dashboard --open-html",
-      "group": "test"
-    },
-    {
-      "label": "Submit Kaggle",
-      "type": "shell",
-      "command": "python cli_submit.py --fast-kaggle",
-      "group": "build"
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Tests",
+            "type": "shell",
+            "command": "pytest --maxfail=1 --disable-warnings -q",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Lint",
+            "type": "shell",
+            "command": "pylint src",
+            "problemMatcher": []
+        },
+        {
+            "label": "Format Code",
+            "type": "shell",
+            "command": "black .",
+            "problemMatcher": []
+        }
+    ]
 }
