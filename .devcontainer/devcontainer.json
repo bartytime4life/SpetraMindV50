@@ -1,65 +1,49 @@
 {
-  "name": "SpectraMind V50 — Dev Container",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": {
-      "PYTHON_VERSION": "3.11"
-    }
+  "name": "SpectraMindV50 DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/cuda:12.2.0-cudnn8-ubuntu22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "python.defaultInterpreterPath": "/usr/local/bin/python",
+    "editor.formatOnSave": true
   },
   "runArgs": [
-    "--shm-size=2g",
-    "--cap-add=SYS_PTRACE",
-    "--security-opt=seccomp=unconfined"
+    "--gpus",
+    "all",
+    "--shm-size=16g"
   ],
-  "postCreateCommand": "/bin/bash .devcontainer/postCreate.sh",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
   "remoteUser": "vscode",
-  "updateRemoteUserUID": true,
+  "containerEnv": {
+    "PYTHONUNBUFFERED": "1",
+    "HYDRA_FULL_ERROR": "1",
+    "MLFLOW_TRACKING_URI": "http://localhost:5000",
+    "V50_LOG_PATH": "/workspaces/SpectraMindV50/logs/v50_debug_log.md"
+  },
+  "forwardPorts": [
+    5000,
+    6006,
+    8888,
+    3000
+  ],
   "mounts": [
-    "source=${localWorkspaceFolder}/.cache/pip,target=/home/vscode/.cache/pip,type=bind,consistency=cached",
-    "source=${localWorkspaceFolder}/.cache/poetry,target=/home/vscode/.cache/pypoetry,type=bind,consistency=cached"
+    "source=${localWorkspaceFolder}/.cache,target=/home/vscode/.cache,type=bind"
   ],
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-python.python",
         "ms-toolsai.jupyter",
-        "ms-python.black-formatter",
-        "redhat.vscode-yaml",
         "ms-azuretools.vscode-docker",
-        "eamodio.gitlens",
+        "redhat.vscode-yaml",
         "mhutchie.git-graph",
-        "njpwerner.autodocstring",
-        "ms-vscode-remote.remote-containers"
-      ],
-      "settings": {
-        "python.defaultInterpreterPath": "/workspaces/${containerWorkspaceFolderBasename}/.venv/bin/python",
-        "python.analysis.typeCheckingMode": "basic",
-        "python.testing.pytestEnabled": true,
-        "python.testing.pytestArgs": ["tests"],
-        "python.formatting.provider": "black",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-          "source.organizeImports": true
-        },
-        "files.trimTrailingWhitespace": true,
-        "files.insertFinalNewline": true
-      }
+        "GitHub.vscode-pull-request-github"
+      ]
     }
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
-      "username": "vscode",
-      "upgradePackages": true
-    },
-    "ghcr.io/devcontainers/features/git:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "latest"
-    }
-  },
-  "forwardPorts": [8888, 6006],
-  "portsAttributes": {
-    "8888": { "label": "Jupyter", "onAutoForward": "openBrowser" },
-    "6006": { "label": "TensorBoard", "onAutoForward": "openBrowser" }
   }
 }
