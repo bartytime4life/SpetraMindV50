@@ -1,0 +1,7 @@
+# Warm Neptune explicit overrides
+
+H2O: 1.25
+NH3: 1.10
+CH4: 1.05
+q05_q50_violation: 1.45
+q50_q95_violation: 1.45

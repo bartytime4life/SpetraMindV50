@@ -1,0 +1,5 @@
+# Smoothness constraints (μ) — binwise and spectral-domain
+
+binwise_scale: 1.00
+fft_high_freq_penalty: 1.50
+outlier_bin_penalty: 2.00

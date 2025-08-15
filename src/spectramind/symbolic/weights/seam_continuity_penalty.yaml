@@ -1,0 +1,4 @@
+# Continuity across AIRS/FGS1 seams and detector join regions
+
+seam_penalty: 1.20
+neighbor_weight: 0.80

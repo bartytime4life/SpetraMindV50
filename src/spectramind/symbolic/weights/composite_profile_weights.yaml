@@ -1,0 +1,26 @@
+# Composite profile presets — these are merged after base/penalties/molecule-region
+
+hot_jupiter:
+  smoothness: 1.20
+  nonnegativity: 1.00
+  molecule_region: 1.30
+  seam_continuity: 0.90
+  quantile_monotonicity: 1.10
+warm_neptune:
+  smoothness: 1.10
+  nonnegativity: 1.00
+  molecule_region: 1.20
+  seam_continuity: 1.00
+  quantile_monotonicity: 1.00
+super_earth:
+  smoothness: 1.30
+  nonnegativity: 1.20
+  molecule_region: 1.00
+  seam_continuity: 1.00
+  quantile_monotonicity: 1.20
+temperate_mini_neptune:
+  smoothness: 1.25
+  nonnegativity: 1.10
+  molecule_region: 1.10
+  seam_continuity: 1.00
+  quantile_monotonicity: 1.15

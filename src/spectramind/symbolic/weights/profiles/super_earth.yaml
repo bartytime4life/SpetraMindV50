@@ -1,0 +1,6 @@
+# Super-Earth explicit overrides
+
+smoothness: 1.40
+nonnegativity: 1.25
+HCN: 0.90
+TiO: 0.65

@@ -1,0 +1,6 @@
+# Temperate Mini-Neptune explicit overrides
+
+smoothness: 1.30
+H2O: 1.20
+CO2: 1.12
+neighbor_weight: 0.85
