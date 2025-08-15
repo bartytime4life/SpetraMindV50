@@ -1,0 +1,20 @@
+# ===================================================================
+# Data — Cluster/HPC overrides
+# ===================================================================
+
+defaults:
+  - override /data: base
+
+data:
+  paths:
+    root: "/mnt/projects/spectramind"
+    raw: "/mnt/datasets/ariel/raw"
+    interim: "/scratch/${env:USER}/spectramind/interim"
+    processed: "/scratch/${env:USER}/spectramind/processed"
+    cache: "/scratch/${env:USER}/spectramind/cache"
+    submissions: "/mnt/projects/spectramind/submissions"
+  loader:
+    num_workers: 16
+  caching:
+    backend: dvc
+

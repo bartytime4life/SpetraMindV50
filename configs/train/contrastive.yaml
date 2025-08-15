@@ -1,0 +1,19 @@
+# ===================================================================
+# Training — Contrastive Phase
+# ===================================================================
+
+defaults:
+  - override /train: base
+
+train:
+  task: contrastive
+  epochs: 60
+  batch_size: 16
+  contrastive:
+    temperature: 0.07
+    projection_dim: 128
+    augment:
+      jitter_injection: true
+      spectro_dropout: 0.05
+      time_warp: false
+

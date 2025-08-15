@@ -1,19 +1,25 @@
-# SpectraMind V50 — Configurations (Hydra)
+# SpectraMind V50 — Configs
 
-This directory contains all Hydra-compatible configuration files for the SpectraMind V50 neuro‑symbolic, physics‑informed AI pipeline for the NeurIPS 2025 Ariel Data Challenge.
+Hydra configuration hub for the SpectraMind V50 pipeline. Import
+`config_v50.yaml` as the root and override components at the CLI, e.g.:
 
-## Layout
+```bash
+python spectramind.py train +data=local +train=supervised +model=fgs1_mamba
+```
 
-- `hydra.yaml` — Global Hydra runtime/sweep directories & job naming.
-- `defaults.yaml` — Single point of composition; includes the canonical base stacks.
+### Layout
 
-### Trees
+- `data/`         — Paths, calibration flags, platform overrides
+- `model/`        — Encoder/decoder settings and overrides
+- `train/`        — Phase configs (MAE pretrain, contrastive, supervised)
+- `diagnostics/`  — Dashboard, UMAP/t-SNE, GLL heatmaps, leaderboard
+- `symbolic/`     — Molecule bands, profiles, and override packs
 
-- `data/`         — Dataset paths, IO, feature-engineering toggles, platform overrides (local/kaggle/cluster).
-- `model/`        — Encoders/decoders/fusion definitions (FGS1 Mamba, AIRS GNN, μ/σ decoders).
-- `training/`     — Phase configs (base, MAE pretrain, contrastive, COREL).
-- `calibration/`  — Post-hoc uncertainty calibration (temperature scaling + conformal/COREL).
-- `diagnostics/`  — SHAP, symbolic, FFT, dashboards.
-- `symbolic/`     — Physics/molecule/alignment rules & weights.
+Logging defaults capture console output, a rotating file log, and a JSONL
+event stream. Experiment tracking toggles are exposed for MLflow and
+Weights & Biases. Reproducibility helpers snapshot git metadata and the
+runtime environment.
 
-> Rule of Truth: platform overrides must only flip values under `paths`, `io`, or `loader`. Do not mutate structure across platforms. Keep configs declarative and composable.
+> Platform overrides should only adjust values under `paths`, `io`, or
+> `loader`. Keep configs declarative and composable.
+
