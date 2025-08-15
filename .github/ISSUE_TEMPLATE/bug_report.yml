@@ -1,0 +1,37 @@
+name: Bug report
+description: File a bug report
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Please describe the issue and expected behavior.
+      placeholder: When I run spectramind diagnose dashboard…
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: Exact commands, config hashes, and environment info.
+      placeholder: |
+        poetry run python -m spectramind --version
+        poetry run python -m spectramind selftest --fast
+        [attach v50_debug_log.md]
+    validations:
+      required: true
+  - type: input
+    id: config-hash
+    attributes:
+      label: Config hash (if available)
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Ubuntu CUDA
+        - MacOS CPU
+        - Windows WSL
+        - Kaggle GPU
+      multiple: false

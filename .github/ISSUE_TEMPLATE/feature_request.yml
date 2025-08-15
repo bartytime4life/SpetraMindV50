@@ -1,0 +1,19 @@
+name: Feature request
+description: Propose an enhancement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What would you like to add or change?
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this useful? Link to diagnostics or notebooks if relevant.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: Concrete CLI flags, configs, or module updates.
