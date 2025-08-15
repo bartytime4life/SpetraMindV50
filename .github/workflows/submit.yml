@@ -1,0 +1,94 @@
+name: Manual Kaggle Submit
+
+on:
+  workflow_dispatch:
+    inputs:
+      competition:
+        description: "Kaggle competition slug (defaults to repo variable KAGGLE_COMPETITION)"
+        type: string
+        required: false
+      message:
+        description: "Submission message / notes"
+        type: string
+        required: false
+        default: "Manual submit from GitHub Actions"
+      artifact_name:
+        description: "Artifact name containing submission.zip"
+        type: string
+        required: false
+        default: "spectramind-ci-${{ github.run_id }}"
+
+permissions:
+  contents: read
+
+env:
+  KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+  KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+  KAGGLE_COMPETITION: ${{ vars.KAGGLE_COMPETITION }}
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python + Kaggle
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install kaggle
+      - name: Configure Kaggle credentials
+        run: |
+          mkdir -p ~/.kaggle
+          cat > ~/.kaggle/kaggle.json <<EOF
+          { "username": "${KAGGLE_USERNAME}", "key": "${KAGGLE_KEY}" }
+          EOF
+          chmod 600 ~/.kaggle/kaggle.json
+      - name: Determine competition
+        id: comp
+        run: |
+          COMP="${{ inputs.competition }}"
+          if [ -z "$COMP" ]; then
+            COMP="${KAGGLE_COMPETITION:-neurips-2025-ariel-data-challenge}"
+          fi
+          echo "competition=$COMP" >> "$GITHUB_OUTPUT"
+      - name: Download artifact (if exists)
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: dl_artifact
+        continue-on-error: true
+      - name: Find submission bundle
+        id: bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          CANDIDATE=""
+          if [ -f dl_artifact/dist/submission.zip ]; then
+            CANDIDATE="dl_artifact/dist/submission.zip"
+          elif [ -f dist/submission.zip ]; then
+            CANDIDATE="dist/submission.zip"
+          elif [ -f submission.zip ]; then
+            CANDIDATE="submission.zip"
+          fi
+          if [ -z "$CANDIDATE" ]; then
+            echo "No submission.zip found. Exiting gracefully."
+            echo "found=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "path=$CANDIDATE" >> "$GITHUB_OUTPUT"
+          echo "found=1" >> "$GITHUB_OUTPUT"
+      - name: Submit
+        if: steps.bundle.outputs.found == '1'
+        env:
+          COMPETITION: ${{ steps.comp.outputs.competition }}
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          RUN_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          MSG="${{ inputs.message }}"
+          MSG="${MSG} (run ${SHORT_SHA}) ${RUN_URL}"
+          kaggle competitions submit -c "${COMPETITION}" -f "${{ steps.bundle.outputs.path }}" -m "${MSG}" || true
+      - name: Done
+        run: echo "Manual submit step finished (best-effort)."
