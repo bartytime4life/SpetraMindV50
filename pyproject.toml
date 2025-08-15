@@ -1,0 +1,14 @@
+[project]
+name = "spetramind"
+version = "0.1.0"
+description = "Use AI to clear up noisy satellite data in order to find exoplanets."
+authors = [{name = "Maintainer"}]
+readme = "README.md"
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
