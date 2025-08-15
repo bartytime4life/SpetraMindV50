@@ -1,0 +1,5 @@
+# SpectraMind V50 — Instrument Overrides (AIRS)
+instrument: "AIRS"
+weights:
+  fft_asymmetry: 0.25
+  photonic_alignment: 0.4

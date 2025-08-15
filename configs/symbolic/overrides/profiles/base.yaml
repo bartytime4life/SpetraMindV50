@@ -1,0 +1,31 @@
+# SpectraMind V50 — Symbolic Profiles (Base)
+
+# Mergeable via Hydra defaults/layers. Override per-planet / per-cluster as needed.
+
+profiles:
+  default:
+    description: "Balanced rules for AIRS + FGS1"
+    applies_to:
+      instruments: ["AIRS", "FGS1"]
+    rules:
+      - id: "smoothness_l2"
+        weight: 1.0
+        mode: "soft"
+        parameters: { window: 3 }
+      - id: "nonnegativity"
+        weight: 1.0
+        mode: "hard"
+        parameters: {}
+      - id: "molecular_coherence"
+        weight: 0.5
+        mode: "soft"
+        parameters: { tolerance: 0.15 }
+  kaggle_fast:
+    description: "Runtime-constrained symbolic set"
+    applies_to:
+      instruments: ["AIRS"]
+    rules:
+      - id: "smoothness_l2"
+        weight: 0.6
+        mode: "soft"
+        parameters: { window: 3 }

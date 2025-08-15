@@ -1,0 +1,10 @@
+# SpectraMind V50 — Event Overrides (sample)
+events:
+  planet_0001:
+    profiles: ["default"]
+    weights:
+      molecular_coherence: 0.8
+  planet_0002:
+    profiles: ["kaggle_fast"]
+    weights:
+      smoothness_l2: 0.7

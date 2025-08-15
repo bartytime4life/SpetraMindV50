@@ -1,0 +1,4 @@
+# SpectraMind V50 — Instrument Overrides (FGS1)
+instrument: "FGS1"
+weights:
+  smoothness_l2: 1.2

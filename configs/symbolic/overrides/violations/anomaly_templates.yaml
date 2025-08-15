@@ -1,0 +1,10 @@
+# SpectraMind V50 — Violation Templates
+templates:
+  spike_artifacts:
+    description: "Impulse-like spikes; watch smoothness/nonnegativity"
+    affects: ["AIRS", "FGS1"]
+    expected_rules: ["smoothness_l2", "nonnegativity"]
+  band_mismatch:
+    description: "Molecular band edges off alignment"
+    affects: ["AIRS"]
+    expected_rules: ["molecular_coherence", "photonic_alignment"]
