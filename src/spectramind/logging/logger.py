@@ -1,157 +1,143 @@
-from __future__ import annotations
-import json, logging, logging.config, os, sys, time, platform, subprocess, hashlib
-from dataclasses import dataclass, asdict
+import json
+import logging
+import os
+import sys
+from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-UTC = time.gmtime
+LOG_DIR = Path(os.environ.get("SPECTRAMIND_LOG_DIR", "logs")).resolve()
+LOG_DIR.mkdir(exist_ok=True, parents=True)
+
+DEBUG_LOG_FILE = LOG_DIR / "v50_debug_log.md"
+EVENTS_JSONL_FILE = LOG_DIR / "events.jsonl"
+ROTATING_LOG_FILE = LOG_DIR / "spectramind.log"
+
+ROTATE_BYTES = int(
+    os.environ.get("SPECTRAMIND_LOG_ROTATE_BYTES", str(10 * 1024 * 1024))
+)
+ROTATE_BACKUPS = int(os.environ.get("SPECTRAMIND_LOG_ROTATE_BACKUPS", "5"))
 
 
-class UtcFormatter(logging.Formatter):
-    converter = time.gmtime
+def setup_rotating_handlers(logger: logging.Logger, level: int) -> None:
+    """
+    Attach console + rotating file handlers with consistent formatting.
+    Safe to call multiple times; handlers are only added once per logger.
+    """
+    # Check if already configured
+    if any(isinstance(h, RotatingFileHandler) for h in logger.handlers) and any(
+        isinstance(h, logging.StreamHandler) for h in logger.handlers
+    ):
+        return
 
-    def formatTime(self, record, datefmt=None):
-        # ISO 8601 UTC with milliseconds
-        ts = super().formatTime(record, datefmt or "%Y-%m-%dT%H:%M:%S")
-        return f"{ts}.{int(record.msecs):03d}Z"
+    logger.setLevel(level)
 
-
-class JsonlFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:
-        payload = {
-            "ts": self.formatTime(record, "%Y-%m-%dT%H:%M:%S"),
-            "level": record.levelname,
-            "name": record.name,
-            "msg": record.getMessage(),
-            "file": f"{record.pathname}:{record.lineno}",
-            "func": record.funcName,
-            "run_id": getattr(record, "run_id", None),
-            "extra": {k: v for k, v in record.__dict__.items() if k not in (
-                "name","msg","args","levelname","levelno","pathname","filename","module",
-                "exc_info","exc_text","stack_info","lineno","funcName","created","msecs","relativeCreated",
-                "thread","threadName","processName","process","ts","taskName","message"
-            )}
-        }
-        if record.exc_info:
-            payload["exc"] = self.formatException(record.exc_info)
-        return json.dumps(payload, ensure_ascii=False)
-
-
-# --- Run metadata capture ----------------------------------------------------
-@dataclass
-class RunMeta:
-    run_id: str
-    start_ts: float
-    git_commit: Optional[str]
-    git_dirty: Optional[bool]
-    git_branch: Optional[str]
-    python: str
-    platform: str
-    machine: str
-    processor: str
-    env_hash: str
-
-    @staticmethod
-    def capture(run_id: str) -> "RunMeta":
-        def sh(cmd):
-            try:
-                return subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-            except Exception:
-                return None
-
-        commit = sh(["git","rev-parse","HEAD"]) or None
-        status = sh(["git","status","--porcelain"]) or ""
-        dirty = bool(status) if commit else None
-        branch = sh(["git","rev-parse","--abbrev-ref","HEAD"]) or None
-        env_dump = os.linesep.join([f"{k}={os.getenv(k)}" for k in sorted(os.environ.keys())])
-        env_hash = hashlib.sha256(env_dump.encode()).hexdigest()
-        return RunMeta(
-            run_id=run_id,
-            start_ts=time.time(),
-            git_commit=commit,
-            git_dirty=dirty,
-            git_branch=branch,
-            python=sys.version.split()[0],
-            platform=platform.platform(),
-            machine=platform.machine(),
-            processor=platform.processor(),
-            env_hash=env_hash,
+    # Console handler (UTC ISO timestamps in stream for consistent CI parsing)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(level)
+    ch.setFormatter(
+        logging.Formatter(
+            "[%(asctime)sZ] %(levelname)s | %(message)s", datefmt="%Y-%m-%dT%H:%M:%S"
         )
+    )
+    logger.addHandler(ch)
+
+    # Rotating file handler
+    fh = RotatingFileHandler(
+        ROTATING_LOG_FILE,
+        maxBytes=ROTATE_BYTES,
+        backupCount=ROTATE_BACKUPS,
+        encoding="utf-8",
+    )
+    fh.setLevel(level)
+    fh.setFormatter(
+        logging.Formatter(
+            "%(asctime)sZ [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S",
+        )
+    )
+    logger.addHandler(fh)
 
 
-# --- Dictionary config (Hydra‑safe) -----------------------------------------
+def get_logger(
+    name: str = "spectramind", level: Optional[int] = None
+) -> logging.Logger:
+    """
+    Create or retrieve a configured logger with console + rotating file output.
+    Level defaults to INFO; override via SPECTRAMIND_LOG_LEVEL or parameter.
+    """
+    logger = logging.getLogger(name)
+    # Determine desired level: parameter > ENV > INFO
+    level_final = (
+        level
+        if level is not None
+        else getattr(
+            logging,
+            os.environ.get("SPECTRAMIND_LOG_LEVEL", "INFO").upper(),
+            logging.INFO,
+        )
+    )
+    setup_rotating_handlers(logger, level_final)
+    return logger
 
-def build_logging_config(log_dir: Path, run_id: str, level: str = "INFO") -> Dict[str, Any]:
-    log_dir.mkdir(parents=True, exist_ok=True)
-    common = {
-        "()": UtcFormatter,
-        "format": "%(asctime)s | %(levelname)7s | %(name)s | %(message)s",
+
+def _append_markdown_row(event_type: str, payload: Dict[str, Any]) -> None:
+    """
+    Append a structured row to the Markdown debug log.
+    """
+    ts = datetime.utcnow().isoformat()
+    # Create header if missing
+    if not DEBUG_LOG_FILE.exists() or DEBUG_LOG_FILE.stat().st_size == 0:
+        with open(DEBUG_LOG_FILE, "w", encoding="utf-8") as f:
+            f.write("| timestamp_utc | event | payload_json |\n")
+            f.write("|---|---|---|\n")
+    # Append the row
+    with open(DEBUG_LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(f"| {ts} | {event_type} | {json.dumps(payload, sort_keys=True)} |\n")
+
+
+def _append_jsonl(event_type: str, payload: Dict[str, Any]) -> None:
+    """
+    Append a JSONL event record for programmatic ingestion and dashboards.
+    """
+    record = {"ts": datetime.utcnow().isoformat(), "type": event_type, "data": payload}
+    with open(EVENTS_JSONL_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(record, sort_keys=True) + "\n")
+
+
+def log_event(
+    event_type: str,
+    payload: Dict[str, Any],
+    *,
+    also_jsonl: bool = True,
+    also_md: bool = True,
+) -> None:
+    """
+    Record a structured event to both Markdown and JSONL streams.
+    """
+    if also_md:
+        _append_markdown_row(event_type, payload)
+    if also_jsonl:
+        _append_jsonl(event_type, payload)
+
+
+def log_cli_call(
+    command: str,
+    args: Dict[str, Any],
+    config_hash: str,
+    cli_version: str,
+    extra: Optional[Dict[str, Any]] = None,
+) -> None:
+    """
+    Specialized recorder for CLI invocations. Consumed by analyze-log / dashboard.
+    """
+    payload = {
+        "command": command,
+        "args": args,
+        "config_hash": config_hash,
+        "cli_version": cli_version,
     }
-    return {
-        "version": 1,
-        "disable_existing_loggers": False,  # Hydra adds its own; we play nice
-        "filters": {
-            "attach_run_id": {
-                "()": "logging.Filter",
-                # runtime sets run_id on record via LoggerAdapter; filter kept for completeness
-            }
-        },
-        "formatters": {
-            "human": common,
-            "jsonl": {"()": JsonlFormatter},
-        },
-        "handlers": {
-            "console": {
-                "class": "logging.StreamHandler",
-                "level": level,
-                "formatter": "human",
-                "stream": "ext://sys.stdout",
-            },
-            "file_text": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "level": level,
-                "formatter": "human",
-                "filename": str(log_dir / f"runtime.log"),
-                "maxBytes": 10_000_000,
-                "backupCount": 10,
-                "encoding": "utf-8",
-            },
-            "file_jsonl": {
-                "class": "logging.handlers.RotatingFileHandler",
-                "level": level,
-                "formatter": "jsonl",
-                "filename": str(log_dir / f"events.jsonl"),
-                "maxBytes": 25_000_000,
-                "backupCount": 20,
-                "encoding": "utf-8",
-            },
-        },
-        "root": {
-            "level": level,
-            "handlers": ["console", "file_text", "file_jsonl"],
-        },
-    }
-
-
-class RunLogger:
-    def __init__(self, run_id: Optional[str] = None, log_dir: Optional[Path] = None, level: str = "INFO"):
-        self.run_id = run_id or os.getenv("RUN_ID") or time.strftime("%Y%m%d_%H%M%S", UTC())
-        base = Path(os.getenv("SPECTRA_LOG_DIR", "./logs"))
-        self.log_dir = log_dir or (base / self.run_id)
-        cfg = build_logging_config(self.log_dir, self.run_id, level)
-        logging.config.dictConfig(cfg)
-        self.logger = logging.getLogger("spectramind")
-        # attach contextual adapter
-        self.adapter = logging.LoggerAdapter(self.logger, extra={"run_id": self.run_id})
-        # emit a run header into both sinks
-        meta = RunMeta.capture(self.run_id)
-        self.adapter.info("RUN_START %s", self.run_id)
-        logging.getLogger("spectramind.meta").info("%s", asdict(meta))
-
-    def get(self, name: str | None = None) -> logging.LoggerAdapter:
-        return logging.LoggerAdapter(logging.getLogger(name or "spectramind"), extra={"run_id": self.run_id})
-
-
-# convenience
-get_logger = lambda name=None: RunLogger().get(name)
-
+    if extra:
+        payload.update(extra)
+    log_event("cli_call", payload)
