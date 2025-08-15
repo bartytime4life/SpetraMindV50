@@ -1,0 +1,10 @@
+rules:
+  - name: nonnegativity_all
+    type: nonnegativity
+    weight: 1.0
+    params: {}
+  - name: smoothness_core
+    type: smoothness_l2
+    weight: 0.5
+    params:
+      lambda: 1.0
