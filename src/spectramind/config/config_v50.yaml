@@ -1,0 +1,66 @@
+# Hydra-ready canonical SpectraMind V50 configuration.
+# Physics-informed, neuro-symbolic, challenge-grade defaults.
+model:
+  encoder: "fgs1_mamba"
+  encoder_params:
+    hidden_dim: 256
+    depth: 12
+    dropout: 0.1
+  airs_gnn:
+    type: "gat"
+    heads: 4
+    hidden_dim: 256
+    edge_features: true
+  decoder: "multi_scale_decoder"
+  decoder_params:
+    output_bins: 283
+    dropout: 0.05
+    uncertainty_head: "flow_uncertainty"
+    use_attention_fusion: true
+
+training:
+  epochs: 50
+  batch_size: 64
+  lr: 0.0005
+  optimizer: "adamw"
+  weight_decay: 0.01
+  amp: true
+  scheduler:
+    type: "cosine"
+    warmup_epochs: 5
+  gradient_accumulation_steps: 2
+  save_every: 5
+  log_every: 50
+  curriculum:
+    mae_pretrain: true
+    contrastive: true
+    symbolic_finetune: true
+
+calibration:
+  method: "corel"
+  corel_params:
+    edge_features: true
+    temporal_bin_encoding: "fourier"
+    coverage_target: 0.9
+    symbolic_weighting: true
+
+diagnostics:
+  run_gll: true
+  run_fft: true
+  run_shap: true
+  run_symbolic_overlay: true
+  run_umap: true
+  run_tsne: true
+  html_report: true
+
+symbolic:
+  enable_constraints: true
+  constraints:
+    smoothness_weight: 0.2
+    asymmetry_weight: 0.1
+    nonnegativity_weight: 0.05
+    photonic_alignment_weight: 0.15
+
+env:
+  device: "cuda"
+  num_workers: 8
