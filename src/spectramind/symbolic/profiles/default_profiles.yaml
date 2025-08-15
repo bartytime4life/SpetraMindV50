@@ -1,0 +1,7 @@
+profiles:
+  default:
+    description: Default symbolic profile for SpectraMind V50.
+    rules:
+      - nonnegativity_all
+      - smoothness_core
+    weights: src/spectramind/symbolic/weights/default_weights.yaml

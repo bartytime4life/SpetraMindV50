@@ -1,0 +1,3 @@
+weights:
+  nonnegativity_all: 1.0
+  smoothness_core: 0.5
