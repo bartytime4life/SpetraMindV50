@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Wrapper to launch an existing Typer root with logging:
+# Example:
+# bin/spectramind-with-logging spectramind.spectramind:app -- train --config configs/config_v50.yaml
+
+python -m spectramind.cli.spectramind_logging_launcher -- "$@"

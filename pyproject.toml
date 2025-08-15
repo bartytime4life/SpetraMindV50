@@ -20,7 +20,9 @@ dependencies = [
 [project.optional-dependencies]
 mlflow = ["mlflow>=2.15"]
 wandb = ["wandb>=0.17"]
+spectramind-logging-extras = [
+    "mlflow>=2.14.0; python_version>='3.8'"
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
