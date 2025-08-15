@@ -1,0 +1,15 @@
+logging:
+  level: INFO
+  dir: ${oc.env:SPECTRA_LOG_DIR,logs}
+  run_id: null  # auto if null
+
+tracking:
+  mlflow:
+    enable: false
+    tracking_uri: ${oc.env:MLFLOW_TRACKING_URI,}
+    experiment: SpectraMindV50
+  wandb:
+    enable: false
+    project: SpectraMindV50
+    entity: null
+
