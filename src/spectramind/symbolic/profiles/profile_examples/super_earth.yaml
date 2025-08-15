@@ -1,0 +1,15 @@
+profiles:
+  - id: super_earth_haze_guard
+    name: Super-Earth — Haze Guard
+    description: >
+      Extends super_earth_survey to guard against haze-flattened spectra by
+      slightly increasing smoothness and introducing outlier suppression.
+    extends: super_earth_survey
+    tags: [super_earth, haze_guard]
+    rules:
+      - id: smoothness_l2
+        weight: 0.95
+        priority: 5
+      - id: outlier_bin_suppression
+        weight: 0.7
+        priority: 2

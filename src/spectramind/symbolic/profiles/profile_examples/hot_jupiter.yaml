@@ -1,0 +1,18 @@
+profiles:
+  - id: hot_jupiter_plus_fft
+    name: Hot Jupiter — +FFT Discipline
+    description: >
+      Extends hot_jupiter_core with stronger FFT continuum discipline and
+      elevated priority for CO/CO2 coherence to handle thermal inversion cases.
+    extends: hot_jupiter_core
+    tags: [hot, gas_giant, fft_strict]
+    rules:
+      - id: fft_continuum_suppress
+        weight: 0.9
+        priority: 4
+      - id: molecule_band_coherence_CO
+        weight: 1.25
+        priority: 7
+      - id: molecule_band_coherence_CO2
+        weight: 1.25
+        priority: 7
