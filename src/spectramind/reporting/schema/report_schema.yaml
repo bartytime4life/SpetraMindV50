@@ -1,0 +1,19 @@
+# YAML mirror of the JSON schema for human editing.
+
+# The generator loads the JSON schema at runtime; this file serves as source-of-truth.
+
+type: object
+properties:
+  summary:
+    type: object
+  metrics:
+    type: object
+  plots:
+    type: object
+  tables:
+    type: object
+  artifacts:
+    type: object
+required:
+  - summary
+additionalProperties: true

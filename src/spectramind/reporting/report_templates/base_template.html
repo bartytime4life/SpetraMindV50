@@ -1,0 +1,155 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{TITLE}} — {{REPORT_VERSION}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* Minimal, clean dashboard CSS with readable typography */
+    :root {
+      --bg: #0b0f14;
+      --panel: #121a22;
+      --text: #e6eef6;
+      --muted: #9ab;
+      --accent: #4fc3f7;
+      --good: #66bb6a;
+      --warn: #ffa726;
+      --bad: #ef5350;
+      --card: #141c26;
+      --border: #1e2935;
+    }
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      padding: 28px 24px 12px 24px;
+      background: linear-gradient(180deg, rgba(79,195,247,0.15), transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0.3px;
+    }
+    header p {
+      margin: 6px 0 0 0;
+      color: var(--muted);
+    }
+    main {
+      padding: 18px 24px 80px 24px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    section {
+      margin: 22px 0;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
+    h2 { margin: 0 0 12px 0; font-size: 20px; }
+    table {
+      width: 100%; border-collapse: collapse; margin: 12px 0 4px 0;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--muted); font-weight: 600; }
+    .muted { color: var(--muted); }
+    .pill { padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: #0f151d; color: var(--muted); font-size: 12px; }
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); grid-gap: 12px; }
+    .col-12 { grid-column: span 12; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-8 { grid-column: span 8; }
+    .foot { margin-top: 28px; color: var(--muted); font-size: 12px; }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; background: #0d141c; border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; }
+    .chart { background: #0d141c; border: 1px solid var(--border); border-radius: 10px; padding: 6px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+  <script>
+    // Minimal JS stub for runtime hints or future interactivity hooks
+    window.addEventListener("load", () => {
+      console.log("SpectraMind V50 report loaded.");
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <h1>{{TITLE}}</h1>
+    <p>{{SUBTITLE}} · <span class="pill">{{REPORT_VERSION}}</span> · <span class="muted">{{UTC_TIME}} UTC</span></p>
+  </header>
+  <main>
+    <section>
+      {{SUMMARY}}
+    </section>
+
+    <section>
+      <h2>Core Metrics</h2>
+      {{TABLE_METRICS}}
+    </section>
+
+    <div class="grid">
+      <section class="col-6">
+        <h2>Per-Bin GLL Heatmap</h2>
+        <div class="chart">{{PLOT_GLL_HEATMAP}}</div>
+      </section>
+      <section class="col-6">
+        <h2>Calibration (σ vs Residual / Coverage)</h2>
+        <div class="chart">{{PLOT_CALIB}}</div>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="col-6">
+        <h2>FFT Power / Spectral Smoothness</h2>
+        <div class="chart">{{PLOT_FFT}}</div>
+      </section>
+      <section class="col-6">
+        <h2>Symbolic Rule × Planet Heatmap</h2>
+        <div class="chart">{{PLOT_SYMBOLIC}}</div>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="col-6">
+        <h2>UMAP Latent Projection</h2>
+        <div class="chart">{{PLOT_UMAP}}</div>
+      </section>
+      <section class="col-6">
+        <h2>t-SNE Latent Projection</h2>
+        <div class="chart">{{PLOT_TSNE}}</div>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="col-6">
+        <h2>Config Hash × Performance</h2>
+        {{TABLE_CONFIG_HASH}}
+      </section>
+      <section class="col-6">
+        <h2>Symbolic Rule Leaderboard</h2>
+        {{TABLE_SYMBOLIC}}
+      </section>
+    </div>
+
+    <section>
+      <h2>CLI History</h2>
+      {{TABLE_CLI}}
+    </section>
+
+    <div class="foot">
+      Built by SpectraMind V50 · Reporting Subsystem · This file is self-contained for archival.
+    </div>
+
+  </main>
+</body>
+</html>
