@@ -1,79 +1,19 @@
-# ===================================================================
-# SpectraMind V50 — Master Hydra Config
-# -------------------------------------------------------------------
-# Canonical import point for the entire pipeline. Compose with
-# `python spectramind.py ... +data=local +train=supervised` etc.
-# ===================================================================
+# SpectraMind V50 – Hydra/OmegaConf config (calibration-focused)
+# This file provides minimal defaults so the calibration CLI runs immediately.
 
-defaults:
-  - data: base
-  - model: base
-  - train: base
-  - diagnostics: base
-  - symbolic: base
-  - _self_
+paths:
+  raw_data: data/raw
+  calibrated_output: outputs/calibrated
 
-project:
-  name: "SpectraMind V50"
-  version: "v50"
-  seed: 1337
-  timezone: "UTC"
-
-reproducibility:
-  capture_git: true      # record git commit/branch/dirty flag
-  capture_env: true      # snapshot environment variables
-  deterministic: true
-  benchmark: false
-  numpy_seed: 1337
-  torch_seed: 1337
-  python_hash_seed: "0"
-
-io_policy:
-  safe_writes: true
-  atomic_writes: true
-  fsync_on_close: false
-
-logging:
-  # Console + rotating file logs, plus JSONL event stream
-  level: INFO
-  fmt: "[%(asctime)s][%(levelname)s][%(name)s] %(message)s"
-  datefmt: "%Y-%m-%d %H:%M:%S"
-  console: true
-  file:
-    enabled: true
-    path: runs/logs/v50.log
-    max_bytes: 10485760
-    backup_count: 5
-  jsonl:
-    enabled: true
-    path: runs/logs/v50_events.jsonl
-
-experiment_tracking:
-  mlflow:
-    enabled: true
-    tracking_uri: "file:./runs/mlflow"
-    experiment: "spectramind_v50"
-    nested_runs: true
-  wandb:
-    enabled: false
-    entity: "your-wandb-entity"
-    project: "spectramind-v50"
-    tags: ["v50", "neurips-2025"]
-
-runtime:
-  device: cuda      # "cuda" | "cpu" | "auto"
-  amp: true
-  grad_accum_steps: 1
-  workers: 8
-  pin_memory: true
-
-hydra:
-  run:
-    dir: runs/${project.version}/${now:%Y-%m-%d}_${now:%H-%M-%S}
-  sweep:
-    dir: runs/${project.version}/sweeps
-    subdir: ${hydra.job.num}
-  job:
-    chdir: true
-    verbose: false
-
+calibration_pipeline:
+  photometry:
+    random_seed: 1337
+    planets: ["planet_001", "planet_002", "planet_003", "planet_004"]
+    samples_per_planet: 1024
+  calibration:
+    default_sigma: 0.02
+    corel:
+      coverage_quantile: 0.9
+      min_sigma: 0.0001
+  checker:
+    z_hist_bins: 60

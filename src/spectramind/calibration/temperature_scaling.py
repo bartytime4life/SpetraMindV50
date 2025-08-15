@@ -1,19 +1,20 @@
-"""Temperature scaling utilities."""
-
-from __future__ import annotations
-
-import numpy as np
+import torch
+import torch.nn as nn
 
 
-def fit_temperature_scaling(residuals: np.ndarray, sigma_pred: np.ndarray) -> float:
-    """Fit global temperature scaling parameter T."""
+class TemperatureScaler(nn.Module):
+    """
+    Logit temperature scaling. Included for completeness; not actively used in this minimal pipeline
+    (AIRS/FGS1 regression typically does not employ classification logits).
+    """
 
-    std_r = float(np.std(residuals))
-    mean_s = float(np.mean(np.abs(sigma_pred)) + 1e-12)
-    return std_r / mean_s
+    def __init__(self, init_temp: float = 0.0):
+        """
+        init_temp is in log-space; actual temperature = exp(param).
+        """
+        super().__init__()
+        self.log_temp = nn.Parameter(torch.tensor(float(init_temp)))
 
-
-def apply_temperature_scaling(sigma_pred: np.ndarray, T: float) -> np.ndarray:
-    """Apply temperature scaling to predicted sigma."""
-
-    return sigma_pred * T
+    def forward(self, logits: torch.Tensor) -> torch.Tensor:
+        temp = torch.exp(self.log_temp)
+        return logits / temp.clamp_min(1e-6)
