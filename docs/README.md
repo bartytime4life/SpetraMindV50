@@ -1,161 +1,241 @@
-# SpectraMind V50
-**Mission-Grade Neuro-Symbolic AI Pipeline for the NeurIPS 2025 Ariel Data Challenge**
+# SpectraMind V50 — Mission‑Grade Documentation Hub
+
+This `docs/` hub is the single, canonical, engineering‑grade knowledge base for SpectraMind V50 and the NeurIPS 2025 Ariel Data Challenge. It organizes scientific background, method standards, engineering guides, mission context, and project‑specific templates into a reproducible, navigable system that integrates with CI/CD, CLI, and diagnostics.
 
 ---
 
-## Mission Brief
+## Table of Contents
 
-SpectraMind V50 is a **physics-informed, neuro-symbolic AI system** built to win the [NeurIPS 2025 Ariel Data Challenge](https://www.cosmos.esa.int/web/ariel/).  
-Its design goes beyond leaderboard chasing — the goal is to set a **reproducibility, explainability, and scientific fidelity standard** for exoplanet spectroscopy pipelines.
+1. Overview & Principles
+   1.1 Scope & Audience
+   1.2 Reproducibility Contract (Science‑first)
+   1.3 How to Use this Docs Hub
 
-**Core Tenets**:
-- **Win with physics-faithful μ/σ** predictions, robust to out-of-distribution (OOD) conditions.
-- **Neuro-symbolic design** — deep sequence/graph encoders + differentiable physics constraints + ex-post logic audit.
-- **FGS1-first strategy** — ~58× weight vs. any AIRS bin; architectural decisions hinge on this.
-- **Reproducibility-first** — every artifact traceable to Git SHA, config hash, environment, and seed.
-- **Operator-first explainability** — built-in SHAP × symbolic overlays, UMAP/t-SNE, FFT/smoothness, violation heatmaps.
-- **Kaggle runtime discipline** — ≤ 9 h over ~1,100 planets (≤ 30 s/planet), enforced via telemetry.
+2. Scientific Method, Experimentation & Templates
+   2.1 Universal Experiment Template
+   2.2 Coding Project Templates (README, CONTRIBUTING, Model Cards)
+   2.3 Glossary & Terminology
 
----
+3. Modeling & Simulation (NASA‑grade Practices)
+   3.1 Modeling Paradigms (ABM, DES, SD, FEM/FVM, Hybrid)
+   3.2 Verification, Validation, and Credibility
+   3.3 Multi‑physics & Co‑simulation Workflows
 
-## Scientific Context
+4. Physics & Astrophysics Reference
+   4.1 Mechanics, EM, Thermodynamics, Quantum, Relativity
+   4.2 Cosmology & Observational Techniques
+   4.3 Spectroscopy Foundations for Exoplanets
 
-Ariel observes transiting exoplanets from **0.5–7.8 μm**, extracting faint atmospheric signals from **instrument-noisy, astrophysically variable** data.  
-The challenge simulates this, providing:
+5. Chemistry & Biology (Foundations & SOPs)
+   5.1 Core Chemistry Domains
+   5.2 Cell/Molecular Biology, Genetics, Physiology
+   5.3 Lab SOPs: Titrations, Chromatography, etc.
 
-- **FGS1 (0.60–0.80 μm)** — broadband photometer; master transit shape & jitter tracking.
-- **AIRS-CH0 (1.95–3.90 μm)** — infrared spectrometer; 282 narrow spectral bins.
+6. Patterns, Algorithms, and Fractals (Math Foundations)
+   6.1 Symmetry, Group Theory, Fourier/Spatial Frequency
+   6.2 Reaction–Diffusion & Dynamical Systems
+   6.3 Fractals & Scaling Laws
 
-**Key constraints**:
-- **Gaussian Log-Likelihood (GLL)** — joint μ and σ accuracy, heavily penalizing miscalibration.
-- **OOD test set** — new chemistries, temperatures, noise profiles.
-- **Physical guardrails** — smoothness, non-negativity, molecular coherence, CH₄:H₂O:CO₂ ratios, quantile monotonicity.
+7. GUI Engineering (Dashboards & Tools)
+   7.1 Event‑Driven Architecture & Main Loop
+   7.2 Retained vs Immediate vs Declarative UIs
+   7.3 Widget Trees, Layout, Accessibility, Testing
 
----
+8. Ariel Mission & Space Observatories (Context)
+   8.1 ARIEL Mission Goals, Payload, Orbit & Ops
+   8.2 Legacy: Hubble, Spitzer, Herschel, JWST
+   8.3 Target Strategy & Observing Modes
 
-## System Overview
+9. Domain Module Examples & Tooling Plan
+   9.1 AI/ML Experiment & Model Card Examples
+   9.2 Training Pipelines & Experiment Tracking
+   9.3 Cross‑Domain Reproducibility Tooling
 
-### Dataflow
-
-```mermaid
-flowchart LR
-  A[FGS1 cubes]:::raw --> C1
-  B[AIRS-CH0 cubes]:::raw --> C1
-  subgraph CAL[Calibration Kill Chain]
-    C1[ADC reversal]-->C2[Bad pixel mask]-->C3[Non-linearity]
-    C3-->C4[Dark subtraction]-->C5[Flat-field]-->C6[Trace extraction]
-  end
-  CAL-->F[Feature Cache]
-  F-->M1[FGS1 Mamba SSM]
-  F-->M2[AIRS GAT]
-  M1 & M2-->MF[Fusion]
-  MF-->D1[μ Decoder]
-  MF-->D2[σ Head]
-  D1 & D2-->SYM[Symbolic Physics Engine]
-  SYM-->CAL2[Uncertainty Calibration]
-  CAL2-->OUT[submission.csv]
-  classDef raw fill:#f6f6ff,stroke:#7a7ab8;
-```
+10. How Docs Integrate with CI/CLI/Dashboard
+    10.1 CI Linting & Broken‑Link Checks
+    10.2 Docs → CLI Help Mapping
+    10.3 Embedding in Diagnostics HTML
 
 ---
 
-## Repository Structure
+## 1) Overview & Principles
 
-```
-SpectraMind-V50/
-├── spectramind.py              # Unified Typer CLI (train/predict/diagnose/calibrate/submit/etc.)
-├── configs/                    # Hydra config hierarchy
-│   ├── config_v50.yaml
-│   ├── data/
-│   ├── model/
-│   └── train/
-├── src/spectramind/
-│   ├── data/                   # Calibration kill-chain, loaders
-│   ├── models/                 # FGS1 Mamba, AIRS GAT, μ decoder, σ head
-│   ├── symbolic/               # symbolic_loss.py, logic engine, profiles
-│   ├── calibration/            # temp scaling, COREL
-│   ├── inference/              # predict_v50.py
-│   ├── training/               # train_v50.py (MAE→contrastive→supervised)
-│   ├── diagnostics/            # SHAP, UMAP/t-SNE, FFT, HTML dashboard
-│   ├── cli/                    # CLI wrappers, selftest, pipeline consistency checker
-│   └── utils/                  # logging, hash/env/git capture
-├── docs/                       # Operator guides, architecture, flight card
-├── outputs/                    # Run artifacts (DVC-tracked)
-├── dvc.yaml                    # DAG: calibrate→features→train→predict→diagnose
-├── pyproject.toml / poetry.lock# Environment pinning (Poetry)
-├── Dockerfile                  # CUDA runtime parity
-├── .github/workflows/ci.yml    # CI/CD with reproducibility gates
-├── v50_debug_log.md            # Human-readable audit log
-└── events.jsonl                # Machine-readable event telemetry
-```
+### 1.1 Scope & Audience
+
+This hub serves engineers, scientists, and contributors building SpectraMind V50. It covers scientific fundamentals, reproducibility, modeling best practices, GUI engineering for dashboards, and Ariel mission knowledge—curated as the reference layer for coding, experimentation, and operations.
+
+### 1.2 Reproducibility Contract (Science‑first)
+
+We enforce a strict documentation‑first approach: every experiment, pipeline, and diagnostic is tied to templates, model cards, and versioned configs. This ensures auditability, credibility, and repeatability across environments and timelines.
+
+### 1.3 How to Use this Docs Hub
+
+* Read the **Scientific Method & Templates** first, then consult **Modeling** and **Physics/Astrophysics** for theory.
+* Use **GUI Engineering** when building dashboards/tools.
+* Reference **Ariel Mission** for domain context and instrumentation constraints.
+* Follow **Domain Module Examples** for reproducible experiments and model documentation.
 
 ---
 
-## Quickstart — Local Mode
+## 2) Scientific Method, Experimentation & Templates
 
-```bash
-# Install dependencies
-poetry install --no-root && poetry shell
+* **Universal Experiment Template** — A standardized, domain‑agnostic template for problem, hypothesis, method, parameters, data sources, results, analysis, and conclusions.
+* **Coding Project Templates** — Production‑grade templates for `README.md`, `CONTRIBUTING.md`, and **Model Cards** capturing intended use, data, performance, and limitations.
+* **Glossary** — Shared terminology to avoid ambiguity across AI, physics, and engineering subdomains.
 
-# Verify GPU
-nvidia-smi
+*Files:*
 
-# Run self-test
-python -m spectramind selftest
-
-# Train model
-python -m spectramind train phase=mae
-python -m spectramind train phase=contrastive
-python -m spectramind train phase=supervised
-
-# Calibrate & diagnose
-python -m spectramind calibrate-temp
-python -m spectramind calibrate-corel
-python -m spectramind diagnose dashboard
-
-# Predict & bundle
-python -m spectramind predict --out-csv outputs/submission.csv
-python -m spectramind submit bundle
-```
+* `Foundational Templates and Glossary for Scientific Method / Research / Master Coder Protocol.pdf`
+* `Scientific Method _ Research _ Master Coder Protocol Documentation.pdf`
 
 ---
 
-## Quickstart — Kaggle Mode
+## 3) Modeling & Simulation (NASA‑grade Practices)
 
-```bash
-# Predict for Kaggle runtime
-python -m spectramind predict data=kaggle     --out-csv /kaggle/working/submission.csv
-```
+* **Paradigms:** Agent‑Based (ABM), Discrete‑Event (DES), System Dynamics (SD), Finite Element/Volume (FEM/FVM), and **Hybrid** models for multi‑scale systems.
+* **V&V&C:** Verification, Validation, and Credibility—adopt NASA standards to ensure that simulations are correct, representative, and trustworthy.
+* **Multi‑physics & Co‑simulation:** Functional Mock‑up Interface (FMI), multi‑tool coupling, and HPC considerations for aerospace‑grade workloads.
 
-**Rules**:
-- Always use `data=kaggle` config override.
-- Keep total runtime ≤ 9 h.
-- Precompute and cache whenever possible.
+*File:*
+
+* `Scientific Modeling and Simulation: A Comprehensive NASA-Grade Guide.pdf`
 
 ---
 
-## Symbolic Physics Constraints
+## 4) Physics & Astrophysics Reference
 
-- **Smoothness** — penalize large 2nd derivative in μ.
-- **Non-negativity** — μ ≥ 0 everywhere.
-- **Molecular coherence** — linked bins for H₂O, CH₄, CO₂ must co-activate.
-- **Seam continuity** — enforce continuity across detector seams.
-- **CH₄:H₂O:CO₂ envelopes** — ratio constraints on integrated band areas.
-- **Quantile monotonicity** — enforce q₁₀ ≤ q₅₀ ≤ q₉₀ for quantile heads.
+* **Foundations:** Classical mechanics; Maxwell’s EM; Thermodynamics & Statistical Mechanics; Quantum Mechanics; Special & General Relativity.
+* **Cosmology:** Expansion, CMB, dark matter/energy; precision cosmology parameters.
+* **Observational Methods:** Spectroscopy, interferometry, photometry; exoplanet transit/eclipse spectroscopy.
 
----
+*Files:*
 
-## Reproducibility Stack
-
-- **Git** — commit SHA in every run log.
-- **Hydra** — full config snapshot + overrides in logs.
-- **Poetry/Docker** — pinned Python + CUDA environment.
-- **DVC** — datasets, calibration caches, checkpoints.
-- **Logs** — `v50_debug_log.md` (human), `events.jsonl` (machine).
+* `Physics and Astrophysics Modeling & Simulation Reference.pdf`
+* `Scientific References for NeurIPS 2025 Ariel Data Challenge.pdf` (if present in your repo’s `docs/`)
 
 ---
 
-## Operator References
-- **[Operator Flight Card (PDF)](docs/Operator_Flight_Card.pdf)** — laminated quick-reference for CLI ops.
-- **`docs/ARCHITECTURE.md`** — deep dive into architecture & scientific rationale.
-- **`docs/`** — calibration math, symbolic loss definitions, MLOps practices.
+## 5) Chemistry & Biology (Foundations & SOPs)
+
+* **Chemistry:** General, Organic, Inorganic, Physical chemistry references for materials, detectors, and cryo systems.
+* **Biology:** Cell/Molecular biology, Genetics, Physiology—useful for analogies, statistical design, and lab SOP rigor.
+* **SOPs:** Titrations, chromatography, and lab practices to harmonize experimental discipline across domains.
+
+*File:*
+
+* `Chemistry and Biology Documentation for MCP.pdf`
+
+---
+
+## 6) Patterns, Algorithms, and Fractals
+
+* **Symmetry & Group Theory:** Classification of spatial patterns; 17 wallpaper groups; invariants.
+* **Fourier/Spatial Frequency:** Temporal and spatial periodicity analysis; spectrograms and 2D FFTs.
+* **Reaction–Diffusion:** Turing patterns; PDEs; emergent structure in noisy fields.
+* **Fractals & Scaling:** Fractal dimension, self‑similarity, and scaling laws relevant to multiscale signals.
+
+*File:*
+
+* `Patterns, Algorithms, and Fractals: A Cross-Disciplinary Technical Reference.pdf`
+
+---
+
+## 7) GUI Engineering (Dashboards & Tools)
+
+* **Event‑Driven Architecture:** Main loop, callbacks, UI thread discipline.
+* **Rendering Models:** Retained vs Immediate vs Declarative (React/SwiftUI/Compose)—choose per performance, ergonomics, and integration with render loops.
+* **Widget Trees & Layout:** Scene graphs, accessibility, responsive design, testing/automation.
+
+*File:*
+
+* `Engineering Guide to GUI Development Across Platforms.pdf`
+
+---
+
+## 8) Ariel Mission & Space Observatories
+
+* **ARIEL (ESA, Launch 2029):** L2 orbit; 0.5–7.8 μm; FGS photometry + AIRS spectroscopy; 10–100 ppm photometric precision; survey of ~500–1000 transiting exoplanets.
+* **Legacy:** Spitzer/Hubble paved space‑based exoplanet spectroscopy; JWST advances IR spectroscopy; ARIEL dedicates nearly all time to exoplanet atmospheres for population‑scale inferences.
+* **Ops:** Transit & eclipse modes; hot/warm target emphasis; continuous pointing constraints; calibration and stability requirements.
+
+*File:*
+
+* `Ariel Space Mission and Predecessor Space Observatories.pdf`
+
+---
+
+## 9) Domain Module Examples & Tooling Plan
+
+* **AI/ML:** End‑to‑end example experiment (ID’d, templated), model card, training pipeline sketch, environment/versioning.
+* **Cross‑Domain Tooling:** Experiment tracking, documentation CI, data sheets, and reproducible environment capture.
+
+*File:*
+
+* `Initial Domain Module Examples and Tooling Plan (Master Coder Protocol).pdf`
+
+---
+
+## 10) CI/CLI/Dashboard Integration
+
+* **Docs in CI:**
+
+  * Link‑check & spell‑check (`docs/`)
+  * PDF existence checks for indexed items
+  * Table‑of‑contents validation for this README
+* **CLI Help Mapping:**
+
+  * Keep CLI `--help` output synchronized with sections here via a generated index (optional `make docs-sync`).
+* **Diagnostics Dashboard:**
+
+  * Embed references from sections 2–9 into the HTML diagnostics report as “Learn More” links.
+  * Generate a versioned `docs_index.json` consumed by the dashboard for quick lookups.
+
+---
+
+## Contribution Workflow
+
+1. **Add/Update Docs:** Place PDFs/MDs under `docs/` and update this README’s ToC/links.
+2. **Run Lints:** `make docs-lint` (or `tox -e docs`) to validate links and formatting.
+3. **Commit:** Use conventional commit style, e.g., `docs: add ARIEL pointing stability summary`.
+4. **PR & CI:** CI enforces link checks and availability of all referenced files.
+
+**Style:** Prefer concise, reference‑rich documents. Include revision dates and short abstracts at the top of each new doc. Keep filenames stable; use dashed or spaced names consistently.
+
+---
+
+## Index of Included Documents (Expected Paths)
+
+* `docs/Foundational Templates and Glossary for Scientific Method _ Research _ Master Coder Protocol.pdf`
+* `docs/Scientific Method _ Research _ Master Coder Protocol Documentation.pdf`
+* `docs/Scientific Modeling and Simulation_ A Comprehensive NASA-Grade Guide.pdf`
+* `docs/Physics and Astrophysics Modeling & Simulation Reference.pdf`
+* `docs/Chemistry and Biology Documentation for MCP.pdf`
+* `docs/Patterns, Algorithms, and Fractals_ A Cross-Disciplinary Technical Reference.pdf`
+* `docs/Engineering Guide to GUI Development Across Platforms.pdf`
+* `docs/Ariel Space Mission and Predecessor Space Observatories.pdf`
+* `docs/Initial Domain Module Examples and Tooling Plan (Master Coder Protocol).pdf`
+* *(Optional additions as they’re ported into the repo’s `docs/` folder)*
+
+---
+
+## License & Attribution
+
+* This documentation library is part of SpectraMind V50. Cite external space‑mission facts to ESA/UCL/JWST sources in the respective PDFs.
+* Internal templates and process documents are © the SpectraMind V50 project; follow the repository license for reuse.
+
+---
+
+## Quick Test Checklist
+
+* [ ] All file paths in **Index** exist in `docs/`
+* [ ] CI link‑check passes
+* [ ] Dashboard can resolve `docs_index.json` (if used)
+* [ ] CLI `spectramind --help` anchors referenced in sections 2, 9, 10 (if mapped)
+
+---
+
+## Changelog
+
+* `2025‑08‑14`: Initial engineering‑grade index and integration guidelines.
+
+---
