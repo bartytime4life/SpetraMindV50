@@ -33,7 +33,7 @@ jobs:
           pip install mkdocs mkdocs-material
           mkdocs build
       - name: Cache DVC data
-        uses: iterative/setup-dvc@v1
+        uses: iterative/setup-dvc@v2
       - name: Upload diagnostics dashboard
         uses: actions/upload-artifact@v4
         with:
