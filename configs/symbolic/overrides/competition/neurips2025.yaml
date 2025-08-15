@@ -1,0 +1,9 @@
+# SpectraMind V50 — Competition Overrides (NeurIPS 2025)
+competition:
+  name: "neurips2025_ariel"
+  submission:
+    max_runtime_hours: 9
+    device: "A100|L4"
+    profiles: ["kaggle_fast"]
+    weights:
+      molecular_coherence: 0.4

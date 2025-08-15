@@ -1,0 +1,28 @@
+# SpectraMind V50 — Override Schema (Hydra-safe)
+
+# Purpose: Validate symbolic override files via jsonschema/yamale/cerberus (your choice).
+
+# Fields are optional by default; strict mode can be enabled in CLI validators.
+
+version: "1.0"
+type: "object"
+properties:
+  name: { type: "string" }
+  description: { type: "string" }
+  applies_to:
+    type: "object"
+    properties:
+      instruments: { type: "array", items: { type: "string" } }
+      molecules:   { type: "array", items: { type: "string" } }
+      regions:     { type: "array", items: { type: "string" } }
+      planets:     { type: "array", items: { type: "string" } }
+  rules:
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        id:          { type: "string" }
+        weight:      { type: ["number", "string"] }   # allow ${oc.env:…} Hydra resolvers
+        mode:        { type: "string", enum: ["soft", "hard"] }
+        parameters:  { type: "object" }
+      required: []
