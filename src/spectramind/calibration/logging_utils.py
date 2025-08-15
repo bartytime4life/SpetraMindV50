@@ -1,104 +1,141 @@
-"""Centralised logging utilities for the calibration package.
-
-Provides console + rotating file handlers and a JSONL event stream hook.
-"""
-
-from __future__ import annotations
-
 import json
 import logging
 import os
-import sys
-from dataclasses import dataclass
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
-
-DEFAULT_LOG_DIR = Path(os.getenv("SPECTRAMIND_LOG_DIR", "logs"))
-DEFAULT_LOG_DIR.mkdir(parents=True, exist_ok=True)
-DEFAULT_LOG_FILE = DEFAULT_LOG_DIR / "calibration.log"
-DEFAULT_JSONL_FILE = DEFAULT_LOG_DIR / "calibration_events.jsonl"
-DEFAULT_DEBUG_MD = DEFAULT_LOG_DIR / "v50_debug_log.md"
+from typing import Any, Dict, Optional
 
 
-@dataclass
-class LogConfig:
-    """Configuration for :func:`setup_logging`."""
+class JsonlHandler(logging.Handler):
+    """
+    Minimal JSONL handler: each record -> one JSON object line.
+    """
 
-    name: str = "spectramind.calibration"
-    level: int = logging.INFO
-    file_path: Path = DEFAULT_LOG_FILE
-    max_bytes: int = 5_000_000
-    backup_count: int = 5
-    jsonl_path: Path = DEFAULT_JSONL_FILE
-    debug_md_path: Path = DEFAULT_DEBUG_MD
+    def __init__(self, path: Path) -> None:
+        super().__init__()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._fh = open(path, "a", encoding="utf-8")
 
-
-class JSONLEventLogger:
-    """Minimal JSONL logger used for diagnostics."""
-
-    def __init__(self, path: Path):
-        self.path = Path(path)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._fh = open(self.path, "a", encoding="utf-8")
-
-    def log(self, event: Dict[str, Any]) -> None:
-        self._fh.write(json.dumps(event, ensure_ascii=False) + "\n")
-        self._fh.flush()
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            entry = {
+                "ts": datetime.utcnow().isoformat(timespec="milliseconds") + "Z",
+                "level": record.levelname,
+                "logger": record.name,
+                "msg": record.getMessage(),
+            }
+            for k, v in record.__dict__.items():
+                if k not in (
+                    "args",
+                    "created",
+                    "exc_info",
+                    "exc_text",
+                    "filename",
+                    "funcName",
+                    "levelname",
+                    "levelno",
+                    "lineno",
+                    "module",
+                    "msecs",
+                    "msg",
+                    "name",
+                    "pathname",
+                    "process",
+                    "processName",
+                    "relativeCreated",
+                    "stack_info",
+                    "thread",
+                    "threadName",
+                ):
+                    try:
+                        json.dumps({k: v})
+                        entry[k] = v
+                    except Exception:
+                        entry[k] = str(v)
+            self._fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            self._fh.flush()
+        except Exception:
+            self.handleError(record)
 
     def close(self) -> None:
         try:
             self._fh.close()
-        except Exception:  # pragma: no cover - best effort
-            pass
+        finally:
+            super().close()
 
 
-def setup_logging(cfg: Optional[LogConfig] = None) -> Tuple[logging.Logger, JSONLEventLogger]:
-    """Create a logger and JSONL event logger."""
+def setup_logging(
+    run_name: str = "calibration",
+    log_dir: str = "logs",
+    log_file_basename: str = "v50_debug_log.log",
+    jsonl_file_basename: str = "events.jsonl",
+    level: int = logging.INFO,
+    max_bytes: int = 2_000_000,
+    backup_count: int = 5,
+) -> Dict[str, Any]:
+    """
+    Configure logging with:
+    - console (INFO)
+    - rotating file log
+    - JSONL event stream
+    Returns a dict of resolved paths and run metadata.
+    """
+    Path(log_dir).mkdir(parents=True, exist_ok=True)
+    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    logfile_path = Path(log_dir) / log_file_basename
+    jsonl_path = Path(log_dir) / jsonl_file_basename
 
-    cfg = cfg or LogConfig()
-    logger = logging.getLogger(cfg.name)
-    logger.setLevel(cfg.level)
-    logger.propagate = False
-
-    if not logger.handlers:
-        # Console handler
-        console = logging.StreamHandler(sys.stdout)
-        console.setLevel(cfg.level)
-        console.setFormatter(
+    root = logging.getLogger()
+    if not any(isinstance(h, RotatingFileHandler) for h in root.handlers):
+        root.setLevel(level)
+        ch = logging.StreamHandler()
+        ch.setLevel(level)
+        ch.setFormatter(
             logging.Formatter(
-                fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S",
+                "[%(asctime)s] %(levelname)s %(name)s | %(message)s",
+                "%Y-%m-%d %H:%M:%S",
             )
         )
-        logger.addHandler(console)
+        root.addHandler(ch)
 
-        # Rotating file handler
-        file_handler = RotatingFileHandler(
-            filename=str(cfg.file_path),
-            maxBytes=cfg.max_bytes,
-            backupCount=cfg.backup_count,
+        fh = RotatingFileHandler(
+            str(logfile_path),
+            maxBytes=max_bytes,
+            backupCount=backup_count,
             encoding="utf-8",
         )
-        file_handler.setLevel(cfg.level)
-        file_handler.setFormatter(
+        fh.setLevel(level)
+        fh.setFormatter(
             logging.Formatter(
-                fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
-                datefmt="%Y-%m-%d %H:%M:%S",
+                "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+                "%Y-%m-%d %H:%M:%S",
             )
         )
-        logger.addHandler(file_handler)
+        root.addHandler(fh)
 
-    # JSONL event stream
-    evt = JSONLEventLogger(cfg.jsonl_path)
-    return logger, evt
+        jh = JsonlHandler(jsonl_path)
+        jh.setLevel(level)
+        root.addHandler(jh)
+
+    meta = {
+        "run_name": run_name,
+        "timestamp_utc": ts,
+        "logfile": str(logfile_path),
+        "jsonl": str(jsonl_path),
+        "cwd": os.getcwd(),
+    }
+    logging.getLogger(__name__).info("Logging configured", extra={"meta": meta})
+    return meta
 
 
-def append_debug_md(header: str, details: Dict[str, Any], path: Path = DEFAULT_DEBUG_MD) -> None:
-    """Append a diagnostic block to ``v50_debug_log.md``."""
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(f"\n\n## {header}\n\n")
-        for k, v in details.items():
-            f.write(f"- {k}: {v}\n")
+def log_event(
+    event_type: str, payload: Optional[Dict[str, Any]] = None, level: int = logging.INFO
+) -> None:
+    """
+    Convenience: emit a structured event to JSONL via standard logging.
+    """
+    payload = payload or {}
+    logging.getLogger("spectramind.events").log(
+        level, f"event:{event_type}", extra=payload
+    )

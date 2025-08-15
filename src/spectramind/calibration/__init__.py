@@ -1,21 +1,30 @@
-"""SpectraMind V50 — Calibration Package
+"""
+SpectraMind V50 – Calibration Package
 
-Exports and package metadata.
+Mission-grade calibration stack for the NeurIPS Ariel Data Challenge.
+Includes:
+    • photometry extraction from raw FGS1/AIRS frames
+    • combined uncertainty calibration (temperature scaling + COREL conformal)
+    • calibration checking & visualization
+    • CLI entrypoint with structured logging (rotating logs + JSONL events)
+
+This package is Hydra/OMEGACONF friendly but does not require Hydra to run.
 """
 
-from __future__ import annotations
-
-from importlib.metadata import version as _pkg_version
+from .check_calibration import CalibrationChecker
+from .corel_calibration import CORELCalibrator
+from .photometry import PhotometryExtractor
+from .pipeline import CalibrationPipeline
+from .temperature_scaling import TemperatureScaler
+from .uncertainty_calibration import UncertaintyCalibrator
+from .visualization import CalibrationVisualizer
 
 __all__ = [
-    "Calibrator",
-    "run_calibration_batch",
-    "run_calibration_one",
+    "CalibrationPipeline",
+    "PhotometryExtractor",
+    "CORELCalibrator",
+    "TemperatureScaler",
+    "UncertaintyCalibrator",
+    "CalibrationChecker",
+    "CalibrationVisualizer",
 ]
-
-try:
-    version = _pkg_version("spectramind")
-except Exception:  # pragma: no cover - package not installed
-    version = "0.0.0-dev"
-
-from .pipeline import Calibrator, run_calibration_batch, run_calibration_one  # noqa: E402,F401
