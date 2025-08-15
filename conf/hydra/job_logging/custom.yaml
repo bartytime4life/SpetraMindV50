@@ -1,0 +1,7 @@
+# Use our dictConfig and avoid Hydra reconfiguring root handlers.
+version: 1
+formatters: {}
+handlers: {}
+root:
+  handlers: []
+
