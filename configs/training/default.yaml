@@ -1,0 +1,29 @@
+# Training group: default
+
+seed: 42
+device: cuda
+precision: amp
+
+batch_size: 32
+grad_accum: 1
+learning_rate: 0.0003
+weight_decay: 0.05
+epochs: 150
+warmup_epochs: 5
+scheduler: cosine
+checkpoint_interval: 5
+resume_from: null
+
+jsonl_events: true
+mlflow_enable: true
+mlflow_tracking_uri: ${oc.env:MLFLOW_TRACKING_URI,}
+mlflow_experiment: SpectraMindV50
+
+wandb_enable: false
+wandb_project: ${oc.env:WANDB_PROJECT,}
+
+deterministic: true
+benchmark_cudnn: false
+
+diagnostics_html: true
+diagnostics_fast: false
