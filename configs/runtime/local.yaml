@@ -1,0 +1,14 @@
+# @package _group_
+# Runtime configuration for local development on workstation or laptop.
+
+defaults:
+  - default
+
+runtime:
+  name: local
+  description: "Local development runtime."
+  device: "cuda"  # switch to "cpu" if no GPU
+  num_workers: 4
+  dry_run: true   # fast dry-run for debugging
+  fast_dev_run: true
+

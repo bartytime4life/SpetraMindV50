@@ -30,6 +30,14 @@ from . import cli_dashboard_mini as dashmini
 
 app = typer.Typer(add_completion=True, no_args_is_help=True, help="SpectraMind V50 — Unified CLI")
 
+
+@app.callback()
+def cli_root(ctx: typer.Context, runtime: str = typer.Option("default", "--runtime", help="Runtime environment config")):
+    """Root SpectraMind CLI with global options."""
+    ctx.obj = ctx.obj or {}
+    ctx.obj["runtime"] = runtime
+
+
 # Register sub-apps
 app.add_typer(core.app, name="core", help="Core train/predict/calibrate/validate/explain")
 app.add_typer(diag.app, name="diagnose", help="Diagnostics and dashboard")

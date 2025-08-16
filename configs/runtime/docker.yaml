@@ -1,0 +1,18 @@
+# @package _group_
+# Runtime config for Docker container execution.
+
+defaults:
+  - default
+
+runtime:
+  name: docker
+  description: "Docker runtime for containerized runs."
+  device: "cuda"
+  num_workers: 6
+
+  docker:
+    image: spectramind:v50
+    shm_size: "32g"
+    ulimit_memlock: -1
+    ulimit_stack: 67108864
+
