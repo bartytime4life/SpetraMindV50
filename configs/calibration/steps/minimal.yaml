@@ -1,0 +1,6 @@
+# configs/calibration/steps/minimal.yaml
+
+calibration:
+  steps:
+    - { name: normalization, enabled: true }
+    - { name: phase_alignment, enabled: true }

@@ -1,0 +1,25 @@
+# configs/model/v50.yaml
+# SpectraMind V50 default model blueprint identifiers and high-level knobs.
+# Concrete hyperparameters live in code or richer sub-groups; these act as stable keys.
+
+model:
+  encoder:
+    fgs1: mamba_ssm            # long-seq encoder for FGS1
+    airs: gat_conv             # edge-feature-aware GNN for AIRS
+  decoder:
+    mean_head: gaussian_ll     # μ decoder optimized for Gaussian log-likelihood
+    uncertainty_head: flow_uncertainty  # σ head with flow/attention fusion
+  training:
+    amp: true
+    epochs: 40
+    batch_size: 16
+    optimizer: adamw
+    lr: 3.0e-4
+    weight_decay: 0.05
+    cosine_decay: true
+  calibration:
+    enable_corel: true
+    enable_temp_scaling: true
+  exports:
+    save_best_by: gll
+    keep_last_k: 3

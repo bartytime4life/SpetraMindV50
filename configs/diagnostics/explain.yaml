@@ -1,4 +1,4 @@
-# configs/diagnostics/symbolic.yaml
+# configs/diagnostics/explain.yaml
 
 diagnostics:
   enable_fft: true
@@ -6,8 +6,8 @@ diagnostics:
   enable_symbolic_overlay: true
   enable_dashboard: true
   enable_interactive_html: true
-  overlays: ["symbolic_rules", "violation_matrix", "symbolic_influence"]
-  fusion_overlays: ["symbolic"]
+  overlays: ["shap_bars", "umap", "tsne"]
+  fusion_overlays: ["shap", "entropy"]
   molecular_templates: []
   molecular_focus: []
   enable_cosmology_context: false

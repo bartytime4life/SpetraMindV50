@@ -1,0 +1,20 @@
+# configs/profiles/kaggle_leaderboard.yaml
+# Mission-grade rigor for NeurIPS Ariel Challenge submissions (<= 9 hours).
+
+defaults:
+  - override /model: v50
+  - override /calibration/steps: full
+  - override /diagnostics: leaderboard
+  - override /logging: mission
+  - override /symbolic/profiles: strict
+
+runtime:
+  max_hours: 9
+  save_submission: true
+
+reproducibility:
+  seed: 2025
+  deterministic: true
+
+project:
+  mode: leaderboard

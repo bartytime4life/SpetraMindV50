@@ -1,13 +1,13 @@
-# configs/diagnostics/calibration.yaml
+# configs/diagnostics/leaderboard.yaml
 
 diagnostics:
   enable_fft: true
-  enable_shap: false
+  enable_shap: true
   enable_symbolic_overlay: true
   enable_dashboard: true
   enable_interactive_html: true
-  overlays: ["calibration_curves", "coverage_map", "zscore_bins"]
-  fusion_overlays: ["symbolic"]
+  overlays: ["gll_heatmap", "umap", "tsne", "calibration"]
+  fusion_overlays: ["symbolic", "shap", "entropy"]
   molecular_templates: ["H2O", "CH4", "CO2"]
   molecular_focus: ["H2O", "CH4", "CO2"]
-  enable_cosmology_context: false
+  enable_cosmology_context: true

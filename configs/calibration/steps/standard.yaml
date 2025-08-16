@@ -1,0 +1,13 @@
+# configs/calibration/steps/standard.yaml
+
+calibration:
+  steps:
+    - { name: adc_correction, enabled: true }
+    - { name: nonlinearity,  enabled: true }
+    - { name: dark_subtract, enabled: true }
+    - { name: flat_field,    enabled: true }
+    - { name: cds,           enabled: true }
+    - { name: photometry,    enabled: true }
+    - { name: trace_extraction, enabled: true }
+    - { name: normalization, enabled: true }
+    - { name: phase_alignment, enabled: true }

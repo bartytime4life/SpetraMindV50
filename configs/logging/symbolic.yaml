@@ -1,0 +1,14 @@
+# configs/logging/symbolic.yaml
+
+logging:
+  level: INFO
+  jsonl_events: true
+  file_rotation_mb: 25
+  file_keep: 5
+  files:
+    text_log: logs/${active_profile}/symbolic.log
+    jsonl_log: logs/${active_profile}/symbolic_events.jsonl
+  context:
+    project: ${project.name}
+    active_profile: ${active_profile}
+    mode: ${project.mode}

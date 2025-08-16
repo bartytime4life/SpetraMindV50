@@ -1,5 +1,5 @@
-# Convenience entry so `-c configs` works even if someone resolves to "default"
-# and you still land on the full root in config.yaml.
+# configs/default.yaml
+# Convenience to ensure resolving "default" lands on the full root "config".
 
 defaults:
   - config

@@ -1,26 +1,13 @@
-# Default symbolic/diagnostic profile for SpectraMind V50
-# This profile acts as a baseline across all domains.
-# Hydra group: profiles=default
+# configs/profiles/default.yaml
+# Balanced default profile for research & testing; reproducible by default.
 
 defaults:
-  - override hydra/job_logging: default
-  - override hydra/launcher: basic
-  - override hydra/sweeper: basic
+  - override /model: v50
+  - override /calibration/steps: standard
+  - override /diagnostics: basic
+  - override /logging: standard
+  - override /symbolic/profiles: default
 
-profile:
-  name: default
-  description: |
-    Default SpectraMind V50 symbolic profile.
-    Uses general symbolic rules, FFT smoothness, entropy checks,
-    and calibration diagnostics.
-  symbolic:
-    enable: true
-    rules: ["smoothness", "nonnegativity", "entropy"]
-    weighting: "uniform"
-  diagnostics:
-    enable_fft: true
-    enable_shap: true
-    enable_symbolic_overlay: true
-  reproducibility:
-    seed: 42
-    deterministic: true
+reproducibility:
+  seed: 42
+  deterministic: true

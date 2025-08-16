@@ -1,0 +1,18 @@
+# configs/profiles/calibration_heavy.yaml
+# Emphasize uncertainty calibration (COREL + temperature scaling) and coverage.
+
+defaults:
+  - override /model: v50
+  - override /calibration/steps: corel_plus_temp
+  - override /diagnostics: calibration
+  - override /logging: mission
+  - override /symbolic/profiles: default
+
+calibration:
+  corel_bins: 283
+  coverage_target: 0.95
+  temp_scaling: true
+
+reproducibility:
+  seed: 606
+  deterministic: true

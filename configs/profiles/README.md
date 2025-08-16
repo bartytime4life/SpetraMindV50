@@ -1,35 +1,37 @@
-# configs/profiles
+# configs/profiles — Scenario Bundles (Hydra)
 
-This directory defines **symbolic and diagnostic profiles** for SpectraMind V50 using Hydra’s configuration grouping.
+These profiles are **Hydra override bundles** that select concrete group configs for:
 
-## Purpose
-Profiles provide domain-specific configurations for symbolic rules, diagnostics, and reproducibility. They enable modular switching between astrophysics, chemistry, biology, cross-disciplinary, and GUI-focused modes.
+* `model` (e.g., `configs/model/v50.yaml`)
+* `calibration/steps` (e.g., `minimal`, `standard`, `full`, `corel_plus_temp`, `symbolic_weighted`)
+* `diagnostics` (e.g., `basic`, `lite`, `leaderboard`, `symbolic`, `explain`, `calibration`)
+* `logging` (e.g., `standard`, `debug`, `mission`, `symbolic`, `verbose`)
+* `symbolic/profiles` (e.g., `default`, `strict`, `relaxed`, `exploratory`)
 
-## Available Profiles
-- **default.yaml** – Baseline symbolic and diagnostic settings.
-- **astrophysics.yaml** – Physics-informed rules (FFT smoothness, photonic alignment, cosmology overlays).
-- **chemistry.yaml** – Quantum chemistry and molecular line constraints.
-- **biology.yaml** – Symbolic entropy and pathway consistency checks for biological systems.
-- **cross_disciplinary.yaml** – Fusion across AI, physics, chemistry, biology.
-- **gui.yaml** – Diagnostic/visualization overlays for dashboards.
+Available profiles:
 
-## Usage
-To activate a profile in Hydra CLI:
-```bash
-python train_v50.py profiles=astrophysics
-python diagnose_v50.py profiles=gui
-```
+* `default.yaml` — balanced defaults for research/testing, reproducible.
+* `fast_dev.yaml` — faster runs; minimal calibration & diagnostics, debug logs.
+* `kaggle_leaderboard.yaml` — mission-grade rigor for challenge submissions (≤9h).
+* `symbolic_strict.yaml` — hard enforcement of symbolic rules.
+* `explainability.yaml` — SHAP, UMAP, t-SNE, overlays & dashboards.
+* `calibration_heavy.yaml` — COREL + temperature scaling focus, coverage-first.
 
-## References
+### Usage
 
-Profiles are informed by:
+Activate any profile with:
 
-* Documentation-first protocol
-* Patterns, algorithms, fractals reference
-* NASA-grade scientific modeling
-* Physics & astrophysics modeling
-* Chemistry & biology foundations
-* Engineering guide to GUI systems
-* Foundational templates & glossary
-* Domain module examples
-* Ariel mission science context
+* Python module:
+  * `python -m spectramind.cli.spectramind train profiles=kaggle_leaderboard`
+  * `python -m spectramind.cli.spectramind diagnose dashboard profiles=explainability`
+* Direct script:
+  * `python src/spectramind/train_v50.py profiles=symbolic_strict`
+  * `python src/spectramind/predict_v50.py profiles=default`
+
+The active profile name is exposed as `${active_profile}` (from Hydra runtime), which is embedded in log paths and context.
+
+### Notes
+
+* Profiles merge with `configs/config.yaml`; they can override `reproducibility`, `project.mode`, etc.
+* Groups are designed to be orthogonal and composable.
+* Add new profiles by composing `defaults` with existing or new group files.

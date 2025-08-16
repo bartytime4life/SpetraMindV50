@@ -1,51 +1,44 @@
+# configs/config.yaml
 # Master root config for SpectraMind V50 (Hydra)
-# Registers the `profiles` group and makes its fields available globally.
+# Profiles here are group overrides; each profile file selects concrete configs
+# for model, calibration/steps, diagnostics, logging, and symbolic/profiles.
+# Active profile is read from hydra:runtime.choices.profiles for logging/UX.
 
 defaults:
   - hydra/job_logging: default
   - hydra/launcher: basic
   - hydra/sweeper: basic
 
-  # Profiles group: choose the default profile; users can override with profiles=<name>
+  # Register and set default profile (users may switch with `profiles=<name>`)
   - profiles: default
 
-  # Project groups wired to read from the active profile (see their defaults files)
-  - logging: default
-  - diagnostics: default
-  - calibration/steps: default
-  - model: default
+  # Baseline group choices (profiles override these)
+  - model: v50
+  - calibration/steps: standard
+  - diagnostics: basic
+  - logging: standard
+  - symbolic/profiles: default
 
 project:
   name: SpectraMind V50
-  mode: standard  # e.g., standard | leaderboard | ci
+  mode: standard  # standard | leaderboard | ci
 
-# Expose the active profile universally
-active_profile: ${profiles.profile.name}
+# Read the currently selected profile name from Hydra runtime choices.
+# This is robust for the "group override" style of profiles.
+active_profile: ${hydra:runtime.choices.profiles}
 
 reproducibility:
-  seed: ${oc.select:profiles.profile.reproducibility.seed,42}
-  deterministic: ${oc.select:profiles.profile.reproducibility.deterministic,true}
+  seed: 42
+  deterministic: true
 
-# Surface symbolic & diagnostics via profile (downstream groups refine this)
-symbolic:
-  enable: ${profiles.profile.symbolic.enable}
-  rules: ${profiles.profile.symbolic.rules}
-  weighting: ${profiles.profile.symbolic.weighting}
-
-diagnostics:
-  enable_fft: ${oc.select:profiles.profile.diagnostics.enable_fft,false}
-  enable_shap: ${oc.select:profiles.profile.diagnostics.enable_shap,false}
-  enable_symbolic_overlay: ${oc.select:profiles.profile.diagnostics.enable_symbolic_overlay,false}
-  enable_dashboard: ${oc.select:profiles.profile.diagnostics.enable_dashboard,false}
-  enable_interactive_html: ${oc.select:profiles.profile.diagnostics.enable_interactive_html,false}
-  fusion_overlays: ${oc.select:profiles.profile.diagnostics.fusion_overlays,[]}
-  overlays: ${oc.select:profiles.profile.diagnostics.overlays,[]}
-  molecular_templates: ${oc.select:profiles.profile.diagnostics.molecular_templates,[]}
-  molecular_focus: ${oc.select:profiles.profile.diagnostics.molecular_focus,[]}
-  enable_cosmology_context: ${oc.select:profiles.profile.diagnostics.enable_cosmology_context,false}
-
+# Global logging defaults (group files may refine)
 logging:
   level: INFO
   jsonl_events: true
   file_rotation_mb: 25
   file_keep: 5
+
+# Model-wide toggles that components may consult (safe defaults)
+runtime:
+  max_hours: 12
+  save_submission: false

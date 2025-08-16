@@ -1,0 +1,14 @@
+# configs/logging/standard.yaml
+
+logging:
+  level: ${oc.select:logging.level,INFO}
+  jsonl_events: ${oc.select:logging.jsonl_events,true}
+  file_rotation_mb: ${oc.select:logging.file_rotation_mb,25}
+  file_keep: ${oc.select:logging.file_keep,5}
+  files:
+    text_log: logs/${active_profile}/spectramind.log
+    jsonl_log: logs/${active_profile}/events.jsonl
+  context:
+    project: ${project.name}
+    active_profile: ${active_profile}
+    mode: ${project.mode}

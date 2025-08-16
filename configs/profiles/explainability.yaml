@@ -1,0 +1,18 @@
+# configs/profiles/explainability.yaml
+# Focus on SHAP, UMAP/t-SNE, and overlay-driven diagnostics & dashboards.
+
+defaults:
+  - override /model: v50
+  - override /calibration/steps: standard
+  - override /diagnostics: explain
+  - override /logging: verbose
+  - override /symbolic/profiles: exploratory
+
+explainability:
+  run_shap: true
+  run_umap: true
+  run_tsne: true
+
+reproducibility:
+  seed: 31415
+  deterministic: true

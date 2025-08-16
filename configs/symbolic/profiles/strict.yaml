@@ -1,0 +1,18 @@
+# configs/symbolic/profiles/strict.yaml
+
+symbolic:
+  enable: true
+  rules:
+    - fft_smoothness
+    - asymmetry
+    - photonic_alignment
+    - energy_conservation
+    - nonnegativity
+  weights:
+    fft_smoothness: 1.0
+    asymmetry: 0.7
+    photonic_alignment: 1.2
+    energy_conservation: 1.0
+    nonnegativity: 0.8
+  enforce_hard: true
+  violation_penalty: 10.0

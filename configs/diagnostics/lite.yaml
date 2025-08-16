@@ -1,0 +1,13 @@
+# configs/diagnostics/lite.yaml
+
+diagnostics:
+  enable_fft: false
+  enable_shap: false
+  enable_symbolic_overlay: false
+  enable_dashboard: false
+  enable_interactive_html: false
+  overlays: []
+  fusion_overlays: []
+  molecular_templates: []
+  molecular_focus: []
+  enable_cosmology_context: false

@@ -1,0 +1,13 @@
+# configs/diagnostics/basic.yaml
+
+diagnostics:
+  enable_fft: true
+  enable_shap: true
+  enable_symbolic_overlay: true
+  enable_dashboard: false
+  enable_interactive_html: false
+  overlays: []
+  fusion_overlays: []
+  molecular_templates: []
+  molecular_focus: []
+  enable_cosmology_context: false
