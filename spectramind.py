@@ -3,6 +3,8 @@ import json
 import typer
 import torch
 from typing import Optional
+
+from src.spectramind.diagnostics import selftest_diagnostics
 try:
     from omegaconf import OmegaConf
 except Exception:
@@ -44,6 +46,12 @@ def fusion_smoke(
     fused, extras = fuser(h_fgs1, h_airs, molecule=torch.ones(B), seam=torch.zeros(B))
     out = {"fused_shape": list(fused.shape), "extras_keys": list(extras.keys())}
     typer.echo(json.dumps(out))
+
+
+@app.command("diagnose")
+def diagnose(outdir: str = typer.Option("diagnostics", help="Output directory")):
+    """Run SpectraMind diagnostics self-test."""
+    selftest_diagnostics.run_selftest(outdir)
 
 if __name__ == "__main__":
     app()
