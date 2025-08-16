@@ -1,0 +1,61 @@
+# Hydra configuration with default parameters for each calibration step.
+
+# @package _group_
+# Default parameter templates for each calibration step in SpectraMind V50.
+
+raw_ingest:
+  input_path: ${paths.raw_data}
+  output_path: ${paths.intermediate}/ingested
+  file_pattern: "*.fits"
+  verify_checksums: true
+
+adc_correction:
+  method: "polynomial"
+  poly_order: 3
+  reference_file: ${paths.calibration}/adc_coeffs.fits
+
+dark_correction:
+  method: "median_stack"
+  reference_file: ${paths.calibration}/dark_frame.fits
+  scale_by_exptime: true
+
+flat_field_correction:
+  method: "divide"
+  reference_file: ${paths.calibration}/flat_field.fits
+  normalize: true
+
+cosmic_ray_removal:
+  method: "lacosmic"
+  threshold_sigma: 5.0
+  neighbor_sigma: 2.0
+  max_iter: 4
+
+cds_computation:
+  method: "pair_subtraction"
+  use_rolling_pairs: false
+
+trace_extraction:
+  method: "optimal"
+  aperture_radius: 7.0
+  background_subtract: true
+  background_poly_order: 2
+
+wavelength_calibration:
+  reference_file: ${paths.calibration}/wavelength_solution.fits
+  method: "linear_interp"
+  apply_drift_correction: true
+
+flux_calibration:
+  reference_file: ${paths.calibration}/flux_standard.fits
+  method: "relative"
+  apply_extinction_correction: true
+
+phase_alignment:
+  ephemeris_file: ${paths.metadata}/ephemerides.csv
+  oversample_factor: 5
+  interpolation: "spline"
+
+final_qc:
+  run_symbolic_checks: true
+  generate_diagnostic_plots: true
+  save_summary_json: ${paths.logs}/calibration_qc_summary.json
