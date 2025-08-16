@@ -1,6 +1,6 @@
 # Root Hydra configuration for SpectraMind V50.
 
-# Compose with: model/defaults, training/default, data/ariel, logging/default, paths/default
+# Compose with: model/defaults, training/default, data/ariel, logging/default, paths/config
 
 # This file is the single entry-point for CLI tools: --config-name config_v50
 
@@ -9,7 +9,7 @@ defaults:
   - training: default
   - data: ariel
   - logging: default
-  - paths: default
+  - paths: config
   - hydra/job_logging: rich
   - hydra/hydra_logging: rich
 
@@ -21,7 +21,7 @@ extras:
 # Optional global overrides (rarely used; prefer group files)
 hydra:
   run:
-    dir: ${paths.runs_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}${oc.env:USER,unknown}${hydra.job.name}_${hydra.job.num}
+    dir: ${paths.outputs.runs_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}${oc.env:USER,unknown}${hydra.job.name}_${hydra.job.num}
   sweep:
-    dir: ${paths.runs_dir}/multirun/${now:%Y-%m-%d}_${now:%H-%M-%S}
+    dir: ${paths.outputs.runs_dir}/multirun/${now:%Y-%m-%d}_${now:%H-%M-%S}
     subdir: ${hydra.job.num}_${hydra.runtime.choices}

@@ -1,0 +1,8 @@
+# configs/paths/logs.yaml
+# Logging, reproducibility, and monitoring directories
+
+logs_root: ${oc.env:LOG_ROOT, ./logs}
+console_log: ${paths.logs.logs_root}/console.log
+jsonl_stream: ${paths.logs.logs_root}/events.jsonl
+debug_md: ${paths.logs.logs_root}/v50_debug_log.md
+hash_summary: ${paths.logs.logs_root}/run_hash_summary_v50.json

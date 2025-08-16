@@ -1,0 +1,21 @@
+# configs/paths/config.yaml
+# Root paths config — imported by Hydra
+# Centralizes all project directory references for reproducibility
+
+defaults:
+  - data: data
+  - outputs: outputs
+  - logs: logs
+  - submissions: submissions
+  - dashboards: dashboards
+
+# Base project root
+project_root: ${oc.env:PROJECT_ROOT, .}
+
+# Backwards-compatibility aliases
+root: ${project_root}
+runs_dir: ${outputs.runs_dir}
+logs_dir: ${logs.logs_root}
+artifacts_dir: ${outputs.artifacts_dir}
+reports_dir: ${dashboards.dashboard_root}
+checkpoints_dir: ${outputs.checkpoints_dir}

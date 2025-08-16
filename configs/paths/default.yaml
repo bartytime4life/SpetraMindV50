@@ -1,8 +1,0 @@
-# Paths group: default
-
-project_root: .
-runs_dir: runs
-logs_dir: logs
-artifacts_dir: artifacts
-reports_dir: reports
-checkpoints_dir: checkpoints
