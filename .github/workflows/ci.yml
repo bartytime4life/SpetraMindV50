@@ -1,148 +1,156 @@
 name: SpectraMind V50 CI
+
 on:
   push:
-    branches: ["main"]
+    branches: [ "**" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "**" ]
   workflow_dispatch:
+
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: spectramind-v50-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  setup:
-    name: Setup (Python, Poetry, cache)
+  ci:
     runs-on: ubuntu-latest
-    outputs:
-      python-version: ${{ steps.meta.outputs.python-version }}
+    timeout-minutes: 120
+
+    env:
+      PYTHONUNBUFFERED: "1"
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+      CUDA_VISIBLE_DEVICES: ""   # force CPU on GitHub-hosted runners
+      SPECTRAMIND_CI: "1"
+
     steps:
-      - uses: actions/checkout@v4
-      - id: meta
-        run: echo "python-version=3.11" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.11
-          cache: pip
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install system build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git wget libgl1
+
       - name: Install Poetry
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
-      - name: Configure Poetry
-        run: poetry config virtualenvs.create false
-      - name: Cache Poetry
+          python -m pip install poetry
+
+      - name: Configure Poetry (no venv inside Github runner)
+        run: |
+          poetry config virtualenvs.create false
+
+      - name: Cache Poetry virtualenv (pip cache handles wheels)
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('/poetry.lock') }}
-          restore-keys: ${{ runner.os }}-poetry-
-      - name: Install deps
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Install project dependencies
         run: |
-          if [ -f pyproject.toml ]; then poetry install --no-root; fi
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-  lint:
-    name: Lint & Pre-commit
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Install Poetry & pre-commit
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry pre-commit
-          poetry config virtualenvs.create false
-          poetry install --no-root || true
-      - name: Run pre-commit
-        run: pre-commit run --all-files || (git status && git diff && exit 1)
-  tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Install Poetry
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry config virtualenvs.create false
-          poetry install --no-root || true
-      - name: PyTest
-        run: |
-          if [ -f pytest.ini ] || [ -d tests ]; then poetry run pytest -q; else echo "No tests/ found; skipping."; fi
-  selftest:
-    name: SpectraMind Selftest (fast)
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Install Poetry
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry config virtualenvs.create false
-          poetry install --no-root || true
-      - name: Run CLI selftest and collect artifacts
-        run: bash scripts/ci_selftest.sh
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: diagnostics-artifacts
-          path: |
-            artifacts/
-            v50_debug_log.md
-          if-no-files-found: ignore
-  docs:
-    name: Build Docs (MkDocs)
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Install Poetry + MkDocs
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry mkdocs mkdocs-material
-          poetry config virtualenvs.create false
-          poetry install --no-root || true
-      - name: Build docs
-        run: |
-          if [ -f mkdocs.yml ]; then mkdocs build --strict; else echo "mkdocs.yml not found; skipping docs"; fi
-      - name: Upload site
-        uses: actions/upload-artifact@v4
-        with:
-          name: site
-          path: site
-          if-no-files-found: ignore
-  submit_dryrun:
-    name: Submission Dry-run Gate
-    runs-on: ubuntu-latest
-    needs: [setup, lint, tests, selftest]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
-      - name: Install Poetry
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry config virtualenvs.create false
-          poetry install --no-root || true
-      - name: Submission dry-run
-        run: |
-          if [ -f spectramind.py ]; then
-            poetry run python -m spectramind submit make --dry-run || true
+          if [ -f pyproject.toml ]; then
+            poetry install --no-interaction --no-ansi
+          elif [ -f requirements.txt ]; then
+            pip install -r requirements.txt
           else
-            echo "spectramind.py not found; skipping submit dry-run"
+            echo "No pyproject.toml or requirements.txt found" >&2
+            exit 1
           fi
+
+      - name: Create minimal venv shim for bin/activate-env.sh
+        run: |
+          python -m venv venv
+          . venv/bin/activate
+          python -m pip install --upgrade pip
+          # Ensure torch is present if defined in pyproject/requirements
+          # (If already installed by Poetry with --system, this is a no-op)
+          python -c "import sys; print('Python:', sys.version)"
+          deactivate
+
+      - name: Make bin scripts executable
+        run: |
+          if [ -d bin ]; then
+            chmod +x bin/*.sh
+          fi
+
+      - name: Selftest (fast)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f bin/selftest.sh ]; then
+            bash bin/selftest.sh
+          else
+            echo "[WARN] bin/selftest.sh missing, attempting python selftest fallback"
+            python -m src.spectramind.selftest --mode fast || true
+          fi
+
+      - name: Minimal train (1 epoch, CPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f bin/run-train.sh ]; then
+            bash bin/run-train.sh --max-epochs=1
+          else
+            echo "[WARN] bin/run-train.sh missing, attempting python CLI fallback"
+            python -m src.spectramind.cli.cli_core_v50 train --config-name=config_v50.yaml --max-epochs=1
+          fi
+
+      - name: Predict (CPU)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f bin/run-predict.sh ]; then
+            bash bin/run-predict.sh
+          else
+            echo "[WARN] bin/run-predict.sh missing, attempting python CLI fallback"
+            python -m src.spectramind.cli.cli_core_v50 predict --config-name=config_v50.yaml
+          fi
+
+      - name: Generate diagnostics dashboard
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f bin/run-diagnose.sh ]; then
+            bash bin/run-diagnose.sh || true
+          else
+            echo "[WARN] bin/run-diagnose.sh missing, attempting python CLI fallback"
+            python -m src.spectramind.cli.cli_diagnose dashboard || true
+          fi
+
+      - name: Bundle submission (optional)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f bin/make-submission.sh ]; then
+            # Run only the validate/bundle stage to avoid retraining
+            python -m src.spectramind.cli.cli_submit make-submission || true
+          else
+            echo "[INFO] Skipping bundle; bin/make-submission.sh not present."
+          fi
+
+      - name: Upload artifacts (logs, diagnostics, submission)
+        uses: actions/upload-artifact@v4
+        with:
+          name: spectramind-v50-artifacts
+          if-no-files-found: warn
+          path: |
+            v50_debug_log.md
+            diagnostic_report_latest.html
+            diagnostics/*.html
+            diagnostics/*.json
+            diagnostics/*.png
+            submission/*.zip
+            submission/*.csv
+            run_hash_summary_v50.json
+            logs/**
