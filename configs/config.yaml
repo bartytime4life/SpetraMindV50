@@ -1,44 +1,10 @@
 # configs/config.yaml
-# Master root config for SpectraMind V50 (Hydra)
-# Profiles here are group overrides; each profile file selects concrete configs
-# for model, calibration/steps, diagnostics, logging, and symbolic/profiles.
-# Active profile is read from hydra:runtime.choices.profiles for logging/UX.
+# Minimal root config for SpectraMind V50 self-tests
 
 defaults:
-  - hydra/job_logging: default
-  - hydra/launcher: basic
-  - hydra/sweeper: basic
+  - runtime: default
+  - _self_
 
-  # Register and set default profile (users may switch with `profiles=<name>`)
-  - profiles: default
-
-  # Baseline group choices (profiles override these)
-  - model: v50
-  - calibration/steps: standard
-  - diagnostics: basic
-  - logging: standard
-  - symbolic/profiles: default
-
-project:
-  name: SpectraMind V50
-  mode: standard  # standard | leaderboard | ci
-
-# Read the currently selected profile name from Hydra runtime choices.
-# This is robust for the "group override" style of profiles.
-active_profile: ${hydra:runtime.choices.profiles}
-
-reproducibility:
-  seed: 42
-  deterministic: true
-
-# Global logging defaults (group files may refine)
-logging:
-  level: INFO
-  jsonl_events: true
-  file_rotation_mb: 25
-  file_keep: 5
-
-# Model-wide toggles that components may consult (safe defaults)
 runtime:
   max_hours: 12
   save_submission: false

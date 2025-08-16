@@ -16,6 +16,8 @@ import importlib
 import sys
 from typing import Optional, List
 
+from omegaconf import DictConfig
+
 from spectramind.conf_helpers.runtime import (
     determine_runtime,
     set_runtime_env,
@@ -50,12 +52,11 @@ def main(cli_runtime: Optional[str] = None) -> int:
 
     # Sanity check that the composed config includes a 'runtime' group resolution.
     try:
-        resolved = cfg.get("runtime", {})
-        if not resolved or not isinstance(resolved, dict):
+        resolved = cfg.get("runtime", None)
+        if not resolved or not isinstance(resolved, DictConfig):
             errors.append("Composed config missing 'runtime' group resolution.")
         else:
-            # Require a name field to be present (as set in configs/runtime/*.yaml).
-            name = resolved.get("name", None)
+            name = resolved.get("name")
             if not name:
                 errors.append("Composed runtime config lacks 'name' field.")
     except Exception as e:
