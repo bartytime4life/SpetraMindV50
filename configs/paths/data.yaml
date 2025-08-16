@@ -1,0 +1,14 @@
+# configs/paths/data.yaml
+# Centralized data paths for the SpectraMind V50 pipeline
+
+raw_dir: ${oc.env:DATA_ROOT, /mnt/data}/raw
+processed_dir: ${oc.env:DATA_ROOT, /mnt/data}/processed
+cache_dir: ${oc.env:DATA_ROOT, /mnt/data}/cache
+external_dir: ${oc.env:DATA_ROOT, /mnt/data}/external
+
+# Challenge dataset references
+airs_frames: ${paths.data.raw_dir}/airs
+fgs1_frames: ${paths.data.raw_dir}/fgs1
+
+# DVC or lakeFS integration
+dvc_remote: ${oc.env:DVC_REMOTE, /mnt/dvc_remote}

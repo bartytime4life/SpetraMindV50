@@ -1,0 +1,10 @@
+# configs/paths/outputs.yaml
+# Model outputs, checkpoints, and experiment runs
+
+checkpoints_dir: ${oc.env:OUTPUT_ROOT, ./outputs}/checkpoints
+runs_dir: ${oc.env:OUTPUT_ROOT, ./outputs}/runs
+predictions_dir: ${oc.env:OUTPUT_ROOT, ./outputs}/predictions
+artifacts_dir: ${oc.env:OUTPUT_ROOT, ./outputs}/artifacts
+
+# Temporary staging for Kaggle submissions
+staging_dir: ${paths.outputs.artifacts_dir}/staging

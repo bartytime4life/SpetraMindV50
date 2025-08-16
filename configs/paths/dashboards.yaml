@@ -1,0 +1,10 @@
+# configs/paths/dashboards.yaml
+# Diagnostics dashboards and reports
+
+dashboard_root: ${oc.env:DASHBOARD_ROOT, ./dashboards}
+html_reports: ${paths.dashboards.dashboard_root}/html
+json_summaries: ${paths.dashboards.dashboard_root}/json
+figures: ${paths.dashboards.dashboard_root}/figures
+
+# Versioned outputs for reproducibility
+versioned_html: ${paths.dashboards.html_reports}/diagnostic_report_v${oc.env:REPORT_VERSION,1}.html

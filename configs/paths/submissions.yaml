@@ -1,0 +1,7 @@
+# configs/paths/submissions.yaml
+# Paths for Kaggle leaderboard submissions and validation
+
+submission_dir: ${oc.env:SUBMISSION_ROOT, ./submissions}
+validations_dir: ${paths.submissions.submission_dir}/validations
+bundles_dir: ${paths.submissions.submission_dir}/bundles
+latest_zip: ${paths.submissions.bundles_dir}/latest_submission.zip
