@@ -2,17 +2,24 @@
 
 This directory defines the Hydra-safe, environment-portable data configuration used across the CLI:
 
-- **base.yaml** — canonical defaults for paths, IO, loader, splits, calibration, features, instruments, diagnostics.  
-- **local.yaml** — workstation overrides (paths under `_local/`, more workers).  
-- **kaggle.yaml** — Kaggle runtime guardrails (fewer workers, working paths).  
-- **splits.yaml** — GroupKFold materialization controls (file output, quick-dev slice).  
-- **calibration.yaml** — tuning knobs for each calibration kill-chain stage.  
-- **fgs1.yaml** — FGS1 instrument-specific feature & extraction settings.  
-- **airs.yaml** — AIRS instrument-specific spectral feature settings.  
-- **features.yaml** — persisted NPZ key schemas and toggles for `fgs1_white` / `airs_bins`.  
-- **paths.yaml** — skeleton of directories the CLI can pre-create for you.  
-- **schema.yaml** — runtime schemas for validators and integrity checks.  
+- **base.yaml** — canonical defaults for paths, IO, loader, splits, calibration, features, instruments, diagnostics.
+- **local.yaml** — workstation overrides (paths under `_local/`, more workers).
+- **kaggle.yaml** — Kaggle runtime guardrails (fewer workers, working paths).
+- **splits.yaml** — GroupKFold materialization controls (file output, quick-dev slice).
+- **calibration.yaml** — tuning knobs for each calibration kill-chain stage.
+- **fgs1.yaml** — FGS1 instrument-specific feature & extraction settings.
+- **airs.yaml** — AIRS instrument-specific spectral feature settings.
+- **features.yaml** — persisted NPZ key schemas and toggles for `fgs1_white` / `airs_bins`.
+- **paths.yaml** — skeleton of directories the CLI can pre-create for you.
+- **schema.yaml** — runtime schemas for validators and integrity checks.
 - **dev_fast.yaml** — developer quick-iterate configuration.
+
+### Schema definitions
+
+The accompanying `schema.yaml` file defines multiple named schema configurations
+such as `default_v1`, `ariel_v1`, and `synthetic_v1`. Other data configuration
+files reference these named schemas via their `schema_ref` key to select the
+appropriate set of validation rules.
 
 ### Composition examples
 
