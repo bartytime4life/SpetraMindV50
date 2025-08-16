@@ -1,0 +1,7 @@
+# configs/model/encoder_fgs1/fgs1_mamba.yaml
+# FGS1 long-sequence encoder (Mamba/Transformer stand-in).
+_name: fgs1_mamba
+input_dim: 32         # channels/features per timestep
+hidden_dim: 128       # latent dim
+depth: 12             # number of encoder blocks
+dropout: 0.10         # dropout within blocks

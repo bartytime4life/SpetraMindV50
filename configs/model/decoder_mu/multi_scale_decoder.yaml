@@ -1,0 +1,5 @@
+# configs/model/decoder_mu/multi_scale_decoder.yaml
+# Multi-scale μ decoder aggregating FGS1/AIRS latents.
+_name: multi_scale_decoder
+hidden_dim: 128       # internal fusion/hidden dim
+output_bins: 283      # number of spectral bins in challenge output

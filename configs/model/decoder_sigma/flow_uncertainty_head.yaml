@@ -1,0 +1,5 @@
+# configs/model/decoder_sigma/flow_uncertainty_head.yaml
+# Flow-based σ head (simple exponential positivity enforcement here).
+_name: flow_uncertainty_head
+hidden_dim: 128
+output_bins: 283

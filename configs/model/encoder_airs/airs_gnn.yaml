@@ -1,0 +1,7 @@
+# configs/model/encoder_airs/airs_gnn.yaml
+# AIRS spectral GNN encoder with attention and edge features.
+_name: airs_gnn
+input_dim: 356        # node feature size (per wavelength bin/node)
+hidden_dim: 128       # latent dim
+num_layers: 4         # GNN depth
+dropout: 0.10         # dropout after each layer
