@@ -1,0 +1,19 @@
+# -----------------------------------------------------------------------------
+# Kaggle GPU runtime profile (local BasicLauncher with guardrails)
+# -----------------------------------------------------------------------------
+# Kaggle constraints:
+# - Single GPU runtime
+# - Hard 9-hour wall-time
+# - Sequential execution only (no large parallel sweeps)
+# This profile tags the environment and provides a timeout hint you can use
+# inside your pipeline to exit gracefully before wall-time.
+# -----------------------------------------------------------------------------
+_target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+
+# Environment tags for programmatic checks in SpectraMind
+env:
+  KAGGLE: true
+  KAGGLE_GPU: 1
+
+# Soft timeout hint (the pipeline may choose to respect this)
+timeout_min: 540  # 9 hours

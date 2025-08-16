@@ -1,0 +1,10 @@
+# -----------------------------------------------------------------------------
+# Local parallel launcher (Hydra BasicLauncher with concurrency)
+# -----------------------------------------------------------------------------
+# Launches multiple jobs in parallel on the local machine. Use with care if
+# experiments require exclusive GPU access. Pair with device pinning if needed.
+# -----------------------------------------------------------------------------
+_target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+
+# Number of concurrent jobs Hydra will launch locally
+max_parallel_jobs: 4
