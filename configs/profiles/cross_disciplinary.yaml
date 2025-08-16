@@ -1,0 +1,19 @@
+# Cross-disciplinary fusion profile
+# Hydra group: profiles=cross_disciplinary
+
+profile:
+  name: cross_disciplinary
+  description: |
+    Fusion profile integrating AI, physics, chemistry,
+    and biology rules into one symbolic logic ensemble:contentReference[oaicite:12]{index=12}:contentReference[oaicite:13]{index=13}:contentReference[oaicite:14]{index=14}.
+  symbolic:
+    enable: true
+    rules: ["smoothness", "fft_smoothness", "stoichiometry_balance", "bio_pathway_consistency"]
+    weighting: "balanced"
+  diagnostics:
+    enable_umap: true
+    enable_tsne: true
+    fusion_overlays: ["symbolic", "shap", "entropy"]
+  reproducibility:
+    seed: 2025
+    deterministic: true

@@ -6,3 +6,4 @@ defaults:
   - calibration: base
   - diagnostics: defaults
   - symbolic: base
+  - profiles: default

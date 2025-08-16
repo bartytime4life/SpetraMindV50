@@ -1,0 +1,19 @@
+# Chemistry-focused profile
+# Hydra group: profiles=chemistry
+
+profile:
+  name: chemistry
+  description: |
+    Chemistry and spectroscopy oriented symbolic profile.
+    Incorporates quantum chemistry, bonding rules, and
+    molecule-region diagnostics:contentReference[oaicite:10]{index=10}.
+  symbolic:
+    enable: true
+    rules: ["stoichiometry_balance", "spectral_line_consistency", "nonnegativity"]
+    weighting: "molecular_priority"
+  diagnostics:
+    enable_shap: true
+    molecular_focus: ["H2O", "CO2", "O3", "NH3"]
+  reproducibility:
+    seed: 1977
+    deterministic: true
