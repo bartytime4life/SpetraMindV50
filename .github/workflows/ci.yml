@@ -176,4 +176,4 @@ jobs:
       - name: Run logging tests
         env:
           SPECTRAMIND_LOG_LEVEL: INFO
-        run: pytest tests/logging -v
+        run: pytest tests/logging src/spectramind/logging/tests -v

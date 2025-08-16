@@ -14,3 +14,12 @@ logging:
     project: ${project.name}
     active_profile: ${active_profile}
     mode: ${project.mode}
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+
+formatters:
+  simple:
+    format: "%(levelname)s:%(name)s:%(message)s"
