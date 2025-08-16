@@ -1,28 +1,21 @@
-# Root Hydra configuration for SpectraMind V50.
-
-# Compose with: model/defaults, training/default, data/ariel, logging/default, paths/config
-
-# This file is the single entry-point for CLI tools: --config-name config_v50
+# configs/config_v50.yaml
+# Unified Hydra entry config for SpectraMind V50 with logging group registered.
 
 defaults:
-  - model: defaults
-  - training: default
-  - data: ariel
-  - logging: default
-  - paths: config
-  - profiles: default
-  - hydra/job_logging: rich
-  - hydra/hydra_logging: rich
+  # Select logging backend (switch via CLI: +logging={console,file,jsonl,mlflow})
+  - logging: console
 
-# Freeform extras for experiment tagging; preserved in Config.extras
-extras:
-  experiment_tag: "v50_default"
-  purpose: "neurips_2025_ariel_data_challenge"
+  # You likely have many more defaults here (models, data, train, etc.). Keep them below.
+  # - model: v50_default
+  # - data: ariel_default
+  # - train: default
 
-# Optional global overrides (rarely used; prefer group files)
-hydra:
-  run:
-    dir: ${paths.outputs.runs_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}${oc.env:USER,unknown}${hydra.job.name}_${hydra.job.num}
-  sweep:
-    dir: ${paths.outputs.runs_dir}/multirun/${now:%Y-%m-%d}_${now:%H-%M-%S}
-    subdir: ${hydra.job.num}_${hydra.runtime.choices}
+# Example top-level keys; real project will have many more.
+project:
+  name: SpectraMindV50
+  seed: 1234
+
+# The selected logging dictConfig will be available under cfg.logging.
+# Your entrypoints can call:
+#   from spectramind.logging.apply import install_from_hydra
+#   install_from_hydra(cfg)
