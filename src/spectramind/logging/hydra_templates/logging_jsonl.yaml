@@ -1,0 +1,14 @@
+# JSONL structured event logging for reproducibility (template reference)
+defaults:
+  - base
+
+logging:
+  handlers:
+    jsonl:
+      class: logging.FileHandler
+      level: INFO
+      formatter: json
+      filename: logs/v50_event_log.jsonl
+      mode: a
+  root:
+    handlers: [jsonl]

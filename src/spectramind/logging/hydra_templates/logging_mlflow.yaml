@@ -1,0 +1,19 @@
+# MLflow logging integration (template reference)
+defaults:
+  - base
+
+logging:
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+  root:
+    handlers: [console]
+
+mlflow:
+  tracking_uri: "file:./mlruns"
+  experiment_name: "SpectraMindV50"
+  log_params: true
+  log_metrics: true

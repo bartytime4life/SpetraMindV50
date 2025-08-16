@@ -1,0 +1,13 @@
+# Console logging template extending base (template reference)
+defaults:
+  - base
+
+logging:
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+  root:
+    handlers: [console]

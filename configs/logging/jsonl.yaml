@@ -1,0 +1,16 @@
+# configs/logging/jsonl.yaml
+# JSONL event stream logging: logs/v50_event_log.jsonl (append mode)
+
+defaults:
+  - base
+
+logging:
+  handlers:
+    jsonl:
+      class: logging.FileHandler
+      level: INFO
+      formatter: json
+      filename: logs/v50_event_log.jsonl
+      mode: a
+  root:
+    handlers: [jsonl]

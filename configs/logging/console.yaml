@@ -1,0 +1,15 @@
+# configs/logging/console.yaml
+# Console logging backend (human-readable)
+
+defaults:
+  - base
+
+logging:
+  handlers:
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+  root:
+    handlers: [console]
