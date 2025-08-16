@@ -22,8 +22,8 @@ hydra:
         item_sep: ','
         exclude_keys: [seed]
 
-  # Include defaults for job_logging and launcher
+  # Include defaults for job_logging, launcher, and sweeper
   defaults:
     - hydra/job_logging: default
     - hydra/launcher: basic
-    - hydra/sweeper: basic
+    - hydra/sweeper: optuna
