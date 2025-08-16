@@ -1,177 +1,159 @@
-from pathlib import Path
-from typing import List, Optional
+from __future__ import annotations
+
+"""
+SpectraMind V50 — Core CLI (training, inference, calibration hooks) with runtime wiring.
+
+Every command resolves a runtime (CLI param -> ENV -> default) and composes a Hydra config
+that includes the override runtime=<name>. The composed config is printed on demand and
+passed into the underlying implementation.
+
+This file intentionally avoids heavy imports at module load time to keep CLI latency low.
+"""
+
+from typing import Optional, List
 
 import typer
 
-from .common import (
-    PROJECT_ROOT,
-    SRC_DIR,
-    REPORTS_DIR,
-    logger,
-    ensure_tools,
-    command_session,
-    find_module_or_script,
-    call_python_module,
-    call_python_file,
-    hydra_kv_to_cli,
+from spectramind.conf_helpers.runtime import (
+    determine_runtime,
+    set_runtime_env,
+    compose_with_runtime,
+    log_runtime_choice,
+    pretty_print_cfg,
 )
-from .cli_guardrails import dry_run_guard
-
-app = typer.Typer(no_args_is_help=True, help="SpectraMind V50 — Core commands: train, predict, calibrate, validate, explain.")
 
 
-def _cfg_list(config: Optional[str]) -> List[Path]:
-    paths: List[Path] = []
-    if config:
-        p = Path(config)
-        if p.exists():
-            paths.append(p)
-    return paths
+app = typer.Typer(help="SpectraMind V50 — Core CLI (training / inference)")
 
 
-@app.command()
-@dry_run_guard
+@app.command("train")
 def train(
-    ctx: typer.Context,
-    config: Optional[str] = typer.Option(None, "--config", "-c", help="Hydra YAML config (config_v50.yaml)"),
-    overrides: List[str] = typer.Argument(None, help="Hydra overrides key=value"),
-    dry_run: bool = False,
+    runtime: Optional[str] = typer.Option(
+        None, "--runtime", "-r", help="Execution environment (Hydra group)"
+    ),
+    config_overrides: List[str] = typer.Option(
+        None,
+        "--override",
+        "-o",
+        help="Additional Hydra overrides (repeatable), e.g. -o model=v50/fgs1_mamba -o data.batch=8",
+        rich_help_panel="Hydra",
+    ),
+    show_cfg: bool = typer.Option(False, "--show-cfg", help="Print resolved Hydra config and exit"),
 ):
-    """Train SpectraMind V50 using Hydra config. Supports Hydra overrides: e.g. train epochs=50 optim.lr=3e-4"""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    args = [f"runtime={runtime}", *hydra_kv_to_cli(overrides or [])]
-    with command_session("core.train", ["--config", str(config or ""), *args], _cfg_list(config)):
-        module = "spectramind.train_v50"
-        candidates = [SRC_DIR / "spectramind" / "train_v50.py"]
-        kind, script = find_module_or_script(module, candidates)
-        ret = 0
-        if kind == "module":
-            ret = call_python_module(module, (["--config", str(config), *args]) if config else args)
-        elif kind == "script" and script:
-            ret = call_python_file(script, (["--config", str(config), *args]) if config else args)
-        else:
-            logger.error("Missing training entrypoint (spectramind.train_v50).")
-            raise typer.Exit(2)
-        raise typer.Exit(ret)
+    """
+    Train the SpectraMind V50 model stack. Respects the chosen runtime.
+    """
+    resolved_runtime = determine_runtime(runtime)
+    set_runtime_env(resolved_runtime)
+    cfg = compose_with_runtime(resolved_runtime, overrides=config_overrides or [])
+    log_runtime_choice(resolved_runtime, cfg, extra_note="core.train")
+
+    if show_cfg:
+        pretty_print_cfg(cfg)
+        raise typer.Exit(0)
+
+    # Defer heavy imports until we actually run training.
+    try:
+        # Expect an implementation function: train_v50.train_from_config(cfg)
+        from spectramind.models.train_v50 import train_from_config
+
+        exit_code = train_from_config(cfg)  # type: ignore[call-arg]
+    except ModuleNotFoundError:
+        # Fallback: if training module isn't present, fail gracefully with guidance.
+        typer.echo(
+            "[ERROR] Module 'spectramind.models.train_v50' not found. "
+            "Please ensure your repository includes the V50 training implementation."
+        )
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"[ERROR] Training failed: {e}")
+        raise typer.Exit(1)
+
+    raise typer.Exit(exit_code if isinstance(exit_code, int) else 0)
 
 
-@app.command()
-@dry_run_guard
+@app.command("predict")
 def predict(
-    ctx: typer.Context,
-    model_path: str = typer.Option(..., "--model", help="Path to trained model weights/checkpoint"),
-    outdir: str = typer.Option("predictions", "--outdir", help="Directory for predictions"),
-    config: Optional[str] = typer.Option(None, "--config", "-c", help="Optional Hydra config for inference"),
-    overrides: List[str] = typer.Argument(None, help="Hydra overrides key=value"),
-    dry_run: bool = False,
+    runtime: Optional[str] = typer.Option(
+        None, "--runtime", "-r", help="Execution environment (Hydra group)"
+    ),
+    config_overrides: List[str] = typer.Option(
+        None,
+        "--override",
+        "-o",
+        help="Additional Hydra overrides for inference",
+        rich_help_panel="Hydra",
+    ),
+    show_cfg: bool = typer.Option(False, "--show-cfg", help="Print resolved Hydra config and exit"),
 ):
-    """Run prediction to produce μ and σ spectra and artifacts for submission packaging."""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    args = ["--model", model_path, "--outdir", outdir]
-    if config:
-        args += ["--config", config]
-    args += [f"runtime={runtime}"]
-    args += hydra_kv_to_cli(overrides or [])
-    with command_session("core.predict", args, _cfg_list(config)):
-        module = "spectramind.predict_v50"
-        candidates = [SRC_DIR / "spectramind" / "predict_v50.py"]
-        kind, script = find_module_or_script(module, candidates)
-        if kind == "module":
-            ret = call_python_module(module, args)
-        elif kind == "script" and script:
-            ret = call_python_file(script, args)
-        else:
-            logger.error("Missing prediction entrypoint (spectramind.predict_v50).")
-            raise typer.Exit(2)
-        raise typer.Exit(ret)
+    """
+    Run inference with the V50 pipeline (μ/σ generation, packaging optional).
+    """
+    resolved_runtime = determine_runtime(runtime)
+    set_runtime_env(resolved_runtime)
+    cfg = compose_with_runtime(resolved_runtime, overrides=config_overrides or [])
+    log_runtime_choice(resolved_runtime, cfg, extra_note="core.predict")
+
+    if show_cfg:
+        pretty_print_cfg(cfg)
+        raise typer.Exit(0)
+
+    try:
+        from spectramind.infer.predict_v50 import predict_from_config
+
+        exit_code = predict_from_config(cfg)  # type: ignore[call-arg]
+    except ModuleNotFoundError:
+        typer.echo(
+            "[ERROR] Module 'spectramind.infer.predict_v50' not found. "
+            "Please ensure your repository includes the V50 inference implementation."
+        )
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"[ERROR] Prediction failed: {e}")
+        raise typer.Exit(1)
+
+    raise typer.Exit(exit_code if isinstance(exit_code, int) else 0)
 
 
-@app.command()
-@dry_run_guard
+@app.command("calibrate")
 def calibrate(
-    ctx: typer.Context,
-    preds_dir: str = typer.Option("predictions", "--preds", help="Directory with raw μ/σ"),
-    outdir: str = typer.Option("calibrated", "--outdir", help="Directory for calibrated outputs"),
-    method: str = typer.Option("corel", "--method", help="Calibration method: corel|temp|hybrid"),
-    dry_run: bool = False,
+    runtime: Optional[str] = typer.Option(
+        None, "--runtime", "-r", help="Execution environment (Hydra group)"
+    ),
+    config_overrides: List[str] = typer.Option(
+        None,
+        "--override",
+        "-o",
+        help="Additional Hydra overrides for calibration",
+        rich_help_panel="Hydra",
+    ),
+    show_cfg: bool = typer.Option(False, "--show-cfg", help="Print resolved Hydra config and exit"),
 ):
-    """Calibrate predictive uncertainty (σ) using COREL / temperature scaling / hybrid methods."""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    args = ["--preds", preds_dir, "--outdir", outdir, "--method", method, f"runtime={runtime}"]
-    with command_session("core.calibrate", args):
-        module = "spectramind.uncertainty.calibrate"
-        candidates = [SRC_DIR / "spectramind" / "uncertainty" / "calibrate.py"]
-        kind, script = find_module_or_script(module, candidates)
-        if kind == "module":
-            ret = call_python_module(module, args)
-        elif kind == "script" and script:
-            ret = call_python_file(script, args)
-        else:
-            logger.error("Missing calibrator (spectramind.uncertainty.calibrate).")
-            raise typer.Exit(2)
-        raise typer.Exit(ret)
+    """
+    Run uncertainty calibration (e.g., temperature scaling + COREL).
+    """
+    resolved_runtime = determine_runtime(runtime)
+    set_runtime_env(resolved_runtime)
+    cfg = compose_with_runtime(resolved_runtime, overrides=config_overrides or [])
+    log_runtime_choice(resolved_runtime, cfg, extra_note="core.calibrate")
 
+    if show_cfg:
+        pretty_print_cfg(cfg)
+        raise typer.Exit(0)
 
-@app.command()
-@dry_run_guard
-def validate(
-    ctx: typer.Context,
-    bundle_dir: str = typer.Option("submission_bundle", "--bundle", help="Submission directory to validate"),
-    dry_run: bool = False,
-):
-    """Validate submission bundle: file presence, GLL score evaluator, zips, and schema checks."""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    args = ["--bundle", bundle_dir, f"runtime={runtime}"]
-    with command_session("core.validate", args):
-        module = "spectramind.validate_submission"
-        candidates = [SRC_DIR / "spectramind" / "validate_submission.py"]
-        kind, script = find_module_or_script(module, candidates)
-        if kind == "module":
-            ret = call_python_module(module, args)
-        elif kind == "script" and script:
-            ret = call_python_file(script, args)
-        else:
-            module2 = "spectramind.generate_diagnostic_summary"
-            cand2 = [SRC_DIR / "spectramind" / "generate_diagnostic_summary.py"]
-            k2, s2 = find_module_or_script(module2, cand2)
-            if k2 == "module":
-                ret = call_python_module(module2, ["--validate-bundle", bundle_dir])
-            elif k2 == "script" and s2:
-                ret = call_python_file(s2, ["--validate-bundle", bundle_dir])
-            else:
-                logger.error("No validator found.")
-                raise typer.Exit(2)
-        raise typer.Exit(ret)
+    try:
+        from spectramind.calibration.calibrate_v50 import calibrate_from_config
 
+        exit_code = calibrate_from_config(cfg)  # type: ignore[call-arg]
+    except ModuleNotFoundError:
+        typer.echo(
+            "[ERROR] Module 'spectramind.calibration.calibrate_v50' not found. "
+            "Please ensure your repository includes the V50 calibration implementation."
+        )
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"[ERROR] Calibration failed: {e}")
+        raise typer.Exit(1)
 
-@app.command("explain")
-@dry_run_guard
-def explain_shap(
-    ctx: typer.Context,
-    preds_dir: str = typer.Option("predictions", "--preds", help="Predictions directory for SHAP/metadata explain"),
-    outdir: str = typer.Option("explain", "--outdir", help="Output directory"),
-    dashboard: bool = typer.Option(True, "--dashboard/--no-dashboard", help="Generate interactive HTML dashboard"),
-    dry_run: bool = False,
-):
-    """Run SHAP + metadata + symbolic overlays and optionally generate a dashboard."""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    args = ["--preds", preds_dir, "--outdir", outdir, f"runtime={runtime}"]
-    if dashboard:
-        args += ["--dashboard"]
-    with command_session("core.explain", args):
-        module = "spectramind.explain_shap_metadata_v50"
-        candidates = [SRC_DIR / "spectramind" / "explain_shap_metadata_v50.py"]
-        kind, script = find_module_or_script(module, candidates)
-        if kind == "module":
-            ret = call_python_module(module, args)
-        elif kind == "script" and script:
-            ret = call_python_file(script, args)
-        else:
-            logger.error("Missing explainer (explain_shap_metadata_v50).")
-            raise typer.Exit(2)
-        raise typer.Exit(ret)
+    raise typer.Exit(exit_code if isinstance(exit_code, int) else 0)
+

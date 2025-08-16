@@ -1,85 +1,72 @@
-from pathlib import Path
-from typing import List, Optional
+from __future__ import annotations
+
+"""
+SpectraMind V50 — Submission orchestration CLI with runtime wiring.
+
+Implements a high-level 'make-submission' command that runs predict → validate → bundle,
+honoring the user's chosen runtime via Hydra (runtime=<name>).
+"""
+
+from typing import Optional, List
 
 import typer
 
-from .common import (
-    SRC_DIR,
-    logger,
-    ensure_tools,
-    command_session,
-    find_module_or_script,
-    call_python_module,
-    call_python_file,
+from spectramind.conf_helpers.runtime import (
+    determine_runtime,
+    set_runtime_env,
+    compose_with_runtime,
+    log_runtime_choice,
+    pretty_print_cfg,
 )
 
-app = typer.Typer(no_args_is_help=True, help="SpectraMind V50 — End-to-end submission orchestration")
+
+app = typer.Typer(help="SpectraMind V50 — Submit CLI")
 
 
 @app.command("make-submission")
 def make_submission(
-    model_path: str = typer.Option(..., "--model", help="Trained checkpoint"),
-    config: Optional[str] = typer.Option(None, "--config", "-c", help="Hydra config"),
-    outdir: str = typer.Option("submission_bundle", "--out", help="Submission output dir"),
-    run_selftest: bool = typer.Option(True, "--selftest/--no-selftest"),
+    runtime: Optional[str] = typer.Option(
+        None, "--runtime", "-r", help="Execution environment (Hydra group)"
+    ),
+    config_overrides: List[str] = typer.Option(
+        None,
+        "--override",
+        "-o",
+        help="Additional Hydra overrides for submission flow",
+        rich_help_panel="Hydra",
+    ),
+    show_cfg: bool = typer.Option(False, "--show-cfg", help="Print resolved Hydra config and exit"),
 ):
-    """Pipeline:
-    1) selftest
-    2) predict
-    3) calibrate (COREL default)
-    4) validate
-    5) bundle zip"""
-    ensure_tools()
-    with command_session("submit.make-submission", ["--model", model_path, "--out", outdir]):
-        if run_selftest:
-            from .selftest import cli as selftest_cli
-            rc = selftest_cli("fast")
-            if rc != 0:
-                raise typer.Exit(rc)
-        module_pred = "spectramind.predict_v50"
-        cand_pred = [SRC_DIR / "spectramind" / "predict_v50.py"]
-        pred_args: List[str] = ["--model", model_path, "--outdir", "predictions"]
-        if config:
-            pred_args += ["--config", config]
-        k, s = find_module_or_script(module_pred, cand_pred)
-        if k == "module":
-            rc2 = call_python_module(module_pred, pred_args)
-        elif k == "script" and s:
-            rc2 = call_python_file(s, pred_args)
-        else:
-            logger.error("Missing predict_v50.")
-            raise typer.Exit(2)
-        if rc2 != 0:
-            raise typer.Exit(rc2)
-        module_cal = "spectramind.uncertainty.calibrate"
-        cand_cal = [SRC_DIR / "spectramind" / "uncertainty" / "calibrate.py"]
-        k3, s3 = find_module_or_script(module_cal, cand_cal)
-        if k3 == "module":
-            rc3 = call_python_module(module_cal, ["--preds", "predictions", "--outdir", "calibrated", "--method", "corel"])
-        elif k3 == "script" and s3:
-            rc3 = call_python_file(s3, ["--preds", "predictions", "--outdir", "calibrated", "--method", "corel"])
-        else:
-            logger.warning("Calibrator not found; skipping calibration step.")
-            rc3 = 0
-        if rc3 != 0:
-            raise typer.Exit(rc3)
-        module_val = "spectramind.validate_submission"
-        cand_val = [SRC_DIR / "spectramind" / "validate_submission.py"]
-        k4, s4 = find_module_or_script(module_val, cand_val)
-        val_args = ["--bundle", outdir]
-        if k4 == "module":
-            rc4 = call_python_module(module_val, val_args)
-        elif k4 == "script" and s4:
-            rc4 = call_python_file(s4, val_args)
-        else:
-            logger.warning("Validator not found; relying on bundler-level checks.")
-            rc4 = 0
-        if rc4 != 0:
-            raise typer.Exit(rc4)
-        from .cli_bundle import make as bundle_make
-        rc5 = bundle_make(
-            preds_dir="calibrated" if k3 != "missing" else "predictions",
-            bundle_dir=outdir,
-            zip_name="submission.zip",
+    """
+    Build a leaderboard-ready submission bundle. This command typically:
+    1) Runs inference on the test set
+    2) Validates the μ/σ outputs and coverage
+    3) Packages artifacts (CSV/ZIP/HTML) for upload
+
+    All steps compose a shared Hydra config that includes `runtime=<name>`.
+    """
+    resolved_runtime = determine_runtime(runtime)
+    set_runtime_env(resolved_runtime)
+    cfg = compose_with_runtime(resolved_runtime, overrides=config_overrides or [])
+    log_runtime_choice(resolved_runtime, cfg, extra_note="submit.make-submission")
+
+    if show_cfg:
+        pretty_print_cfg(cfg)
+        raise typer.Exit(0)
+
+    try:
+        from spectramind.cli_submit_impl import make_submission_from_config
+
+        exit_code = make_submission_from_config(cfg)  # type: ignore[call-arg]
+    except ModuleNotFoundError:
+        typer.echo(
+            "[ERROR] Module 'spectramind.cli_submit_impl' not found. "
+            "Please include the submission implementation with a 'make_submission_from_config(cfg)' entrypoint."
         )
-        raise typer.Exit(rc5 if isinstance(rc5, int) else 0)
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"[ERROR] Submission workflow failed: {e}")
+        raise typer.Exit(1)
+
+    raise typer.Exit(exit_code if isinstance(exit_code, int) else 0)
+
