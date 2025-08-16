@@ -1,0 +1,10 @@
+# Hydra-compatible telemetry configuration for SpectraMind V50
+defaults:
+  - override hydra/job_logging: default
+
+telemetry:
+  log_dir: logs/telemetry
+  enable_jsonl: true
+  sync_mlflow: false
+  sync_wandb: false
+  diagnostics_interval: 300  # seconds
