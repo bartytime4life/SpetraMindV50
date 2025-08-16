@@ -1,0 +1,13 @@
+# Provides command-line help metadata for Hydra subcommands in SpectraMind V50.
+
+hydra:
+  help:
+    app_name: "SpectraMind V50"
+    header: |
+      SpectraMind V50 – Neuro-Symbolic, Physics-Informed Pipeline
+      Hydra-Safe Configs for Training, Calibration, Diagnostics, and Submission
+    footer: |
+      Example Usage:
+        python -m spectramind.cli.train_v50 +experiment=default
+        python -m spectramind.cli.predict_v50 ckpt=latest
+        python -m spectramind.cli_diagnose dashboard --open-html

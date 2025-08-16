@@ -1,0 +1,42 @@
+# Default job logging config for SpectraMind V50.
+# Uses rotating file handlers, console output, and JSONL streams.
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  simple:
+    format: "[%(asctime)s][%(levelname)s] %(name)s: %(message)s"
+  jsonl:
+    format: '{"time": "%(asctime)s", "level": "%(levelname)s", "name": "%(name)s", "msg": "%(message)s"}'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    level: INFO
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.handlers.RotatingFileHandler
+    formatter: simple
+    level: DEBUG
+    filename: logs/v50_run.log
+    maxBytes: 5_000_000
+    backupCount: 5
+
+  jsonl:
+    class: logging.FileHandler
+    formatter: jsonl
+    level: DEBUG
+    filename: logs/v50_events.jsonl
+
+root:
+  level: DEBUG
+  handlers: [console, file, jsonl]
+
+loggers:
+  spectramind:
+    level: DEBUG
+    handlers: [console, file, jsonl]
+    propagate: no
