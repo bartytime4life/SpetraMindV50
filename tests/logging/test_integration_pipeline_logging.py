@@ -1,17 +1,21 @@
 import logging
-from spectramind.logging.setup_logging import setup_logging
+from spectramind.logging import LoggingConfig, init_logging, get_logger
 
 
-def test_integration_logging_pipeline(tmp_path):
+def test_integration_logging_pipeline(tmp_path, capsys):
     """Test that full pipeline logging writes to console, file, and JSONL."""
     log_dir = tmp_path / "logs"
-    setup_logging(log_dir=log_dir, level=logging.INFO)
+    cfg = LoggingConfig(log_dir=str(log_dir), console=True, file=True, jsonl=True)
+    init_logging(cfg)
 
-    logger = logging.getLogger("spectramind.pipeline")
+    logger = get_logger("spectramind.pipeline")
     logger.info("Integration log message")
 
-    console = log_dir / "console.log"
+    captured = capsys.readouterr()
+    assert "Integration log message" in captured.out
+
+    logfile = log_dir / "spectramind.log"
     jsonl = log_dir / "events.jsonl"
-    assert console.exists()
+    assert logfile.exists()
     assert jsonl.exists()
-    assert any("Integration log message" in open(console).read() for _ in [0])
+    assert "Integration log message" in logfile.read_text()
