@@ -1,0 +1,42 @@
+# Model defaults that pull symbolic switches & weighting from the active profile.
+# Your training/decoding code can read these directly.
+
+model:
+  encoder:
+    fgs1: mamba_ssm
+    airs: gat_conv
+  decoder:
+    mean_head: gaussian_ll
+    uncertainty_head: flow_uncertainty
+
+symbolic_loss:
+  enable: ${symbolic.enable}
+  rules: ${symbolic.rules}
+  # A place to map profile weighting strings to numeric weights (can be overridden per-run)
+  weights:
+    # When weighting == "physics_prioritized", for example:
+    physics_prioritized:
+      fft_smoothness: 1.0
+      asymmetry: 0.7
+      photonic_alignment: 1.2
+      energy_conservation: 1.0
+      smoothness: 0.5
+      nonnegativity: 0.5
+    molecular_priority:
+      stoichiometry_balance: 1.2
+      spectral_line_consistency: 1.0
+      nonnegativity: 0.6
+      smoothness: 0.4
+    bio_centric:
+      entropy_minimization: 1.2
+      bio_pathway_consistency: 1.0
+      smoothness: 0.6
+    balanced:
+      smoothness: 0.7
+      fft_smoothness: 0.7
+      stoichiometry_balance: 0.7
+      bio_pathway_consistency: 0.7
+    uniform:
+      default: 0.7
+
+  weighting: ${symbolic.weighting}
