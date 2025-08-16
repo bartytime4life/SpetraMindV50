@@ -5,7 +5,7 @@ Reproducibility-first: keep code/configs/lightweight manifests in Git; ignore he
 
 Python / Virtualenv / Packaging
 
-pycache/
+__pycache__/
 *.py[cod]
 *.so
 *.pyd
@@ -63,6 +63,8 @@ artifacts/**/*
 ckpts/
 checkpoints/
 models/
+!src/spectramind/models/
+!src/spectramind/models/**
 *.pt
 *.ckpt
 *.onnx

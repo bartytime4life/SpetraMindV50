@@ -3,10 +3,6 @@
 
 _target_: spectramind.models.multi_scale_decoder.MultiScaleDecoder
 
-hidden_dim: 256
-num_scales: 4
-kernel_sizes: [3, 5, 9, 15]
-activation: gelu
-dropout: 0.1
-spectral_smoothness_loss: true # enforce spectral smoothness via FFT/L2 penalty
-symbolic_alignment_loss: true  # add photonic alignment constraint
+hidden_dim: 128
+output_bins: 283
+

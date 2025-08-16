@@ -1,14 +1,10 @@
 # @package model.airs_gnn
 # Graph neural network encoder for AIRS spectral bins
 
-_target_: spectramind.models.airs_gnn.AIRSGNN
+_target_: spectramind.models.airs_gnn.AIRSSpectralGNN
 
-num_bins: 356
-hidden_dim: 256
-num_layers: 6
-gnn_type: gat          # options: gat, rgcn, mpnn
-edge_features: true    # include molecule-region, wavelength distance
-dropout: 0.15
-residual: true
-positional_encoding: fourier # sinusoidal or fourier
-symbolic_region_mask: true   # mask edges by symbolic region definitions
+input_dim: 32
+hidden_dim: 128
+num_layers: 4
+dropout: 0.1
+

@@ -1,46 +1,31 @@
-# Copyright (c) 2025.
-# SpectraMind V50 - Models Package
-# This __init__ flattens imports and exposes a stable registry for CLI/config loading.
+"""
+SpectraMind V50 Model Package
+=============================
 
-from .airs_gnn import AIRSGNN
+This package contains the core neural architectures for the NeurIPS 2025 Ariel Data Challenge.
+It integrates sequence models (Mamba SSM), spectral GNNs, multi-scale decoders, symbolic-aware
+loss heads, and utility layers. All models follow Hydra-safe config loading, logging, and
+reproducibility standards.
+"""
+
 from .fgs1_mamba import FGS1MambaEncoder
+from .airs_gnn import AIRSSpectralGNN
 from .multi_scale_decoder import MultiScaleDecoder
+from .moe_decoder import MoEDecoder
 from .flow_uncertainty_head import FlowUncertaintyHead
-from .symbolic_logic_engine import SymbolicLogicEngine
-from .symbolic_loss import SymbolicLoss, SymbolicLossConfig, symbolic_loss_from_yaml
-from .symbolic_violation_predictor import SymbolicViolationPredictor
-from .symbolic_violation_predictor_nn import SymbolicViolationPredictorNN
-from .symbolic_fusion_predictor import SymbolicFusionPredictor
-from .fusion_attention_diagnostics import FusionAttentionDiagnostics, AttentionTrace
-from .neural_logic_graph import NeuralLogicGraph
-from .model_utils import (
-    init_weights,
-    count_parameters,
-    summarize_module,
-    save_checkpoint,
-    load_checkpoint,
-    seed_everything,
-)
+from .spectral_corel import SpectralCOREL
+from .base_model import SpectraMindModel
+from .model_registry import get_model_class, register_model
 
 __all__ = [
-    "AIRSGNN",
     "FGS1MambaEncoder",
+    "AIRSSpectralGNN",
     "MultiScaleDecoder",
+    "MoEDecoder",
     "FlowUncertaintyHead",
-    "SymbolicLogicEngine",
-    "SymbolicLoss",
-    "SymbolicLossConfig",
-    "symbolic_loss_from_yaml",
-    "SymbolicViolationPredictor",
-    "SymbolicViolationPredictorNN",
-    "SymbolicFusionPredictor",
-    "FusionAttentionDiagnostics",
-    "AttentionTrace",
-    "NeuralLogicGraph",
-    "init_weights",
-    "count_parameters",
-    "summarize_module",
-    "save_checkpoint",
-    "load_checkpoint",
-    "seed_everything",
+    "SpectralCOREL",
+    "SpectraMindModel",
+    "get_model_class",
+    "register_model",
 ]
+
