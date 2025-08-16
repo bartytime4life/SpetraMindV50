@@ -1,8 +1,0 @@
-model:
-  encoders:
-    airs_gnn:
-      gnn_type: "gat"
-      heads: 8
-      hidden_dim: 256
-      num_layers: 5
-      dropout: 0.10

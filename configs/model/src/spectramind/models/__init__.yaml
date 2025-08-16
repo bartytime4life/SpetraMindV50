@@ -1,9 +1,0 @@
-# Hydra defaults for the spectramind/models config group
-defaults:
-  - fgs1_mamba
-  - airs_gnn
-  - fusion
-  - multi_scale_decoder
-  - flow_uncertainty_head
-  - registry
-  - pipeline_active

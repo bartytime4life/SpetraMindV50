@@ -15,7 +15,7 @@ from pathlib import Path
 class ModelConfig:
     """
     Core model architecture configuration (neuro-symbolic + physics-aware).
-    Fields map 1:1 with Hydra group: model/v50.yaml.
+    Fields map 1:1 with Hydra group: model/defaults.yaml.
     """
     fgs1_encoder: str = "MambaSSM"                     # Long-seq state-space model for FGS1
     airs_encoder: str = "GATConv"                      # Edge-aware spectral GNN for AIRS

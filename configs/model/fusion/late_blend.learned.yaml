@@ -1,8 +1,0 @@
-# @package _global_.model.fusion
-type: late_blend
-late:
-  strategy: learned
-proj:
-  bias: true
-export:
-  gate_values: true

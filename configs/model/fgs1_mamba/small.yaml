@@ -1,7 +1,0 @@
-model:
-  encoders:
-    fgs1_mamba:
-      d_model: 192
-      d_state: 48
-      n_layers: 6
-      dropout: 0.10

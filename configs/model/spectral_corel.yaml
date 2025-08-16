@@ -1,0 +1,16 @@
+# @package model.spectral_corel
+# SpectralCOREL calibration GNN with temporal bin correlations
+
+_target_: spectramind.models.spectral_corel.SpectralCOREL
+
+num_layers: 4
+hidden_dim: 128
+gnn_backend: rgcn     # options: gat, rgcn, mpnn
+edge_features: true   # molecule, distance, region
+dropout: 0.15
+residual: true
+positional_encoding: true
+torchscript: true     # enable JIT export
+spectral_smoothing_loss: true
+symbolic_constraint_loss: true
+coverage_violation_logging: true

@@ -1,0 +1,11 @@
+# @package model.moe_decoder
+# Mixture-of-Experts decoder with symbolic SHAP tracing
+
+_target_: spectramind.models.moe_decoder.MoEDecoder
+
+hidden_dim: 256
+num_experts: 8
+top_k: 2                  # number of experts per forward pass
+dropout: 0.2
+attention_tracing: true   # export attention traces for SHAP fusion
+symbolic_overlay: true    # log expert usage × symbolic rules

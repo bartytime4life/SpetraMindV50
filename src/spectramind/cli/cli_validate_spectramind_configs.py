@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""SpectraMind V50 — CLI to validate configs/model/src/spectramind/*.yaml."""
+"""SpectraMind V50 — CLI to validate configs/model/*.yaml."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from ..config.schemas_spectramind import load_and_validate_yaml
 app = typer.Typer(
     add_completion=False,
     no_args_is_help=True,
-    help="Validate SpectraMind 'model/src/spectramind' YAMLs.",
+    help="Validate SpectraMind model YAMLs.",
 )
 
 
@@ -60,12 +60,12 @@ def validate(
         "-p",
         exists=False,
         readable=True,
-        help="Path to a single YAML (default: validate all under configs/model/src/spectramind).",
+        help="Path to a single YAML (default: validate all under configs/model).",
     ),
     validate_all: bool = typer.Option(
         False,
         "--all",
-        help="Validate all YAMLs under configs/model/src/spectramind.",
+        help="Validate all YAMLs under configs/model.",
     ),
     emit_merged: Optional[Path] = typer.Option(
         None,
@@ -75,7 +75,7 @@ def validate(
 ) -> None:
     """Validate one or more YAML files against the structured schemas."""
     repo_root = Path(os.environ.get("SPECTRAMIND_REPO_ROOT", Path.cwd())).resolve()
-    cfg_dir = repo_root / "configs" / "model" / "src" / "spectramind"
+    cfg_dir = repo_root / "configs" / "model"
 
     targets: List[Path] = []
     if path is not None:

@@ -1,6 +1,0 @@
-model:
-  fusion:
-    strategy: "gated"     # options: concat|gated|cross_attn
-    out_dim: 256
-    norm: "layernorm"
-    dropout: 0.05
