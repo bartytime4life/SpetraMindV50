@@ -1,0 +1,30 @@
+{% extends "base.html.j2" %}
+{% block content %}
+
+<section class="card" style="margin-top:1rem;">
+  <h2 style="margin:0;">Symbolic Rule Violations</h2>
+  <p class="hint">Top-k violated rules per planet with scores and optional details.</p>
+  {% if rows and rows | length > 0 %}
+  <table class="table">
+    <thead><tr>
+      <th>Planet</th>
+      <th>Rule</th>
+      <th>Score</th>
+      <th>Details</th>
+    </tr></thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td class="mono">{{ r.planet_id }}</td>
+        <td>{{ r.rule_name }}</td>
+        <td>{{ "{:.4f}".format(r.score) }}</td>
+        <td class="hint">{{ r.details or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="hint">No rows supplied.</div>
+  {% endif %}
+</section>
+{% endblock %}

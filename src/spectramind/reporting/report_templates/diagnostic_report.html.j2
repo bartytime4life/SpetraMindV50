@@ -1,0 +1,104 @@
+{% extends "base.html.j2" %}
+{% import "macros.html.j2" as M %}
+
+{% block content %}
+
+<section class="card" style="margin-top:1rem;">
+  <div class="section-title">
+    <h2 style="margin:0;">Overview</h2>
+    <span class="slug">SpectraMind diagnostics and provenance</span>
+  </div>
+  <div class="kpi">
+    {{ M.kpi("{:.4f}".format(metrics.gll_mean if metrics and metrics.gll_mean is defined else 0.0), "GLL (mean)") }}
+    {{ M.kpi("{:.4f}".format(metrics.rmse_mean if metrics and metrics.rmse_mean is defined else 0.0), "RMSE (mean)") }}
+    {{ M.kpi("{:.4f}".format(metrics.calibration_error if metrics and metrics.calibration_error is defined else 0.0), "Calibration Error") }}
+    {{ M.kpi(metrics.num_planets if metrics and metrics.num_planets is defined else 0, "Planets") }}
+  </div>
+  <div class="kv" style="margin-top:0.75rem;">
+    <div class="key">Duration</div><div>{{ "{:.1f}s".format(metrics.duration_seconds) if metrics and metrics.duration_seconds is defined else "n/a" }}</div>
+    <div class="key">Generated</div><div>{{ generated_at_utc or now_utc() }}</div>
+    <div class="key">Run</div><div class="mono">{{ run.cli if run else "" }}</div>
+    <div class="key">Git Commit</div><div class="mono">{{ run.git_commit if run else "unknown" }}</div>
+    <div class="key">Config Hash</div><div class="mono">{{ run.config_hash if run else "n/a" }}</div>
+  </div>
+</section>
+
+<section class="grid cols-2" style="margin-top:1rem;">
+  <div class="card">
+    <h3 style="margin-top:0;">UMAP Projection</h3>
+    <div id="umap-container">
+      {{ artifacts.umap_html | safe if artifacts and artifacts.umap_html is defined else "<div class='hint'>No UMAP HTML provided.</div>" }}
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">t-SNE Projection</h3>
+    <div id="tsne-container">
+      {{ artifacts.tsne_html | safe if artifacts and artifacts.tsne_html is defined else "<div class='hint'>No t-SNE HTML provided.</div>" }}
+    </div>
+  </div>
+</section>
+
+<section class="grid cols-2" style="margin-top:1rem;">
+  <div class="card">
+    <h3 style="margin-top:0;">Bin-wise GLL Heatmap</h3>
+    {% if artifacts and artifacts.gll_heatmap_base64 %}
+      <img alt="GLL Heatmap" style="width:100%; border-radius:10px; border:1px solid var(--border);" src="data:image/png;base64,{{ artifacts.gll_heatmap_base64 }}">
+    {% else %}
+      <div class="hint">No GLL heatmap provided.</div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0;">Top Symbolic Rule Violations</h3>
+    {% if artifacts and artifacts.symbolic_rule_table_rows and artifacts.symbolic_rule_table_rows | length > 0 %}
+      <table class="table">
+        <thead><tr><th>Planet</th><th>Rule</th><th>Score</th><th>Details</th></tr></thead>
+        <tbody>
+          {% for r in artifacts.symbolic_rule_table_rows %}
+          <tr>
+            <td class="mono">{{ r.planet_id }}</td>
+            <td>{{ r.rule_name }}</td>
+            <td>{{ "{:.4f}".format(r.score) }}</td>
+            <td class="hint">{{ r.details or "" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="hint">No symbolic violation data provided.</div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card" style="margin-top:1rem;">
+  <h3 style="margin-top:0;">CLI Log (Recent)</h3>
+  {% if cli_log_rows and cli_log_rows | length > 0 %}
+    <div class="code code-scroll mono" id="cli-log">
+      {% for line in cli_log_rows %}
+        {{ line }}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="hint">No CLI log rows supplied.</div>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top:1rem;">
+  <h3 style="margin-top:0;">Artifacts & Manifests</h3>
+  <div class="kv">
+    <div class="key">Report Hash</div>
+    <div class="mono">{{ report_hash if report_hash is defined else "n/a" }}</div>
+    <div class="key">Artifacts</div>
+    <div>
+      {% if artifacts and artifacts | length > 0 %}
+        <ul>
+          {% for k, v in artifacts.items() %}
+          <li><span class="mono">{{ k }}</span> – {{ (v | length) if v is string else 'ready' }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <span class="hint">No artifacts described.</span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

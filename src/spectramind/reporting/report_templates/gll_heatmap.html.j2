@@ -1,0 +1,8 @@
+<div class="card">
+  <h3 style="margin-top:0;">Bin-wise GLL Heatmap</h3>
+  {% if gll_heatmap_base64 %}
+    <img alt="GLL Heatmap" style="width:100%; border-radius:10px; border:1px solid var(--border);" src="data:image/png;base64,{{ gll_heatmap_base64 }}">
+  {% else %}
+    <div class="hint">No GLL heatmap provided.</div>
+  {% endif %}
+</div>

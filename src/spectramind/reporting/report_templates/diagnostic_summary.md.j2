@@ -1,0 +1,26 @@
+# SpectraMind V50 – Diagnostics Summary
+
+Generated: {{ generated_at_utc or now_utc() }}
+Version: {{ spectramind_version or "V50" }}
+
+## Overview
+
+* Planets: {{ metrics.num_planets if metrics and metrics.num_planets is defined else 0 }}
+* GLL (mean): {{ "{:.6f}".format(metrics.gll_mean if metrics and metrics.gll_mean is defined else 0.0) }}
+* RMSE (mean): {{ "{:.6f}".format(metrics.rmse_mean if metrics and metrics.rmse_mean is defined else 0.0) }}
+* Calibration Error: {{ "{:.6f}".format(metrics.calibration_error if metrics and metrics.calibration_error is defined else 0.0) }}
+* Duration: {{ "{:.2f}".format(metrics.duration_seconds) if metrics and metrics.duration_seconds is defined else "n/a" }} s
+
+## Provenance
+
+* CLI: `{{ run.cli if run else "" }}`
+* Git: `{{ run.git_commit if run else "unknown" }}`
+* Config Hash: `{{ run.config_hash if run else "n/a" }}`
+* Host: `{{ run.host if run else "n/a" }}`
+
+## Artifacts
+
+* UMAP: {{ "yes" if artifacts and artifacts.umap_html is defined else "no" }}
+* t-SNE: {{ "yes" if artifacts and artifacts.tsne_html is defined else "no" }}
+* GLL Heatmap: {{ "yes" if artifacts and artifacts.gll_heatmap_base64 else "no" }}
+* Symbolic Violations: {{ "yes" if artifacts and artifacts.symbolic_rule_table_rows is defined else "no" }}
