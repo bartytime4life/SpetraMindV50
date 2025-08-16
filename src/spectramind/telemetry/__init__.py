@@ -11,10 +11,14 @@ from .diagnostics_hooks import DiagnosticsHooks
 from .event_stream import EventStream
 from .metrics_logger import MetricsLogger
 from .telemetry_manager import TelemetryManager
+from .logger import TelemetryLogger, get_telemetry_logger, get_logger
 
 __all__ = [
     "TelemetryManager",
     "EventStream",
     "MetricsLogger",
     "DiagnosticsHooks",
+    "TelemetryLogger",
+    "get_telemetry_logger",
+    "get_logger",
 ]
