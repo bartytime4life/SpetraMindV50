@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from typing import Callable, Iterable, List, Any, Sequence
+from typing import Callable, Iterable, List, Any, Sequence, Tuple
 
 
 def cpu_count_safe(default: int = 2) -> int:
@@ -18,7 +18,9 @@ def chunked(seq: Sequence[Any], n: int) -> List[Sequence[Any]]:
     return [seq[i : i + size] for i in range(0, L, size)]
 
 
-def _worker(fn: Callable[[Any], Any], item: Any) -> Any:
+def _worker(args: Tuple[Callable[[Any], Any], Any]) -> Any:
+    """Unpack function and item for pool workers."""
+    fn, item = args
     return fn(item)
 
 
