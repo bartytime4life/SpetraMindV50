@@ -1,0 +1,8 @@
+# @package _group_
+# Gaussian Log Likelihood diagnostics config
+
+compute_binwise: true      # If true, produce per-bin GLL heatmaps
+aggregate: ["mean", "median", "max"]  # Aggregate statistics to compute
+output_formats: ["png", "json", "csv"]
+highlight_worst_bins: 10   # Highlight top N worst bins in plots
+color_map: "viridis"       # Matplotlib colormap

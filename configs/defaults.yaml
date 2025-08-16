@@ -4,5 +4,5 @@ defaults:
   - model: base
   - training: base
   - calibration: base
-  - diagnostics: base
+  - diagnostics: defaults
   - symbolic: base

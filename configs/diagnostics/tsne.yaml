@@ -1,0 +1,10 @@
+# @package _group_
+# t-SNE projection diagnostics
+
+latent_source: "fusion"
+dimensions: 2
+perplexity: 30
+learning_rate: "auto"
+n_iter: 1000
+color_by: "symbolic_cluster"
+html_output: "tsne_plot.html"
