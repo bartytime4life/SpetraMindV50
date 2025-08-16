@@ -1,7 +1,10 @@
-# Basic Hydra sweeper for param sweeps.
-# Allows grid and random sweeps across configs.
+# Simple grid/random sweeper configuration
+# Useful for debugging sweeps without Optuna overhead.
 
-class: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
-params:
-  # Maximum number of runs in a sweep
-  max_batch_size: 16
+defaults:
+  - override /hydra/sweeper: basic
+
+hydra:
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null

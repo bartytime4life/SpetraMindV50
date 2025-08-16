@@ -1,0 +1,26 @@
+# Hydra sweeper config using Optuna
+# This config controls hyperparameter search for SpectraMind V50
+# Reproducibility: all seeds and logs are tied to Git commit hash and ENV capture.
+
+defaults:
+  - override /hydra/sweeper: optuna
+
+hydra:
+  sweeper:
+    _target_: hydra_plugins.hydra_optuna_sweeper.optuna_sweeper.OptunaSweeper
+    sampler:
+      _target_: optuna.samplers.TPESampler
+      seed: 42                # Deterministic sweeps
+      multivariate: true
+      group: true
+    direction: minimize        # GLL loss minimization objective
+    study_name: spectramind_v50_sweep
+    storage: null              # Use in-memory by default; can set RDB for multi-node runs
+    n_trials: 50               # Default number of trials; override on CLI with +n_trials=N
+    n_jobs: 1                  # Parallelism per node; integrate with launcher for multi-GPU
+    params:
+      training.lr: tag(log, interval(1e-5, 1e-2))
+      training.batch_size: choice(16, 32, 64)
+      model.encoder_dim: choice(256, 512, 768)
+      model.dropout: interval(0.0, 0.5)
+      optimizer.weight_decay: interval(1e-6, 1e-3)
