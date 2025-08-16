@@ -1,0 +1,44 @@
+# @package _group_
+# Default runtime settings for SpectraMind V50
+# All other runtime configs inherit from this base.
+# Hydra-safe with interpolation for environment-specific overrides.
+
+runtime:
+  name: default
+  description: "Base runtime defaults for SpectraMind V50 pipeline."
+
+  # Device management
+  device: "cuda"          # options: cuda, cpu, mps
+  num_workers: 8          # dataloader workers
+  pin_memory: true
+  deterministic: true     # ensure reproducibility
+
+  # Seed and reproducibility
+  seed: 42
+  cudnn_benchmark: false
+  cudnn_deterministic: true
+
+  # Paths (linked to configs/paths)
+  paths:
+    data_root: ${paths.data_root}
+    output_dir: ${paths.output_dir}/runtime/${runtime.name}
+    cache_dir: ${paths.cache_dir}
+
+  # Logging (linked to configs/logging)
+  logging:
+    level: ${logging.level}
+    console: ${logging.console}
+    file: ${logging.file}
+    jsonl: ${logging.jsonl}
+
+  # Distributed training settings
+  distributed:
+    enabled: false
+    backend: "nccl"
+    world_size: 1
+    rank: 0
+
+  # CI and test mode toggles
+  dry_run: false
+  fast_dev_run: false
+

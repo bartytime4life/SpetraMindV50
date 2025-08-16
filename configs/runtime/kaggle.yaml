@@ -1,0 +1,19 @@
+# @package _group_
+# Runtime config for Kaggle competition environment (9hr limit).
+
+defaults:
+  - default
+
+runtime:
+  name: kaggle
+  description: "Kaggle runtime settings for Ariel Data Challenge."
+  device: "cuda"
+  num_workers: 2
+  dry_run: false
+  fast_dev_run: false
+
+  # Kaggle-specific limits
+  time_limit_hours: 9
+  memory_limit_gb: 30
+  gpu_limit: 1
+

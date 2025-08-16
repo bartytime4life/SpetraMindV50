@@ -32,22 +32,24 @@ def _cfg_list(config: Optional[str]) -> List[Path]:
 @app.command()
 @dry_run_guard
 def train(
+    ctx: typer.Context,
     config: Optional[str] = typer.Option(None, "--config", "-c", help="Hydra YAML config (config_v50.yaml)"),
     overrides: List[str] = typer.Argument(None, help="Hydra overrides key=value"),
     dry_run: bool = False,
 ):
     """Train SpectraMind V50 using Hydra config. Supports Hydra overrides: e.g. train epochs=50 optim.lr=3e-4"""
     ensure_tools()
-    args = hydra_kv_to_cli(overrides or [])
+    runtime = ctx.obj.get("runtime", "default")
+    args = [f"runtime={runtime}", *hydra_kv_to_cli(overrides or [])]
     with command_session("core.train", ["--config", str(config or ""), *args], _cfg_list(config)):
         module = "spectramind.train_v50"
         candidates = [SRC_DIR / "spectramind" / "train_v50.py"]
         kind, script = find_module_or_script(module, candidates)
         ret = 0
         if kind == "module":
-            ret = call_python_module(module, (["--config", str(config)] + args) if config else args)
+            ret = call_python_module(module, (["--config", str(config), *args]) if config else args)
         elif kind == "script" and script:
-            ret = call_python_file(script, (["--config", str(config)] + args) if config else args)
+            ret = call_python_file(script, (["--config", str(config), *args]) if config else args)
         else:
             logger.error("Missing training entrypoint (spectramind.train_v50).")
             raise typer.Exit(2)
@@ -57,6 +59,7 @@ def train(
 @app.command()
 @dry_run_guard
 def predict(
+    ctx: typer.Context,
     model_path: str = typer.Option(..., "--model", help="Path to trained model weights/checkpoint"),
     outdir: str = typer.Option("predictions", "--outdir", help="Directory for predictions"),
     config: Optional[str] = typer.Option(None, "--config", "-c", help="Optional Hydra config for inference"),
@@ -65,9 +68,11 @@ def predict(
 ):
     """Run prediction to produce μ and σ spectra and artifacts for submission packaging."""
     ensure_tools()
+    runtime = ctx.obj.get("runtime", "default")
     args = ["--model", model_path, "--outdir", outdir]
     if config:
         args += ["--config", config]
+    args += [f"runtime={runtime}"]
     args += hydra_kv_to_cli(overrides or [])
     with command_session("core.predict", args, _cfg_list(config)):
         module = "spectramind.predict_v50"
@@ -86,6 +91,7 @@ def predict(
 @app.command()
 @dry_run_guard
 def calibrate(
+    ctx: typer.Context,
     preds_dir: str = typer.Option("predictions", "--preds", help="Directory with raw μ/σ"),
     outdir: str = typer.Option("calibrated", "--outdir", help="Directory for calibrated outputs"),
     method: str = typer.Option("corel", "--method", help="Calibration method: corel|temp|hybrid"),
@@ -93,7 +99,8 @@ def calibrate(
 ):
     """Calibrate predictive uncertainty (σ) using COREL / temperature scaling / hybrid methods."""
     ensure_tools()
-    args = ["--preds", preds_dir, "--outdir", outdir, "--method", method]
+    runtime = ctx.obj.get("runtime", "default")
+    args = ["--preds", preds_dir, "--outdir", outdir, "--method", method, f"runtime={runtime}"]
     with command_session("core.calibrate", args):
         module = "spectramind.uncertainty.calibrate"
         candidates = [SRC_DIR / "spectramind" / "uncertainty" / "calibrate.py"]
@@ -111,12 +118,14 @@ def calibrate(
 @app.command()
 @dry_run_guard
 def validate(
+    ctx: typer.Context,
     bundle_dir: str = typer.Option("submission_bundle", "--bundle", help="Submission directory to validate"),
     dry_run: bool = False,
 ):
     """Validate submission bundle: file presence, GLL score evaluator, zips, and schema checks."""
     ensure_tools()
-    args = ["--bundle", bundle_dir]
+    runtime = ctx.obj.get("runtime", "default")
+    args = ["--bundle", bundle_dir, f"runtime={runtime}"]
     with command_session("core.validate", args):
         module = "spectramind.validate_submission"
         candidates = [SRC_DIR / "spectramind" / "validate_submission.py"]
@@ -142,6 +151,7 @@ def validate(
 @app.command("explain")
 @dry_run_guard
 def explain_shap(
+    ctx: typer.Context,
     preds_dir: str = typer.Option("predictions", "--preds", help="Predictions directory for SHAP/metadata explain"),
     outdir: str = typer.Option("explain", "--outdir", help="Output directory"),
     dashboard: bool = typer.Option(True, "--dashboard/--no-dashboard", help="Generate interactive HTML dashboard"),
@@ -149,7 +159,8 @@ def explain_shap(
 ):
     """Run SHAP + metadata + symbolic overlays and optionally generate a dashboard."""
     ensure_tools()
-    args = ["--preds", preds_dir, "--outdir", outdir]
+    runtime = ctx.obj.get("runtime", "default")
+    args = ["--preds", preds_dir, "--outdir", outdir, f"runtime={runtime}"]
     if dashboard:
         args += ["--dashboard"]
     with command_session("core.explain", args):

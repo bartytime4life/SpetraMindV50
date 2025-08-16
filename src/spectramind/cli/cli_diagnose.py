@@ -21,6 +21,7 @@ app = typer.Typer(
 
 @app.command("dashboard")
 def dashboard(
+    ctx: typer.Context,
     preds_dir: str = typer.Option(
         "predictions", "--preds", help="Predictions directory"
     ),
@@ -35,6 +36,7 @@ def dashboard(
     """Build unified diagnostics: GLL heatmap, UMAP/t-SNE, SHAP overlays, symbolic rule leaderboard,
     COREL calibration plots, and an interactive HTML dashboard."""
     ensure_tools()
+    runtime = ctx.obj.get("runtime", "default")
     args_summary = [
         "--preds",
         preds_dir,
@@ -43,6 +45,7 @@ def dashboard(
         "--emit-json",
         "--config",
         str(DIAG_CONFIG),
+        f"runtime={runtime}",
     ]
     with command_session(
         "diagnose.dashboard",
@@ -71,6 +74,7 @@ def dashboard(
             html_out,
             "--config",
             str(DIAG_CONFIG),
+            f"runtime={runtime}",
         ]
         if no_umap:
             args_html.append("--no-umap")
@@ -91,6 +95,7 @@ def dashboard(
 
 @app.command("gll-heatmap")
 def gll_heatmap(
+    ctx: typer.Context,
     preds_dir: str = typer.Option(
         "predictions", "--preds", help="Predictions directory"
     ),
@@ -100,6 +105,7 @@ def gll_heatmap(
 ):
     """Render bin-wise GLL heatmap and summary."""
     ensure_tools()
+    runtime = ctx.obj.get("runtime", "default")
     with command_session(
         "diagnose.gll-heatmap", ["--preds", preds_dir, "--outdir", outdir]
     ):
@@ -113,6 +119,7 @@ def gll_heatmap(
             outdir,
             "--config",
             str(DIAG_CONFIG),
+            f"runtime={runtime}",
         ]
         if k == "module":
             rc = call_python_module(module, args)

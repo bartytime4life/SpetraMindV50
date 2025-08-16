@@ -1,0 +1,14 @@
+# @package _group_
+# Runtime config for CI/CD pipelines (GitHub Actions).
+
+defaults:
+  - default
+
+runtime:
+  name: ci
+  description: "CI/CD runtime for automated testing."
+  device: "cpu"
+  num_workers: 2
+  dry_run: true
+  fast_dev_run: true
+
