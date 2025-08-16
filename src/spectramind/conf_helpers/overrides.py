@@ -1,72 +1,50 @@
-# SPDX-License-Identifier: MIT
-
-"""Tools for applying symbolic overrides to configurations."""
-
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any, Dict, List, Union
+import ast
+import re
+from typing import Any, Dict
 
-from omegaconf import DictConfig, OmegaConf
-
-from .exceptions import OverrideLoadError
-from .io import load_yaml
-from .logging_utils import log_event, write_md
+_NUMBER_RE = re.compile(r"^-?\d+(\.\d+)?$")
 
 
-def deep_update(d: Dict[str, Any], u: Dict[str, Any]) -> Dict[str, Any]:
-    """Recursively merge dictionary ``u`` into ``d``."""
-    for k, v in u.items():
-        if isinstance(v, dict) and isinstance(d.get(k), dict):
-            d[k] = deep_update(d[k], v)
-        else:
-            d[k] = v
-    return d
-
-
-def _to_dict(cfg: Union[Dict[str, Any], DictConfig]) -> Dict[str, Any]:
-    if isinstance(cfg, DictConfig):
-        return OmegaConf.to_container(cfg, resolve=True)  # type: ignore[return-value]
-    return dict(cfg)
-
-
-def apply_symbolic_overrides(
-    config: Union[Dict[str, Any], DictConfig],
-    override_path: str | Path,
-) -> Union[Dict[str, Any], DictConfig]:
-    """Apply a single YAML override file to a configuration."""
+def _coerce_val(v: str) -> Any:
+    """
+    Attempt to coerce a string into bool/int/float/list/dict via ast.literal_eval,
+    falling back to string on failure.
+    """
+    # Fast-path number
+    if _NUMBER_RE.match(v):
+        return float(v) if "." in v else int(v)
+    # Booleans / None / lists / dicts etc.
     try:
-        ovr = load_yaml(override_path)
-        write_md("Applying symbolic overrides", {"override_path": str(override_path)})
-        log_event("apply_override", {"override_path": str(override_path)})
-        base = _to_dict(config)
-        merged = deep_update(base, ovr)
-        return OmegaConf.create(merged) if isinstance(config, DictConfig) else merged
-    except Exception as e:  # pragma: no cover - YAML issues
-        write_md(
-            "Apply override failed",
-            {"error": str(e), "override_path": str(override_path)},
-        )
-        log_event("apply_override_error", {"error": str(e)})
-        raise OverrideLoadError(str(e)) from e
+        lit = ast.literal_eval(v)
+        return lit
+    except Exception:
+        # pass-through strings like "fgs1_mamba"
+        return v
 
 
-def load_overrides_layered(
-    config: Union[Dict[str, Any], DictConfig],
-    paths: List[str | Path],
-) -> Union[Dict[str, Any], DictConfig]:
-    """Apply a sequence of override files in order."""
-    out = config
-    for p in paths:
-        out = apply_symbolic_overrides(out, p)
-    return out
+def cli_override_parser(override_list: list[str]) -> Dict[str, Any]:
+    """
+    Parse CLI override strings into a flattened dictionary.
+
+    Example:
+        ["train.lr=0.001", "model=fgs1_mamba", "flags.debug=True"]
+        -> {"train.lr": 0.001, "model": "fgs1_mamba", "flags.debug": True}
+    """
+    parsed: Dict[str, Any] = {}
+    for o in override_list:
+        if "=" not in o:
+            raise ValueError(f"Invalid override (missing '='): {o}")
+        k, v = o.split("=", 1)
+        parsed[k.strip()] = _coerce_val(v.strip())
+    return parsed
 
 
-def cli_override_parser(overrides: List[str]) -> DictConfig:
-    """Parse CLI-style ``key=value`` overrides into a ``DictConfig``."""
-    return OmegaConf.from_dotlist(overrides)
-
-
-def apply_overrides(cfg: DictConfig, overrides: DictConfig) -> DictConfig:
-    """Merge ``overrides`` into ``cfg`` returning a new ``DictConfig``."""
-    return OmegaConf.merge(cfg, overrides)
+def apply_overrides(cfg, override_dict: Dict[str, Any]):
+    """
+    Apply overrides onto an OmegaConf object using dot-keys.
+    """
+    for k, v in override_dict.items():
+        cfg[k] = v
+    return cfg

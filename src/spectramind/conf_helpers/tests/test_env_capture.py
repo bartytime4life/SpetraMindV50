@@ -1,18 +1,19 @@
-import json
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from spectramind.conf_helpers import capture_environment, log_environment
+from spectramind.conf_helpers import capture_environment, capture_environment_detailed
 
 
-def test_capture_and_log(tmp_path):
+def test_env_capture_basic():
     env = capture_environment()
     assert "python_version" in env
-    out = tmp_path / "env.json"
-    logged = log_environment(out)
-    assert out.exists()
-    with open(out, "r", encoding="utf-8") as f:
-        data = json.load(f)
-    assert data["python_version"] == logged["python_version"]
+    assert "git" in env
+
+
+def test_env_capture_detailed():
+    env = capture_environment_detailed()
+    assert "pip_freeze" in env

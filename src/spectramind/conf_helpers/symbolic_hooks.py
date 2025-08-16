@@ -1,16 +1,22 @@
-"""Helpers for injecting default symbolic constraint weights."""
-
 from __future__ import annotations
 
-from typing import Any, Dict
 
-from omegaconf import DictConfig, OmegaConf
+def inject_symbolic_constraints(cfg):
+    """
+    Ensure default symbolic constraint weights exist in the config.
 
-
-def inject_symbolic_constraints(cfg: DictConfig) -> DictConfig:
-    """Ensure a ``symbolic.constraints`` section exists with default weights."""
-    data: Dict[str, Any] = OmegaConf.to_container(cfg, resolve=True)  # type: ignore[assignment]
-    symbolic = data.setdefault("symbolic", {})
-    constraints = symbolic.setdefault("constraints", {})
-    constraints.setdefault("default_weight", 1.0)
-    return OmegaConf.create(data)
+    Defaults reflect physics-aware + neuro-symbolic priors used in V50.
+    """
+    if "symbolic" not in cfg:
+        cfg.symbolic = {}
+    defaults = {
+        "smoothness": 1.0,
+        "nonnegativity": 1.0,
+        "asymmetry": 0.5,
+        "fft_suppression": 0.5,
+        "photonic_alignment": 1.0,
+    }
+    for k, v in defaults.items():
+        if k not in cfg.symbolic:
+            cfg.symbolic[k] = v
+    return cfg
