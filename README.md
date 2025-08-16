@@ -1,87 +1,146 @@
-SpectraMind V50 — NeurIPS 2025 Ariel Data Challenge (Mission‑Grade Root)
+SpectraMind V50 — NeurIPS 2025 Ariel Data Challenge
 
-SpectraMind V50 is a neuro‑symbolic, physics‑informed AI pipeline engineered to excel in the NeurIPS 2025 Ariel Data Challenge. It is designed to be a reproducible, CLI-first, ESA‑Ariel‑aware, NASA‑grade research system with strict logging, experiment tracking, and symbolic rule integration that encodes physical truths directly into learning.
-
-Mission Brief
-•Objective: Predict mean (μ) and uncertainty (σ) spectra for exoplanet atmospheres from dual instruments (FGS1 temporal, AIRS spectral), with leaderboard‑grade Generalized Log Likelihood (GLL) performance under strict runtime constraints (≤9 hours across ~1,100 planets).
-•Strategy:
-•FGS1-first temporal modeling (Mamba SSM or equivalent long‑sequence encoder) to extract robust transit dynamics.
-•AIRS spectral GNN (e.g., GAT/RGCN/edge‑aware) with wavelength‑graph structure, molecule/region edges, and symbolic priors.
-•Multi‑scale μ decoder + Flow σ head (calibration-aware), with symbolic constraints (smoothness, non‑negativity, molecular coherence).
-•Calibration kill chain for photometric corrections and alignment; COREL conformal coverage tuning; temperature scaling.
-•Diagnostics and Explainability: SHAP overlays, symbolic rule violation dashboards, FFT/UMAP/t‑SNE overlays, and HTML reports.
-
-Reproducibility & Engineering Tenets
-•CLI-first: A single Typer multiplexer (spectramind.py) orchestrates training, inference, calibration, diagnostics, dashboard, ablations, and submission.
-•Hydra configs: All parameters are composable YAML; never hardcode in code paths.
-•Logging discipline:
-•Console logs (human‑readable).
-•Rotating file logs (logs/…), retention guarded.
-•JSONL event stream (logs/events.jsonl) for machine auditability.
-•Experiment tracking: MLflow by default; optional W&B.
-•Git/ENV capture: Each run records Git SHA/dirty flag, diff summary, pip freeze, CUDA/cudnn info, and host specs to run_hash_summary_v50.json.
-•CI/Policy Gates: GitHub Actions run selftests, diagnostics, docs build, and submission sanity checks. Optional OPA/Conftest for K8s/Helm if deployed.
-•Data governance: Data paths via Hydra only; no path literals in code; DVC/lakeFS recommended (configured in sub‑scaffold).
-
-This README is the root-level handbook. See docs/ and ARCHITECTURE.md for deep diagrams, module contracts, and acceptance tests.
+A neuro-symbolic, physics-informed pipeline for exoplanet transmission spectroscopy.
+This repository is engineered for scientific rigor, full reproducibility, and fast iteration: Hydra configs, Typer CLI, DVC/lakeFS data discipline, MLflow-optional tracking, and a rich diagnostics dashboard.
 
 ⸻
 
-Quickstart (once full scaffold is in place)
-
-poetry install --no-root
-poetry run python -m spectramind --version
-poetry run python -m spectramind selftest --fast
-poetry run python -m spectramind diagnose dashboard --no-open
-poetry run python -m spectramind submit make --dry-run
-
-Logs & Reports
-•Human log: logs/spectramind.log (rotating)
-•JSONL events: logs/events.jsonl
-•Run hash: run_hash_summary_v50.json
-•Diagnostics HTML: artifacts/diagnostics/index.html
+✨ Highlights
+•Dual-encoder architecture: FGS1 (Mamba SSM, long-sequence) + AIRS (edge-aware GNN) with multi-scale decoders for μ (mean) and σ (uncertainty).
+•Neuro-symbolic constraints: Smoothness, non-negativity, FFT/asymmetry, photonic alignment; rule engines with violation maps and influence tracing.
+•Uncertainty calibration: Temperature scaling + COREL (bin-wise conformal), with coverage/quantile checks and symbolic-region analysis.
+•CLI-first workflow: One unified app (src/spectramind/spectramind.py) that runs training, inference, calibration, diagnostics, bundling, and log analysis.
+•Reproducibility: Hydra YAMLs, config hashing, rotating logs + JSONL events, environment snapshots, optional Docker & CI.
+•Diagnostics UI: Generate an interactive HTML dashboard (UMAP/t-SNE overlays, SHAP×symbolic fusion, GLL heatmaps, FFT, rule leaderboards).
 
 ⸻
 
-Root Files in This Repository
+📁 Repository Structure (core)
 
-This root contains (created by scaffold_root_spectramindv50.sh):
-•README.md (this file)
-•ARCHITECTURE.md (engineering spec; if missing, generate from docs scaffold)
-•LICENSE (MIT by default)
-•CHANGELOG.md (Keep a changelog)
-•CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md
-•CITATION.cff
-•VERSION (semantic version for CLI/reporting)
-•.gitignore, .dockerignore, .gitattributes, .editorconfig
-•.pre-commit-config.yaml
-•pyproject.toml (Poetry/ruff/pytest/black/isort/mkdocs config root)
-•mkdocs.yml (Docs site definition)
-•Dockerfile (GPU-ready base stub; extend to your infra)
-•.vscode/settings.json (editor hygiene)
-•push_root_files.sh (one-liner to commit/push these root files)
+configs/                 # Hydra-safe YAMLs (model, calibration, diagnostics, hydra/*)
+scripts/                 # One-liner wrappers: train/predict/calibrate/dashboard/bundle/etc.
+src/spectramind/         # Library code (CLI, models, calibration, diagnostics, symbolic, etc.)
+selftest.py              # Fast/deep repo consistency & integrity checks
+README.md                # You are here
+.gitignore               # Reproducibility-first ignore rules
 
-Subdirectories like src/, configs/, scripts/, docs/, tests/ are created by dedicated scaffolders. This root scaffold only asserts the top-level contract.
+Tip: all heavy artifacts (logs, checkpoints, datasets) are ignored by default for clean commits. Use DVC/lakeFS for data governance.
 
 ⸻
 
-Governance & Safety
-•Pre-commit enforces style and security checks.
-•Security policy describes vulnerability reporting.
-•Code of Conduct sets community expectations.
-•License defaults to MIT; adjust if needed.
+🚀 Quickstarts
+
+0) Environment
+•Python 3.10+ recommended.
+•Optional: uv or poetry makes dependency management seamless.
+•GPU/CUDA advised for training.
+
+1) Self-Test
+
+Run a fast integrity check (CLI registration, configs, shapes, and paths):
+
+bash scripts/run_selftest.sh
+
+Deep mode:
+
+bash scripts/run_selftest.sh --deep --open-html
+
+2) Train
+
+bash scripts/train_v50.sh --config configs/model/config_v50.yaml --tag baseline
+
+3) Predict & Bundle
+
+bash scripts/predict_v50.sh --ckpt ckpts/best.pt --bundle --open-html
+
+Or one-click end-to-end (selftest → predict → bundle):
+
+bash scripts/one_click_make_submission.sh --ckpt ckpts/best.pt --open-html
+
+4) Diagnostics Dashboard
+
+bash scripts/diagnose_dashboard.sh --open
+
+UMAP / t-SNE latents:
+
+bash scripts/umap_latents.sh --open
+bash scripts/tsne_latents.sh --open
+
+Symbolic rule ranking:
+
+bash scripts/symbolic_rank.sh
+
+Symbolic profile overview:
+
+bash scripts/profile_diagnose.sh --open
+
 
 ⸻
 
-Citation
+🧩 CLI Reference (top-level)
 
-If this work informs your research, please cite the repository via CITATION.cff.
+The unified Typer root is exposed as a Python module:
+
+python -m src.spectramind.spectramind --help
+
+Key subcommands (wrappers exist in scripts/):
+•train — model training (Hydra configs, AMP, logging, hashing)
+•predict — inference producing μ/σ + packaging hooks
+•calibrate — photometry + σ calibration (temp scaling + COREL)
+•diagnose — dashboard, UMAP/t-SNE, FFT, symbolic overlays, GLL/entropy
+•analyze-log — parse v50_debug_log.md, export CSV/MD tables, heatmaps
+•corel-train — dedicated COREL GNN training
+•test — repository self-tests (selftest.py)
+
+All commands write timestamped outputs under logs/… and append a config/run hash for reproducibility.
 
 ⸻
 
-Support
-•Issues: use GitHub Issues with labeled templates.
-•Discussions: roadmap and research threads welcome.
-•PRs: must pass CI, selftests, and lint/policy gates.
+🔬 Reproducibility & Data Discipline
+•Hydra: All runtime parameters live in YAML under configs/. Override with +key=value.
+•Hashing: Every script writes run_hash.json and appends to run_hash_summary_v50.json.
+•Data: Use DVC/lakeFS to version raw/calibrated datasets; keep Git clean.
+•Env snapshots: bash scripts/export_env.sh --poetry --pip --conda --out .envsnap
+•Docker: bash scripts/docker_build.sh --tag spectramind:v50
 
-— SpectraMind V50 (master‑architect edition)
+⸻
+
+🧪 CI / Local Checks
+
+Run a local CI mimic:
+
+bash scripts/ci_check.sh --fast
+
+This will run tests (if present), a fast selftest, and best-effort lint/format.
+
+⸻
+
+🧠 Scientific Notes
+•Losses: Gaussian NLL (GLL) with spectral smoothness and asymmetry regularizers; optional quantile or diffusion decoders.
+•Symbolic: Rule weights, violation masks, influence maps, and summaries exported to diagnostics.
+•Calibration: Coverage and quantile evaluation per bin, molecule region summaries, and overlays in the dashboard.
+
+⸻
+
+🤝 Contributing
+•Write code with docstrings, robust error handling, and clear logs.
+•Keep configs Hydra-safe and minimal; add defaults to groups.
+•Prefer functional commits and include selftest passes before pushing.
+•Avoid committing large artifacts; use DVC/lakeFS remotes.
+
+⸻
+
+📜 License
+
+Project-specific license TBD. If unsure, default to a permissive license (Apache-2.0 or MIT) suitable for research and challenge participation.
+
+⸻
+
+📧 Support
+
+Open issues in the GitHub repository with:
+•Command used, full console log excerpt
+•Config overrides
+•Environment snapshot (.envsnap/system_info.txt if available)
+
+Stay stellar. ✨
