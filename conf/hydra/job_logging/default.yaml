@@ -1,3 +1,4 @@
+# conf/hydra/job_logging/default.yaml
 # Default job logging config for SpectraMind V50.
 # Uses rotating file handlers, console output, and JSONL streams.
 
@@ -22,7 +23,7 @@ handlers:
     formatter: simple
     level: DEBUG
     filename: logs/v50_run.log
-    maxBytes: 5_000_000
+    maxBytes: 5000000
     backupCount: 5
 
   jsonl:
