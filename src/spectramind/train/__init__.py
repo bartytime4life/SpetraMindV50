@@ -1,44 +1,41 @@
-from __future__ import annotations
-
 """
-SpectraMind V50 — Training Package (src/spectramind/train)
+SpectraMind V50 - Training Package
+==================================
 
-This package provides unified, Hydra-safe, CLI-integrable training pipelines for the
-NeurIPS 2025 Ariel Data Challenge (SpectraMind V50). It includes:
+This package provides mission-grade training utilities for the NeurIPS Ariel Data Challenge 2025:
 
-* train_v50.py:         Full μ/σ supervised training loop with physics-aware losses.
-* train_mae_v50.py:     Masked Autoencoder (MAE) pretraining for spectral/time cubes.
-* train_contrastive_v50.py: Contrastive pretraining on latent embeddings.
-* corel_train.py:       COREL bin-wise conformal calibration training (GNN-ready).
-* callbacks.py:         Early stopping, checkpointing, and graceful failover hooks.
-* schedulers.py:        Cosine annealing with warmup; step and plateau schedulers.
-* losses.py:            Gaussian log-likelihood (GLL), L2 smoothness, FFT penalties,
-  symbolic wrapper hooks for physics-informed constraints.
-* logger.py:            Console + rotating file logs + JSONL event stream + MLflow/W&B optional.
-* common.py:            Deterministic seeding, device selection, checkpoint utils, hash capture.
-* data_loading.py:      Thin data adapters and dataset registry plumbing.
-* selftest_train_pkg.py: Coherence checks for this package (imports, shapes, I/O).
+* Deterministic seeding and environment capture
+* Console + rotating file logs AND JSONL event stream
+* Optional MLflow/W&B sync (MLflow integrated; W&B can be added similarly)
+* Hydra/OmegaConf-friendly builders (datasets, models, losses, optimizers, schedulers, step processors)
+* Robust TrainerBase with AMP, grad accumulation, checkpointing, early stopping, and reproducibility
+* Self-test harness for quick validation of the stack
 
-All modules write reproducibility metadata to `v50_debug_log.md` and support structured
-JSONL logging for post-hoc analytics and dashboards.
+Primary public entry points:
 
-Conventions:
+* train_v50.run_train(cfg)  -> general supervised training
+* train_mae_v50.run_train(cfg)  -> masked autoencoder pretraining
+* train_contrastive_v50.run_train(cfg) -> contrastive pretraining
 
-* Do NOT import heavy frameworks at module import unless necessary. Delay where possible.
-* Always provide rich docstrings and explicit typing.
-* Every public function logs via the unified logger when meaningful.
-
-Note:
-This package intentionally keeps *no* project-specific absolute paths; it relies on Hydra
-configs and the caller's working directory.
+These functions are designed to be called from CLI modules (e.g., spectramind CLI).
 """
+
+from .utils import seed_everything, get_device, count_parameters, dump_yaml_safely
+from .experiment_logger import ExperimentLogger
+from .trainer_base import TrainerBase, TrainerHooks
+from .callbacks import EarlyStopping, CheckpointManager
+from .optim import build_optimizer, build_scheduler
+from .losses import GaussianLikelihoodLoss, SmoothnessLoss, AsymmetryLoss, CompositeLoss
+from .registry import build_from_target, resolve_callable
+from .step_processors import GenericGaussianProcessor
 
 __all__ = [
-    "common",
-    "logger",
-    "losses",
-    "schedulers",
-    "callbacks",
-    "data_loading",
+    "seed_everything", "get_device", "count_parameters", "dump_yaml_safely",
+    "ExperimentLogger",
+    "TrainerBase", "TrainerHooks",
+    "EarlyStopping", "CheckpointManager",
+    "build_optimizer", "build_scheduler",
+    "GaussianLikelihoodLoss", "SmoothnessLoss", "AsymmetryLoss", "CompositeLoss",
+    "build_from_target", "resolve_callable",
+    "GenericGaussianProcessor",
 ]
-

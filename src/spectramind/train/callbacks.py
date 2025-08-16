@@ -1,67 +1,61 @@
-from __future__ import annotations
-
-import math
 from dataclasses import dataclass
+import os
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-from .common import save_checkpoint
-from .logger import get_logger, write_jsonl
+from typing import Dict, Optional
 
 
 @dataclass
-class EarlyStopper:
-    """Simple early stopping utility based on a monitored metric (lower is better)."""
-
+class EarlyStopping:
+    """
+    Simple early-stopping on a monitored metric.
+    """
+    monitor: str = "val_loss"
+    mode: str = "min"  # "min" or "max"
     patience: int = 10
-    min_delta: float = 0.0
-    best: float = math.inf
-    hits: int = 0
+    best: Optional[float] = None
+    num_bad: int = 0
     stopped: bool = False
-    metric_name: str = "val_loss"
 
-    def step(self, value: float) -> bool:
-        """Update with a new validation metric. Returns True if should stop."""
-        improved = (self.best - value) > self.min_delta
+    def step(self, metrics: Dict[str, float]) -> bool:
+        """
+        Update with latest metrics; return True if should stop.
+        """
+        current = metrics.get(self.monitor)
+        if current is None:
+            return False
+
+        if self.best is None:
+            self.best = current
+            self.num_bad = 0
+            return False
+
+        improved = (current < self.best) if self.mode == "min" else (current > self.best)
         if improved:
-            self.best = value
-            self.hits = 0
+            self.best = current
+            self.num_bad = 0
         else:
-            self.hits += 1
-            if self.hits >= self.patience:
+            self.num_bad += 1
+            if self.num_bad >= self.patience:
                 self.stopped = True
         return self.stopped
 
 
-class Checkpointer:
-    """Manage periodic/best checkpoint saving and artifact manifest logging."""
-
-    def __init__(self, out_dir: str, keep_last: int = 5, best_name: str = "best.pt"):
+class CheckpointManager:
+    """
+    Manage checkpoint saving with 'best' and 'last' semantics.
+    """
+    def __init__(self, out_dir: str, best_name: str = "best.ckpt", last_name: str = "last.ckpt") -> None:
+        Path(out_dir).mkdir(parents=True, exist_ok=True)
         self.out_dir = out_dir
-        self.keep_last = keep_last
-        self.best_name = best_name
-        self.best_value = float("inf")
-        self.logger = get_logger()
+        self.best_path = os.path.join(out_dir, best_name)
+        self.last_path = os.path.join(out_dir, last_name)
 
-    def save_periodic(self, state: Dict[str, Any], tag: str) -> str:
-        """Save a rolling checkpoint e.g., per-epoch."""
-        fpath = save_checkpoint(state, self.out_dir, tag=tag, keep_last=self.keep_last)
-        self.logger.info(f"Saved periodic checkpoint: {fpath}")
-        write_jsonl({"event": "checkpoint_periodic", "path": fpath, "tag": tag})
-        return fpath
+    def save_last(self, state: Dict) -> str:
+        import torch
+        torch.save(state, self.last_path)
+        return self.last_path
 
-    def try_save_best(self, state: Dict[str, Any], value: float) -> Optional[str]:
-        """If `value` improves the best metric, save a 'best.pt' style checkpoint."""
-        if value < self.best_value:
-            self.best_value = value
-            Path(self.out_dir).mkdir(parents=True, exist_ok=True)
-            fpath = str(Path(self.out_dir) / self.best_name)
-            # Overwrite best
-            import torch  # local import to keep module import light
-
-            torch.save(state, fpath)
-            self.logger.info(f"New best ({value:.6f}) saved to: {fpath}")
-            write_jsonl({"event": "checkpoint_best", "path": fpath, "best": value})
-            return fpath
-        return None
-
+    def save_best(self, state: Dict) -> str:
+        import torch
+        torch.save(state, self.best_path)
+        return self.best_path
