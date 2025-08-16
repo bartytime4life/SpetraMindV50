@@ -13,6 +13,7 @@ from .check_calibration import CalibrationChecker
 from .logging_utils import log_event
 from .photometry import PhotometryExtractor
 from .uncertainty_calibration import UncertaintyCalibrator
+from spectramind.conf_helpers.profile_wire import apply_profile_wire
 
 log = logging.getLogger(__name__)
 
@@ -72,6 +73,7 @@ if hydra is not None:
         version_base=None, config_path="../../configs", config_name="config_v50"
     )
     def main(cfg: DictConfig) -> None:  # pragma: no cover
+        cfg = apply_profile_wire(cfg)
         pipe = CalibrationPipeline(cfg.get("calibration_pipeline", {}))
         paths = cfg.get("paths", {})
         pipe.run(

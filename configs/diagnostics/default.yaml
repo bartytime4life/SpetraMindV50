@@ -1,0 +1,13 @@
+# Diagnostics group reads through from the selected profile but remains overrideable.
+
+diagnostics:
+  enable_fft: ${oc.select:diagnostics.enable_fft,false}
+  enable_shap: ${oc.select:diagnostics.enable_shap,false}
+  enable_symbolic_overlay: ${oc.select:diagnostics.enable_symbolic_overlay,false}
+  enable_dashboard: ${oc.select:diagnostics.enable_dashboard,false}
+  enable_interactive_html: ${oc.select:diagnostics.enable_interactive_html,false}
+  overlays: ${oc.select:diagnostics.overlays,[]}
+  fusion_overlays: ${oc.select:diagnostics.fusion_overlays,[]}
+  molecular_templates: ${oc.select:diagnostics.molecular_templates,[]}
+  molecular_focus: ${oc.select:diagnostics.molecular_focus,[]}
+  enable_cosmology_context: ${oc.select:diagnostics.enable_cosmology_context,false}

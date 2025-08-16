@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import math
 import os
+import hydra
+from spectramind.conf_helpers.profile_wire import apply_profile_wire
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterator, List, Tuple
@@ -360,3 +362,13 @@ def train(cfg: DictConfig) -> None:
     # cfg.train.*, cfg.model.* expected by this trainer
     trainer = Trainer(cfg)
     trainer.run()
+
+if hydra is not None:
+
+    @hydra.main(version_base=None, config_path="../../configs", config_name="config")
+    def main(cfg: DictConfig) -> None:  # pragma: no cover
+        cfg = apply_profile_wire(cfg)
+        train(cfg)
+
+    if __name__ == "__main__":  # pragma: no cover
+        main()

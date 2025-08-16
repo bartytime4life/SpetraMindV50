@@ -66,3 +66,8 @@ steps:
     enabled: true
     description: "Run quality control checks on calibrated products before modeling."
     params: ${calibration/step_definitions/final_qc}
+
+  - name: molecular_region_qc
+    enabled: ${oc.select:diagnostics.molecular_focus,[]}
+    params:
+      focus_molecules: ${oc.select:diagnostics.molecular_focus,[]}
