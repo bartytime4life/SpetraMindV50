@@ -1,51 +1,142 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
+——————————————————————————————
+SpectraMind V50 — .gitignore
+Reproducibility-first: keep code/configs/lightweight manifests in Git; ignore heavy artifacts
+——————————————————————————————
+
+Python / Virtualenv / Packaging
+
+pycache/
+*.py[cod]
+*.so
 *.pyd
-*.egg-info/
-.build/
-dist/
-.poetry/
+*.dylib
+*.egg
+.egg-info/
+.Python
+.python-version
 .venv/
 venv/
+env/
+ENV/
+pip-wheel-metadata/
+.build/
+dist/
+build/
+.eggs/
+.mypy_cache/
+.pytype/
+.dmypy.json
+.pyre/
+coverage.
+htmlcov/
+.tox/
+.cache/
+.ipynb_checkpoints/
+*.ipynb
 
-# IDE
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
+Editors / IDE
 
+.vscode/
+.vscode-test/
 .idea/
-
-# Data / Artifacts
-data/
-artifacts/
-outputs/
-checkpoints/
-runs/
-mlruns/
-wandb/
-dvc.lock
-.dvc/
-.lakefs/
-
-# Logs
-logs/*
-!logs/.gitkeep
-!logs/README.md
-*.log
-*.jsonl
-
-# Env
-.env
-.env.*
-.secrets/
-*.secret
-
-# OS
-.DS_Store
+*.swp
+*.swo
+*.DS_Store
 Thumbs.db
 
-# Docker
-*.bak
-var/
+Logs / Diagnostics / Reports
+
+logs/
+**/console.log
+**/console.txt
+*.log
+*.log.gz
+*.md.backup
+diagnostics_report.json
+log_table.md
+run_hash_summary_v50.json
+
+Model Artifacts / Checkpoints / Datasets
+
+artifacts/
+artifacts/**/*
+ckpts/
+checkpoints/
+models/
+*.pt
+*.ckpt
+*.onnx
+*.jit
+*.engine
+*.plan
+*.npy
+*.npz
+*.npz.zip
+*.h5
+*.pkl
+*.pickle
+*.joblib
+
+Data & Caches
+
+data/
+!data/.keep
+datasets/
+!datasets/.keep
+.cache/
+.tmp/
+tmp/
+temp/
+**/.ipynb_checkpoints
+**/node_modules/
+
+Hydra Outputs
+
+multirun/
+outputs/
+**/.hydra/
+**/hydra/
+**/hydra_outputs/
+
+DVC / lakeFS (keep metadata, ignore large caches)
+
+.dvc/
+!.dvc/config
+!.dvc/.gitignore
+**/.dvc/cache/
+**/.dvc/tmp/
+**/.dvc/plots/
+**/.dvc/experiments/
+.lakefs/
+lakefs_client/
+**/lakefs_cache/
+**/lakefs_tmp/
+
+Kaggle / Submissions
+
+.zip
+submission.csv
+submission*.zip
+
+HTML bundles (keep versioned dashboards in logs/ via artifacts but ignore stray)
+
+.html
+!docs/**/.html
+
+Notebooks autosave
+
+*.nbconvert.ipynb
+
+OS / Misc
+
+.DS_Store
+Icon?
+ehthumbs.db
+Desktop.ini
+
+Poetry / uv
+
+poetry.lock
+.venv*/
+uv.lock
+uv_cache/
