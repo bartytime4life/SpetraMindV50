@@ -1,131 +1,110 @@
+from __future__ import annotations
+
+"""
+SpectraMind V50 — Diagnostics & Dashboard CLI with runtime wiring.
+
+Provides dashboard, symbolic-rank, and other diagnostic commands, all honoring
+the selected Hydra runtime group via runtime=<name>.
+"""
+
+from typing import Optional, List
+
 import typer
 
-from .common import (
-    PROJECT_ROOT,
-    SRC_DIR,
-    call_python_file,
-    call_python_module,
-    command_session,
-    ensure_tools,
-    find_module_or_script,
-    logger,
-    open_in_browser,
+from spectramind.conf_helpers.runtime import (
+    determine_runtime,
+    set_runtime_env,
+    compose_with_runtime,
+    log_runtime_choice,
+    pretty_print_cfg,
 )
 
-DIAG_CONFIG = PROJECT_ROOT / "configs" / "diagnostics" / "defaults.yaml"
 
-app = typer.Typer(
-    no_args_is_help=True, help="SpectraMind V50 — Diagnostics & Dashboard"
-)
+app = typer.Typer(help="SpectraMind V50 — Diagnostics CLI")
 
 
 @app.command("dashboard")
 def dashboard(
-    ctx: typer.Context,
-    preds_dir: str = typer.Option(
-        "predictions", "--preds", help="Predictions directory"
+    runtime: Optional[str] = typer.Option(
+        None, "--runtime", "-r", help="Execution environment (Hydra group)"
     ),
-    outdir: str = typer.Option(
-        "diagnostics", "--outdir", help="Diagnostics output directory"
+    config_overrides: List[str] = typer.Option(
+        None,
+        "--override",
+        "-o",
+        help="Additional Hydra overrides for HTML dashboard generation",
+        rich_help_panel="Hydra",
     ),
-    html_out: str = typer.Option("reports/diagnostic_report_v1.html", "--html-out"),
-    open_browser: bool = typer.Option(False, "--open-browser/--no-open-browser"),
-    no_umap: bool = typer.Option(False, "--no-umap", help="Skip UMAP render"),
-    no_tsne: bool = typer.Option(False, "--no-tsne", help="Skip t-SNE render"),
+    show_cfg: bool = typer.Option(False, "--show-cfg", help="Print resolved Hydra config and exit"),
 ):
-    """Build unified diagnostics: GLL heatmap, UMAP/t-SNE, SHAP overlays, symbolic rule leaderboard,
-    COREL calibration plots, and an interactive HTML dashboard."""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    args_summary = [
-        "--preds",
-        preds_dir,
-        "--outdir",
-        outdir,
-        "--emit-json",
-        "--config",
-        str(DIAG_CONFIG),
-        f"runtime={runtime}",
-    ]
-    with command_session(
-        "diagnose.dashboard",
-        ["--preds", preds_dir, "--outdir", outdir, "--html", html_out],
-    ):
-        module_sum = "spectramind.generate_diagnostic_summary"
-        cand_sum = [SRC_DIR / "spectramind" / "generate_diagnostic_summary.py"]
-        k, s = find_module_or_script(module_sum, cand_sum)
-        if k == "module":
-            rc = call_python_module(module_sum, args_summary)
-        elif k == "script" and s:
-            rc = call_python_file(s, args_summary)
-        else:
-            logger.error("Missing generate_diagnostic_summary.")
-            raise typer.Exit(2)
-        if rc != 0:
-            raise typer.Exit(rc)
-        module_html = "spectramind.generate_html_report"
-        cand_html = [SRC_DIR / "spectramind" / "generate_html_report.py"]
-        args_html = [
-            "--preds",
-            preds_dir,
-            "--diagnostics",
-            outdir,
-            "--html-out",
-            html_out,
-            "--config",
-            str(DIAG_CONFIG),
-            f"runtime={runtime}",
-        ]
-        if no_umap:
-            args_html.append("--no-umap")
-        if no_tsne:
-            args_html.append("--no-tsne")
-        k2, s2 = find_module_or_script(module_html, cand_html)
-        if k2 == "module":
-            rc2 = call_python_module(module_html, args_html)
-        elif k2 == "script" and s2:
-            rc2 = call_python_file(s2, args_html)
-        else:
-            logger.error("Missing generate_html_report.")
-            raise typer.Exit(2)
-        if rc2 == 0 and open_browser:
-            open_in_browser(html_out)
-        raise typer.Exit(rc2)
+    """
+    Generate the interactive diagnostics dashboard HTML (UMAP/t-SNE/SHAP/symbolic overlays).
+    """
+    resolved_runtime = determine_runtime(runtime)
+    set_runtime_env(resolved_runtime)
+    cfg = compose_with_runtime(resolved_runtime, overrides=config_overrides or [])
+    log_runtime_choice(resolved_runtime, cfg, extra_note="diagnose.dashboard")
+
+    if show_cfg:
+        pretty_print_cfg(cfg)
+        raise typer.Exit(0)
+
+    try:
+        from spectramind.diagnostics.generate_html_report import generate_report_from_config
+
+        exit_code = generate_report_from_config(cfg)  # type: ignore[call-arg]
+    except ModuleNotFoundError:
+        typer.echo(
+            "[ERROR] Module 'spectramind.diagnostics.generate_html_report' not found. "
+            "Please ensure your repository includes the diagnostics dashboard implementation."
+        )
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"[ERROR] Dashboard generation failed: {e}")
+        raise typer.Exit(1)
+
+    raise typer.Exit(exit_code if isinstance(exit_code, int) else 0)
 
 
-@app.command("gll-heatmap")
-def gll_heatmap(
-    ctx: typer.Context,
-    preds_dir: str = typer.Option(
-        "predictions", "--preds", help="Predictions directory"
+@app.command("symbolic-rank")
+def symbolic_rank(
+    runtime: Optional[str] = typer.Option(
+        None, "--runtime", "-r", help="Execution environment (Hydra group)"
     ),
-    outdir: str = typer.Option(
-        "diagnostics", "--outdir", help="Diagnostics output directory"
+    config_overrides: List[str] = typer.Option(
+        None,
+        "--override",
+        "-o",
+        help="Additional Hydra overrides for symbolic analysis",
+        rich_help_panel="Hydra",
     ),
+    show_cfg: bool = typer.Option(False, "--show-cfg", help="Print resolved Hydra config and exit"),
 ):
-    """Render bin-wise GLL heatmap and summary."""
-    ensure_tools()
-    runtime = ctx.obj.get("runtime", "default")
-    with command_session(
-        "diagnose.gll-heatmap", ["--preds", preds_dir, "--outdir", outdir]
-    ):
-        module = "spectramind.plot_gll_heatmap_per_bin"
-        candidates = [SRC_DIR / "spectramind" / "plot_gll_heatmap_per_bin.py"]
-        k, s = find_module_or_script(module, candidates)
-        args = [
-            "--preds",
-            preds_dir,
-            "--outdir",
-            outdir,
-            "--config",
-            str(DIAG_CONFIG),
-            f"runtime={runtime}",
-        ]
-        if k == "module":
-            rc = call_python_module(module, args)
-        elif k == "script" and s:
-            rc = call_python_file(s, args)
-        else:
-            logger.error("Missing plot_gll_heatmap_per_bin.")
-            raise typer.Exit(2)
-        raise typer.Exit(rc)
+    """
+    Run the symbolic rule violation analysis and export leaderboards / overlays.
+    """
+    resolved_runtime = determine_runtime(runtime)
+    set_runtime_env(resolved_runtime)
+    cfg = compose_with_runtime(resolved_runtime, overrides=config_overrides or [])
+    log_runtime_choice(resolved_runtime, cfg, extra_note="diagnose.symbolic-rank")
+
+    if show_cfg:
+        pretty_print_cfg(cfg)
+        raise typer.Exit(0)
+
+    try:
+        from spectramind.symbolic.symbolic_violation_predictor import run_symbolic_rank_from_config
+
+        exit_code = run_symbolic_rank_from_config(cfg)  # type: ignore[call-arg]
+    except ModuleNotFoundError:
+        typer.echo(
+            "[ERROR] Module 'spectramind.symbolic.symbolic_violation_predictor' not found. "
+            "Ensure your repository includes the symbolic ranking implementation."
+        )
+        raise typer.Exit(1)
+    except Exception as e:
+        typer.echo(f"[ERROR] Symbolic ranking failed: {e}")
+        raise typer.Exit(1)
+
+    raise typer.Exit(exit_code if isinstance(exit_code, int) else 0)
+
