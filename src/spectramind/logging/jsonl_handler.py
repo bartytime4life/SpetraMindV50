@@ -1,14 +1,28 @@
+"""
+JSONL Event Stream Handler
+--------------------------
+Logs each record as a structured JSON line for downstream analysis.
+"""
+import logging
 import json
 from pathlib import Path
-from typing import Any, Dict
+from datetime import datetime
 
-class JSONLHandler:
-    """Minimal JSONL writer used for logging structured events."""
 
-    def __init__(self, filename: Path):
-        self.path = Path(filename)
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+class JSONLHandler(logging.Handler):
+    def __init__(self, filepath: Path):
+        super().__init__()
+        self.filepath = filepath.open("a", encoding="utf-8")
 
-    def emit(self, record: Dict[str, Any]) -> None:
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(record) + "\n")
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            entry = {
+                "timestamp": datetime.utcnow().isoformat(),
+                "level": record.levelname,
+                "logger": record.name,
+                "message": record.getMessage(),
+            }
+            self.filepath.write(json.dumps(entry) + "\n")
+            self.filepath.flush()
+        except Exception:
+            self.handleError(record)
