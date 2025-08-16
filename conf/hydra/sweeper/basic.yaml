@@ -1,5 +1,4 @@
-# conf/hydra/sweeper/basic.yaml
-# Basic Hydra sweeper for parameter sweeps.
+# Basic Hydra sweeper for param sweeps.
 # Allows grid and random sweeps across configs.
 
 class: hydra._internal.core_plugins.basic_sweeper.BasicSweeper

@@ -1,7 +1,6 @@
-# conf/hydra/launcher/basic.yaml
 # Basic Hydra launcher for local execution.
 # Suitable for laptop / devcontainer runs.
-# Advanced launchers (e.g., submitit, slurm) can override this.
+# Advanced launchers (e.g. submitit, slurm) can override this.
 
 class: hydra._internal.core_plugins.basic_launcher.BasicLauncher
 params: {}

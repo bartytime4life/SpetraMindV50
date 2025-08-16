@@ -61,8 +61,8 @@ SRC = os.path.normpath("configs/hydra")
 DST = os.path.normpath("conf/hydra")
 
 DEFAULT_IGNORES = [
-    # Add ignorable patterns here if needed:
-    # "README.md",
+    # Meta documentation not part of the mirrored tree
+    "README.md",
 ]
 
 
