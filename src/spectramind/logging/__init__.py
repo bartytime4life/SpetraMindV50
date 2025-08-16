@@ -23,6 +23,11 @@ from .logger import (
     log_event,
     setup_rotating_handlers,
 )
+from .console_handler import setup_console_logging
+from .file_handler import setup_rotating_file_logging
+from .jsonl_handler import JSONLHandler
+from .setup_logging import setup_logging
+from .reproducibility import capture_reproducibility_metadata
 from .mlflow_sync import MLflowSync
 
 __all__ = [
@@ -40,4 +45,9 @@ __all__ = [
     "get_version_banner",
     "ensure_log_tables",
     "write_cli_banner",
+    "setup_console_logging",
+    "setup_rotating_file_logging",
+    "JSONLHandler",
+    "setup_logging",
+    "capture_reproducibility_metadata",
 ]
