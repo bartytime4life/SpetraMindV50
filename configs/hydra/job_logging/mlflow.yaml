@@ -1,0 +1,13 @@
+# MLflow logging override
+version: 1
+disable_existing_loggers: false
+
+handlers:
+  mlflow:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: spectramind_formatter
+    stream: ext://sys.stdout
+
+root:
+  handlers: [console, file, jsonl, mlflow]

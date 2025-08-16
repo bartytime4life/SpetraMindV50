@@ -1,0 +1,64 @@
+# Master logging setup for SpectraMind V50 pipeline
+# Features:
+# - Console logging with color + timestamp
+# - Rotating file logs (logs/v50_pipeline.log)
+# - JSONL event stream for structured post-analysis
+# - MLflow/W&B optional integration via handlers
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  spectramind_formatter:
+    format: "[%(asctime)s] [%(levelname)s] [%(name)s] [%(process)d] %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  jsonl_formatter:
+    format: '{"time":"%(asctime)s", "level":"%(levelname)s", "name":"%(name)s", "process":%(process)d, "message":"%(message)s"}'
+    datefmt: "%Y-%m-%dT%H:%M:%S"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: spectramind_formatter
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: spectramind_formatter
+    filename: logs/v50_pipeline.log
+    maxBytes: 50MB
+    backupCount: 10
+
+  jsonl:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: jsonl_formatter
+    filename: logs/v50_event_stream.jsonl
+    encoding: utf-8
+
+  # Optional MLflow handler (enabled only if mlflow is installed and active)
+  mlflow:
+    class: logging.NullHandler
+    level: INFO
+
+  # Optional W&B handler (enabled only if wandb is active)
+  wandb:
+    class: logging.NullHandler
+    level: INFO
+
+root:
+  level: DEBUG
+  handlers: [console, file, jsonl]
+
+loggers:
+  spectramind:
+    level: DEBUG
+    handlers: [console, file, jsonl]
+    propagate: no
+
+  hydra:
+    level: INFO
+    handlers: [console, file]
+    propagate: no
