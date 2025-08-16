@@ -1,0 +1,23 @@
+# Astrophysics-focused profile
+# Hydra group: profiles=astrophysics
+
+defaults:
+  - override hydra/job_logging: default
+
+profile:
+  name: astrophysics
+  description: |
+    Profile tuned for astrophysics and exoplanet spectroscopy.
+    Integrates physical constraints from Newtonian mechanics,
+    thermodynamics, spectroscopy, and relativity:contentReference[oaicite:9]{index=9}.
+  symbolic:
+    enable: true
+    rules: ["fft_smoothness", "asymmetry", "photonic_alignment", "energy_conservation"]
+    weighting: "physics_prioritized"
+  diagnostics:
+    enable_fft: true
+    molecular_templates: ["H2O", "CH4", "CO2"]
+    enable_cosmology_context: true
+  reproducibility:
+    seed: 2029
+    deterministic: true

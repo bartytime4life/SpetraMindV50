@@ -1,0 +1,19 @@
+# Biology-focused profile
+# Hydra group: profiles=biology
+
+profile:
+  name: biology
+  description: |
+    Profile for life sciences, cell/molecular biology,
+    and biochemistry overlays:contentReference[oaicite:11]{index=11}.
+    Includes entropy-based symbolic constraints for living systems.
+  symbolic:
+    enable: true
+    rules: ["entropy_minimization", "bio_pathway_consistency", "smoothness"]
+    weighting: "bio_centric"
+  diagnostics:
+    enable_umap: true
+    overlays: ["genetics", "metabolism", "ecology"]
+  reproducibility:
+    seed: 1982
+    deterministic: false

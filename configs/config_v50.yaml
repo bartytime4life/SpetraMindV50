@@ -10,6 +10,7 @@ defaults:
   - data: ariel
   - logging: default
   - paths: config
+  - profiles: default
   - hydra/job_logging: rich
   - hydra/hydra_logging: rich
 

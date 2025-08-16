@@ -1,0 +1,20 @@
+# GUI-focused profile
+# Hydra group: profiles=gui
+
+profile:
+  name: gui
+  description: |
+    Profile for GUI and dashboard integration:contentReference[oaicite:15]{index=15}.
+    Prioritizes symbolic overlays suitable for visualization in
+    interactive diagnostic dashboards.
+  symbolic:
+    enable: true
+    rules: ["entropy", "visual_smoothness", "attention_overlay"]
+    weighting: "visual_priority"
+  diagnostics:
+    enable_dashboard: true
+    enable_interactive_html: true
+    embed_overlays: ["umap", "tsne", "shap"]
+  reproducibility:
+    seed: 101
+    deterministic: true
