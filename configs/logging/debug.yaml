@@ -1,0 +1,14 @@
+# configs/logging/debug.yaml
+
+logging:
+  level: DEBUG
+  jsonl_events: true
+  file_rotation_mb: 20
+  file_keep: 3
+  files:
+    text_log: logs/${active_profile}/debug.log
+    jsonl_log: logs/${active_profile}/debug_events.jsonl
+  context:
+    project: ${project.name}
+    active_profile: ${active_profile}
+    mode: ${project.mode}

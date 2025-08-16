@@ -1,0 +1,14 @@
+# configs/logging/mission.yaml
+
+logging:
+  level: INFO
+  jsonl_events: true
+  file_rotation_mb: 15
+  file_keep: 10
+  files:
+    text_log: logs/${active_profile}/mission.log
+    jsonl_log: logs/${active_profile}/mission_events.jsonl
+  context:
+    project: ${project.name}
+    active_profile: ${active_profile}
+    mode: leaderboard

@@ -1,0 +1,13 @@
+# configs/profiles/symbolic_strict.yaml
+# Hard emphasis on symbolic rule compliance and diagnostics.
+
+defaults:
+  - override /model: v50
+  - override /calibration/steps: symbolic_weighted
+  - override /diagnostics: symbolic
+  - override /logging: symbolic
+  - override /symbolic/profiles: strict
+
+reproducibility:
+  seed: 777
+  deterministic: true

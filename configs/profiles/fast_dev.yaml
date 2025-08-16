@@ -1,0 +1,18 @@
+# configs/profiles/fast_dev.yaml
+# Minimal pipeline for rapid iterations and local debugging.
+
+defaults:
+  - override /model: v50
+  - override /calibration/steps: minimal
+  - override /diagnostics: lite
+  - override /logging: debug
+  - override /symbolic/profiles: relaxed
+
+reproducibility:
+  seed: 123
+  deterministic: false
+
+hydra:
+  sweeper:
+    params:
+      +fast_dev: true

@@ -1,0 +1,7 @@
+# configs/calibration/steps/corel_plus_temp.yaml
+
+calibration:
+  steps:
+    - { name: standard_pipeline, enabled: true }  # aggregate of standard steps in code
+    - { name: temperature_scaling, enabled: true, params: { per_instrument: true } }
+    - { name: corel_conformalize,  enabled: true, params: { bins: 283, coverage_target: 0.95 } }

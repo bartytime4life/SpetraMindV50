@@ -1,14 +1,14 @@
+# configs/symbolic/profiles/default.yaml
+
 symbolic:
-  profile:
-    name: "default"
-    description: "Balanced symbolic settings for general training and validation."
-    normalize: true
-    mode: "soft"
-    export_detail: "summary"     # ["none","summary","full"]
-    toggles:
-      export_fft_power: true
-      export_alignment: true
-      export_per_molecule: true
-      export_violation_maps: true
-    caps:
-      per_rule_cap: 10.0
+  enable: true
+  rules:
+    - smoothness
+    - nonnegativity
+    - entropy
+  weights:
+    smoothness: 0.7
+    nonnegativity: 0.7
+    entropy: 0.7
+  enforce_hard: false
+  violation_penalty: 1.0

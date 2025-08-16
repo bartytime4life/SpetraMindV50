@@ -1,0 +1,14 @@
+# configs/logging/verbose.yaml
+
+logging:
+  level: TRACE
+  jsonl_events: true
+  file_rotation_mb: 50
+  file_keep: 2
+  files:
+    text_log: logs/${active_profile}/verbose.log
+    jsonl_log: logs/${active_profile}/verbose_events.jsonl
+  context:
+    project: ${project.name}
+    active_profile: ${active_profile}
+    mode: ${project.mode}

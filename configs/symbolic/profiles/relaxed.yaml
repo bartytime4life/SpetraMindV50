@@ -1,0 +1,12 @@
+# configs/symbolic/profiles/relaxed.yaml
+
+symbolic:
+  enable: true
+  rules:
+    - smoothness
+    - nonnegativity
+  weights:
+    smoothness: 0.4
+    nonnegativity: 0.4
+  enforce_hard: false
+  violation_penalty: 0.5

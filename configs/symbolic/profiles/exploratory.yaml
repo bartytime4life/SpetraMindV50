@@ -1,0 +1,16 @@
+# configs/symbolic/profiles/exploratory.yaml
+
+symbolic:
+  enable: true
+  rules:
+    - smoothness
+    - visual_smoothness
+    - attention_overlay
+    - entropy
+  weights:
+    smoothness: 0.6
+    visual_smoothness: 0.6
+    attention_overlay: 0.6
+    entropy: 0.6
+  enforce_hard: false
+  violation_penalty: 0.8

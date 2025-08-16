@@ -1,0 +1,8 @@
+# configs/calibration/steps/symbolic_weighted.yaml
+# Emphasize symbolic regions (e.g., molecular bands) during QC/calibration.
+
+calibration:
+  steps:
+    - { name: standard_pipeline, enabled: true }
+    - { name: molecular_region_qc, enabled: true, params: { focus_molecules: ["H2O","CH4","CO2","CO","NH3","O3"] } }
+    - { name: symbolic_region_weighting, enabled: true, params: { weight_factor: 1.25 } }

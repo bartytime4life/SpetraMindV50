@@ -1,0 +1,17 @@
+# configs/calibration/steps/full.yaml
+
+calibration:
+  steps:
+    - { name: adc_correction, enabled: true }
+    - { name: nonlinearity,  enabled: true }
+    - { name: dark_subtract, enabled: true }
+    - { name: flat_field,    enabled: true }
+    - { name: cds,           enabled: true }
+    - { name: cosmic_ray_removal, enabled: true }
+    - { name: background_subtract, enabled: true }
+    - { name: photometry,    enabled: true }
+    - { name: trace_extraction, enabled: true }
+    - { name: wavelength_calibration, enabled: true }
+    - { name: normalization, enabled: true }
+    - { name: phase_alignment, enabled: true }
+    - { name: molecular_region_qc, enabled: true, params: { focus_molecules: ["H2O","CH4","CO2"] } }
