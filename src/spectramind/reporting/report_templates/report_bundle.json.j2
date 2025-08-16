@@ -1,0 +1,16 @@
+{
+"bundle_name": "{{ bundle_name or 'spectramind_v50_report_bundle' }}",
+"generated_at_utc": "{{ generated_at_utc or now_utc() }}",
+"includes": [
+{"path": "{{ output.report_html if output and output.report_html is defined else 'report.html' }}", "kind": "html"},
+{"path": "{{ output.summary_md if output and output.summary_md is defined else 'summary.md' }}", "kind": "markdown"},
+{"path": "{{ output.manifest_json if output and output.manifest_json is defined else 'manifest.json' }}", "kind": "json"},
+{"path": "assets/", "kind": "dir"}
+],
+"hashes": {
+"report_html": "{{ hashes.report_html if hashes and hashes.report_html is defined else '' }}",
+"summary_md": "{{ hashes.summary_md if hashes and hashes.summary_md is defined else '' }}",
+"manifest_json": "{{ hashes.manifest_json if hashes and hashes.manifest_json is defined else '' }}"
+},
+"notes": "{{ notes or '' }}"
+}

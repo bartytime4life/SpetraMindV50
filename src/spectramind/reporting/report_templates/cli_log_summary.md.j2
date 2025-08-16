@@ -1,0 +1,9 @@
+# SpectraMind – CLI Log Summary
+
+Generated: {{ generated_at_utc or now_utc() }}
+
+| Time (UTC)           | Command                 |                 Config Hash |               Duration |                     Exit |
+| -------------------- | ----------------------- | --------------------------: | ---------------------: | -----------------------: |
+| {% for r in rows -%} |                         |                             |                        |                          |
+| {{ r.time or "" }}   | `{{ r.command or "" }}` | `{{ r.config_hash or "" }}` | {{ r.duration or "" }} | {{ r.exit_code or "" }} |
+| {% endfor %}         |                         |                             |                        |                          |

@@ -1,0 +1,6 @@
+<div class="card">
+  <h3 style="margin-top:0;">t-SNE Projection</h3>
+  <div id="tsne-container">
+    {{ tsne_html | safe if tsne_html is defined else "<div class='hint'>No t-SNE HTML provided.</div>" }}
+  </div>
+</div>

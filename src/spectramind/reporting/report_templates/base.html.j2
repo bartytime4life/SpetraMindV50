@@ -1,0 +1,45 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ title or 'SpectraMind V50 – Diagnostics Report' }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>{{ inline_asset('assets/spectramind_report.css') }}</style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+          <div>
+            <h1 style="margin:0 0 0.25rem 0;">{{ title or 'SpectraMind V50 – Diagnostics Report' }}</h1>
+            <div class="hint">Generated at {{ generated_at_utc or now_utc() }} • SpectraMind {{ spectramind_version or 'V50' }}</div>
+          </div>
+          <div>
+            <span class="badge">Reproducible</span>
+            <span class="badge">Deterministic</span>
+            <span class="badge">NASA-grade</span>
+          </div>
+        </div>
+      </header>
+
+      {% block content %}{% endblock %}
+
+      <footer class="card" style="margin-top:1rem;">
+        <div class="kv">
+          <div class="key">CLI</div>
+          <div class="mono code">{{ run.cli if run else "" }}</div>
+          <div class="key">Git</div>
+          <div class="mono">{{ run.git_commit if run else "unknown" }}</div>
+          <div class="key">Config Hash</div>
+          <div class="mono">{{ run.config_hash if run else "n/a" }}</div>
+          <div class="key">Host</div>
+          <div class="mono">{{ run.host if run else "n/a" }}</div>
+        </div>
+        <hr class="sep"/>
+        <div class="hint">© {{ now_utc()[:4] }} SpectraMind V50 – Ariel Data Challenge</div>
+      </footer>
+    </div>
+    <script>{{ inline_asset('assets/spectramind_report.js') }}</script>
+  </body>
+</html>

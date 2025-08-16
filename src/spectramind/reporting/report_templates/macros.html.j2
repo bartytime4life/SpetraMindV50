@@ -1,0 +1,38 @@
+{% macro kpi(value, label) -%}
+<div class="tile">
+  <div class="value">{{ value }}</div>
+  <div class="label">{{ label }}</div>
+</div>
+{%- endmacro %}
+
+{% macro table(headers, rows) -%}
+<table class="table">
+  <thead>
+    <tr>
+      {%- for h in headers %}
+      <th>{{ h }}</th>
+      {%- endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {%- for r in rows %}
+    <tr>
+      {%- for c in r %}
+      <td>{{ c }}</td>
+      {%- endfor %}
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% macro badge(text, tone="ok") -%} <span class="badge" style="
+{%- if tone == 'ok' -%}
+ background: var(--bg-alt); color: var(--text); border-color: var(--border);
+{%- elif tone == 'warn' -%}
+ background: rgba(255,209,102,0.12); color: var(--warn); border-color: rgba(255,209,102,0.35);
+{%- else -%}
+ background: rgba(255,107,107,0.12); color: var(--danger); border-color: rgba(255,107,107,0.35);
+{%- endif -%}
+">{{ text }}</span>
+{%- endmacro %}

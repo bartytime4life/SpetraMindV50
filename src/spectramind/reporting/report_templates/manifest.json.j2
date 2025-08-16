@@ -1,0 +1,24 @@
+{
+"name": "{{ name or 'diagnostics-report' }}",
+"generated_at_utc": "{{ generated_at_utc or now_utc() }}",
+"version": "{{ spectramind_version or 'V50' }}",
+"provenance": {
+"cli": "{{ run.cli if run else '' }}",
+"git_commit": "{{ run.git_commit if run else 'unknown' }}",
+"config_hash": "{{ run.config_hash if run else 'n/a' }}",
+"host": "{{ run.host if run else 'n/a' }}"
+},
+"artifacts": {
+"report_html": "{{ artifacts.report_html if artifacts and artifacts.report_html is defined else '' }}",
+"umap_html": "{{ 'embedded' if artifacts and artifacts.umap_html is defined else '' }}",
+"tsne_html": "{{ 'embedded' if artifacts and artifacts.tsne_html is defined else '' }}",
+"gll_heatmap": "{{ 'embedded-base64' if artifacts and artifacts.gll_heatmap_base64 else '' }}"
+},
+"metrics": {
+"gll_mean": {{ metrics.gll_mean if metrics and metrics.gll_mean is defined else 0.0 }},
+"rmse_mean": {{ metrics.rmse_mean if metrics and metrics.rmse_mean is defined else 0.0 }},
+"calibration_error": {{ metrics.calibration_error if metrics and metrics.calibration_error is defined else 0.0 }},
+"num_planets": {{ metrics.num_planets if metrics and metrics.num_planets is defined else 0 }},
+"duration_seconds": {{ metrics.duration_seconds if metrics and metrics.duration_seconds is defined else 0.0 }}
+}
+}
