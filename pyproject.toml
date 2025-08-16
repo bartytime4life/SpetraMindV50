@@ -12,6 +12,7 @@ dependencies = [
   "psutil>=5.9",
   "pyyaml>=6.0",
   "packaging>=24.0",
+  "pydantic>=2.5",
   # Optional experiment trackers (enable in config)
   "mlflow>=2.15; extra == 'mlflow'",
   "wandb>=0.17; extra == 'wandb'",
