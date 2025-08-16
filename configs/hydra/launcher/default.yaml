@@ -1,0 +1,20 @@
+# -----------------------------------------------------------------------------
+# Default Hydra launcher configuration for SpectraMind V50
+# -----------------------------------------------------------------------------
+# This file defines the active Hydra launcher via the "launcher" config group.
+# Usage:
+# hydra/launcher=basic    # local sequential (safe for debug/CI)
+# hydra/launcher=local    # local parallel multirun
+# hydra/launcher=slurm    # SLURM via Submitit
+# hydra/launcher=kaggle   # Kaggle GPU runtime constraints
+# -----------------------------------------------------------------------------
+
+defaults:
+  - override hydra/launcher: basic
+
+hydra:
+  run:
+    dir: logs/runs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: logs/multiruns/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  output_subdir: .hydra
