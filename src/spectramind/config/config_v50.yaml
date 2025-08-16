@@ -1,0 +1,7 @@
+model: {}
+train: {}
+data: {}
+symbolic:
+  loss_weights:
+    default: 1.0
+diagnostics: {}
