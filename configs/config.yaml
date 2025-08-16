@@ -1,0 +1,62 @@
+# Master root config for SpectraMind V50 (Hydra)
+#
+# This file “registers” config groups and sets the default profile so users can
+# switch with `profiles=<name>` without specifying full paths.
+#
+# Example:
+# python -m spectramind.cli.spectramind train profiles=astrophysics
+# python -m spectramind.cli.spectramind diagnose dashboard profiles=gui
+
+defaults:
+  # ── Core Hydra plumbing (adjust to your existing hydra/* files as needed)
+  - hydra/job_logging: default
+  - hydra/launcher: basic
+  - hydra/sweeper: basic
+
+  # ── Profiles group: make the profile group active and choose a default
+  - profiles: default
+
+  # ── (Optional) Add other project groups here so they’re discoverable too.
+  # - paths: default
+  # - diagnostics: default
+  # - calibration/steps: default
+  # - logging: default
+  # - model: default
+
+# Global toggles that many subconfigs read (safe to keep minimal here).
+project:
+  name: SpectraMind V50
+  mode: standard
+
+reproducibility:
+  seed: 42
+  deterministic: true
+
+logging:
+  level: INFO
+  jsonl_events: true
+  file_rotation_mb: 25
+  file_keep: 5
+
+# Respect the active profile’s symbolic/diagnostics knobs by default.
+symbolic:
+  enable: ${profiles.profile.symbolic.enable}
+  rules: ${profiles.profile.symbolic.rules}
+  weighting: ${profiles.profile.symbolic.weighting}
+
+diagnostics:
+  enable_fft: ${oc.select:profiles.profile.diagnostics.enable_fft,false}
+  enable_shap: ${oc.select:profiles.profile.diagnostics.enable_shap,false}
+  enable_symbolic_overlay: ${oc.select:profiles.profile.diagnostics.enable_symbolic_overlay,false}
+  enable_dashboard: ${oc.select:profiles.profile.diagnostics.enable_dashboard,false}
+  enable_interactive_html: ${oc.select:profiles.profile.diagnostics.enable_interactive_html,false}
+  fusion_overlays: ${oc.select:profiles.profile.diagnostics.fusion_overlays,[]}
+  overlays: ${oc.select:profiles.profile.diagnostics.overlays,[]}
+  molecular_templates: ${oc.select:profiles.profile.diagnostics.molecular_templates,[]}
+  molecular_focus: ${oc.select:profiles.profile.diagnostics.molecular_focus,[]}
+  enable_cosmology_context: ${oc.select:profiles.profile.diagnostics.enable_cosmology_context,false}
+
+# Allow CLI tools to read the active profile name for logs/manifest.
+active_profile: ${profiles.profile.name}
+
+# End of file
