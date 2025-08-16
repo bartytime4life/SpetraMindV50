@@ -1,17 +1,8 @@
-# =====================================================================
-# SpectraMind V50 — Calibration Diagnostics Configuration
-# ---------------------------------------------------------------------
-# Purpose:
-#   Evaluate and visualize uncertainty calibration (σ vs residuals),
-#   COREL coverage, quantile reliability, and symbolic-region failures.
-# =====================================================================
+# @package _group_
+# Calibration diagnostics config
 
-defaults:
-  - base
-
-diagnostics:
-  calibration:
-    coverage_bins: 20
-    output_histograms: true
-    overlay_symbolic_regions: true
-    save_per_bin_csv: true
+methods: ["temperature_scaling", "corel"]
+evaluate_coverage: true
+coverage_quantiles: [0.5, 0.8, 0.9]
+symbolic_region_analysis: true
+export_formats: ["png", "csv", "json"]

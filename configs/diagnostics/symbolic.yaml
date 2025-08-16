@@ -1,18 +1,8 @@
-# =====================================================================
-# SpectraMind V50 — Symbolic Rule Diagnostics Configuration
-# ---------------------------------------------------------------------
-# Purpose:
-#   Run symbolic logic engine on μ predictions, produce per-rule and
-#   per-planet violation maps, integrate with dashboard.
-# =====================================================================
+# @package _group_
+# Symbolic rule violation diagnostics configuration
 
-defaults:
-  - base
-
-diagnostics:
-  symbolic:
-    rules_file: "${paths.root}/configs/symbolic/rules.yaml"
-    soft_mode: false
-    violation_threshold: 0.5
-    output_masks: true
-    overlay_on_plots: true
+rank_rules: true           # Rank rules by mean violation score
+top_rules: 20              # Number of top rules to display
+output_matrix: true        # Save planet × rule violation matrix
+export_formats: ["csv", "json", "html"]
+overlay_shap: true         # If true, merge with SHAP overlays

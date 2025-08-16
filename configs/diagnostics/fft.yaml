@@ -1,31 +1,8 @@
-# =====================================================================
-# SpectraMind V50 — FFT Diagnostics Configuration
-# ---------------------------------------------------------------------
-# Purpose:
-#   Perform Fourier analysis on μ spectra for each planet/bin, compute
-#   power spectra, detect periodicities, and overlay symbolic/SHAP maps.
-# Inputs:
-#   - Predicted μ spectra (CSV or NumPy)
-#   - Optional σ, GLL metrics
-# Outputs:
-#   - Power spectra PNG/HTML
-#   - Peak frequency CSV
-#   - Overlay plots with molecule region annotations
-# =====================================================================
+# @package _group_
+# FFT + spectral diagnostics
 
-defaults:
-  - base
-
-diagnostics:
-  fft:
-    window_function: "hann"
-    normalize: true
-    detrend: true
-    min_frequency: 0.0
-    max_frequency: 0.5
-    peak_detection:
-      enabled: true
-      prominence: 0.05
-      min_distance_bins: 3
-    overlay_symbolic: true
-    overlay_shap: true
+apply_to: "mu"             # "mu", "sigma"
+include_autocorr: true
+molecule_overlay: ["H2O", "CH4", "CO2"]
+export_formats: ["png", "csv", "json"]
+highlight_clusters: true

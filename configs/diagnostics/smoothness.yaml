@@ -1,0 +1,7 @@
+# @package _group_
+# Spectral smoothness diagnostics
+
+metric: "l2_gradient"      # Options: l2_gradient, spectral_slope, polyfit_residual
+aggregate: ["mean", "max"]
+threshold: null            # Optional threshold for flagging anomalies
+export_formats: ["png", "json"]

@@ -1,0 +1,14 @@
+# @package _group_
+# Default diagnostics configuration for SpectraMind V50.
+# Uses Hydra's group/defaults pattern so sub-configs can be swapped.
+
+defaults:
+  - gll: default
+  - shap: default
+  - symbolic: default
+  - umap: default
+  - tsne: default
+  - fft: default
+  - smoothness: default
+  - dashboard: default
+  - calibration: default
