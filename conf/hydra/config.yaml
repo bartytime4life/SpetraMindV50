@@ -1,6 +1,7 @@
-# Master Hydra configuration for SpectraMind V50
+# conf/hydra/config.yaml
+# Master Hydra configuration for SpectraMind V50 (parallel tree to configs/hydra)
 # Registers logging, sweeper/launcher, and output directories.
-# This file anchors all sub-configs in configs/hydra.
+# This file anchors all sub-configs in conf/hydra.
 
 hydra:
   run:
