@@ -1,6 +1,10 @@
-# Basic Hydra launcher for local execution.
-# Suitable for laptop / devcontainer runs.
-# Advanced launchers (e.g. submitit, slurm) can override this.
+# Hydra Basic Launcher — SpectraMind V50
+# Built-in Hydra launcher; executes in-process.
+# Useful for debugging or environments without plugin launchers.
 
-class: hydra._internal.core_plugins.basic_launcher.BasicLauncher
-params: {}
+defaults:
+  - override /hydra/launcher: basic
+
+hydra:
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
