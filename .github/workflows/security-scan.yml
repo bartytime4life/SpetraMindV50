@@ -9,7 +9,7 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install security tools
         run: pip install pip-audit bandit
       - name: Python dependency audit
