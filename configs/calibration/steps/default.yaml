@@ -1,0 +1,68 @@
+# Hydra configuration for SpectraMind V50 calibration step sequencing
+# This file defines the default calibration pipeline execution order and parameters.
+
+# @package _group_
+# This group defines the ordered list of calibration steps for the SpectraMind V50 pipeline.
+# Each step can be overridden via CLI or experiment-specific configs.
+# All steps are executed in the listed order unless explicitly skipped.
+
+defaults:
+  - _self_
+  - step_definitions: default  # Loads the parameter templates for each calibration step.
+
+# Ordered list of calibration steps to run
+steps:
+  - name: raw_ingest
+    enabled: true
+    description: "Ingest raw FGS1/AIRS frames from the dataset into the processing pipeline."
+    params: ${calibration/step_definitions/raw_ingest}
+
+  - name: adc_correction
+    enabled: true
+    description: "Apply Analog-to-Digital Conversion (ADC) nonlinearity correction."
+    params: ${calibration/step_definitions/adc_correction}
+
+  - name: dark_correction
+    enabled: true
+    description: "Subtract dark current from raw frames."
+    params: ${calibration/step_definitions/dark_correction}
+
+  - name: flat_field_correction
+    enabled: true
+    description: "Correct for pixel-to-pixel sensitivity variations."
+    params: ${calibration/step_definitions/flat_field_correction}
+
+  - name: cosmic_ray_removal
+    enabled: true
+    description: "Identify and remove cosmic ray hits in the detector frames."
+    params: ${calibration/step_definitions/cosmic_ray_removal}
+
+  - name: cds_computation
+    enabled: true
+    description: "Compute correlated double sampling (CDS) to reduce read noise."
+    params: ${calibration/step_definitions/cds_computation}
+
+  - name: trace_extraction
+    enabled: true
+    description: "Extract spectral or photometric traces from the corrected frames."
+    params: ${calibration/step_definitions/trace_extraction}
+
+  - name: wavelength_calibration
+    enabled: true
+    description: "Apply wavelength calibration to spectral traces."
+    params: ${calibration/step_definitions/wavelength_calibration}
+
+  - name: flux_calibration
+    enabled: true
+    description: "Convert counts to physical flux units."
+    params: ${calibration/step_definitions/flux_calibration}
+
+  - name: phase_alignment
+    enabled: true
+    description: "Align light curves in orbital phase for transit/eclipse analysis."
+    params: ${calibration/step_definitions/phase_alignment}
+
+  - name: final_qc
+    enabled: true
+    description: "Run quality control checks on calibrated products before modeling."
+    params: ${calibration/step_definitions/final_qc}
