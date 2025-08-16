@@ -4,9 +4,14 @@
 
 import math
 
-import torch
+import pytest
 
-from src.spectramind.symbolic.rules import (
+# This test suite exercises rule modules that depend on PyTorch. When torch
+# isn't installed we skip the entire module so that optional dependencies don't
+# cause import-time failures.
+torch = pytest.importorskip("torch")
+
+from src.spectramind.symbolic.rules import (  # noqa: E402
     AsymmetryRule,
     CompositeRule,
     FFTSpectralRule,
