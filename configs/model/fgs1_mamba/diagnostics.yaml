@@ -1,6 +1,0 @@
-# Diagnostics switches for analysis & explainability
-model:
-  encoders:
-    fgs1_mamba:
-      export_step_latents: true   # emit per-time-step latents for UMAP/t-SNE/FFT
-# Optional: richer probing can be handled in the training/diagnostics loop via hooks.

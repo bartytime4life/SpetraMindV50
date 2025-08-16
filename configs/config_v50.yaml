@@ -1,11 +1,11 @@
 # Root Hydra configuration for SpectraMind V50.
 
-# Compose with: model/v50, training/default, data/ariel, logging/default, paths/default
+# Compose with: model/defaults, training/default, data/ariel, logging/default, paths/default
 
 # This file is the single entry-point for CLI tools: --config-name config_v50
 
 defaults:
-  - model: v50
+  - model: defaults
   - training: default
   - data: ariel
   - logging: default

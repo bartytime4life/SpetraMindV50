@@ -1,6 +1,0 @@
-This directory contains Hydra config variants for the SpectraMind V50 μ decoder:
-•base.yaml
-•multiscale.yaml
-•moe.yaml
-•quantile_aux.yaml
-Compose with:  model/mu_decoder@model.decoders.mu_decoder: 

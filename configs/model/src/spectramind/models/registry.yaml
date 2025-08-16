@@ -1,9 +1,0 @@
-# SpectraMind V50 — Model registry to enforce import paths & friendly names
-spectramind:
-  models:
-    registry:
-      FGS1MambaEncoder: "spectramind.models.fgs1_mamba.FGS1MambaEncoder"
-      AIRSGNNEncoder: "spectramind.models.airs_gnn.AIRSGNNEncoder"
-      MultiScaleMuDecoder: "spectramind.models.multi_scale_decoder.MultiScaleMuDecoder"
-      FlowUncertaintyHead: "spectramind.models.flow_uncertainty_head.FlowUncertaintyHead"
-      FusionBlock: "spectramind.models.fusion.FusionBlock"

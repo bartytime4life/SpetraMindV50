@@ -1,0 +1,11 @@
+# @package _global_
+# Master defaults for model configuration
+# This file ensures all sub-models can be swapped via Hydra groups.
+
+defaults:
+  - model/fgs1_mamba: default
+  - model/airs_gnn: default
+  - model/multi_scale_decoder: default
+  - model/moe_decoder: default
+  - model/flow_uncertainty_head: default
+  - model/spectral_corel: default

@@ -1,4 +1,0 @@
-# Hydra config for multi-scale decoder
-_target_: spectramind.models.multi_scale_decoder.MultiScaleDecoder
-out_bins: 283
-multiscale: true

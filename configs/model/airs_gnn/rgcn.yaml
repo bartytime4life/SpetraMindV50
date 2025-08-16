@@ -1,9 +1,0 @@
-model:
-  encoders:
-    airs_gnn:
-      gnn_type: "rgcn"
-      hidden_dim: 256
-      num_layers: 5
-      dropout: 0.10
-      # Optional: typed edges for molecule regions / detector lanes
-      relation_types: ["band_gap","molecule","detector"]

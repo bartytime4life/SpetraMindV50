@@ -1,7 +1,0 @@
-# @package _global_.model.fusion
-type: residual_sum
-proj:
-  bias: true
-  per_feature: false
-  init_alpha: 0.5
-  init_beta: 0.5

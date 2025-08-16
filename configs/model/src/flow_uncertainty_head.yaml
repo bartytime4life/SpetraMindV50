@@ -1,4 +1,0 @@
-# Hydra config for flow-based uncertainty head
-_target_: spectramind.models.flow_uncertainty_head.FlowUncertaintyHead
-out_bins: 283
-softplus: true
