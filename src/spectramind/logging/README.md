@@ -1,25 +1,23 @@
-# SpectraMind V50 Logging
+# SpectraMind V50 — Logging
 
-Mission-grade logging system for the NeurIPS 2025 Ariel Data Challenge.
+Mission-grade logging for the NeurIPS 2025 Ariel Data Challenge.
 
-## Features
-- Console + rotating file logs
-- JSONL event stream (`logs/events.jsonl`)
-- Hydra-safe configuration
-- Optional MLflow / W&B sync
-- Structured telemetry hooks
+* Console + rotating file logs
+* JSONL event stream (`logs/events.jsonl`)
+* Hydra-safe config via `LoggingConfig` and templates in `hydra_templates/`
+* Optional MLflow / W&B
+* Telemetry helpers
+* CI/self-test validators
 
-## Usage
+Quick start:
+
 ```python
-from spectramind.logging import init_logging, get_logger, LoggingConfig
-
-cfg = LoggingConfig(log_level="DEBUG", mlflow=True, wandb=True)
+from spectramind.logging import LoggingConfig, init_logging, get_logger
+cfg = LoggingConfig(log_level="DEBUG", log_dir="logs", jsonl=True)
 init_logging(cfg)
-log = get_logger("spectramind")
-
-log.info("Mission logging online")
+log = get_logger("spectramind.demo")
+log.info("Mission logging online", extra={"component": "demo"})
 ```
 
-## Tests
-
-Run `pytest` in this directory to validate logging system.
+Hydra templates are provided in `hydra_templates/`. Copy or adapt them to your
+configs tree (e.g. `configs/hydra/job_logging`).
