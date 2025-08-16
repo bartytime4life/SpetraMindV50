@@ -3,10 +3,8 @@
 
 _target_: spectramind.models.fgs1_mamba.FGS1MambaEncoder
 
-seq_len: 135000       # full lightcurve length
-patch_size: 128       # downsampling factor
-hidden_dim: 256       # embedding size
-depth: 12             # number of Mamba layers
+input_dim: 32
+hidden_dim: 128
+depth: 12
 dropout: 0.1
-use_snr_dropout: true # enable SNR-aware dropout for calibration
-symbolic_overlays: true # log symbolic violations on latent
+

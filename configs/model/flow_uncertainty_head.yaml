@@ -4,8 +4,5 @@
 _target_: spectramind.models.flow_uncertainty_head.FlowUncertaintyHead
 
 hidden_dim: 128
-num_flows: 4
-dropout: 0.1
-attention_fusion: true    # fuse attention with symbolic overlays
-entropy_regularizer: 0.01 # encourage calibrated entropy
-corel_temperature: true   # temperature scaling option
+output_bins: 283
+
