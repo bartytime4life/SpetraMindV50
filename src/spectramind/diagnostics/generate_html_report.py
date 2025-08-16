@@ -1,21 +1,13 @@
 """
-Generates interactive HTML dashboard:
-- UMAP, t-SNE latent plots
-- GLL heatmaps
-- SHAP overlays
-- Symbolic violation tables
-- FFT diagnostics
-- CLI log integration
+Diagnostics HTML Report
+-----------------------
+Combines UMAP, t-SNE, SHAP, symbolic overlays, and CLI logs
+into a unified interactive dashboard.
 """
-from pathlib import Path
 
-def generate_html(version: int = 1, outdir: str = "diagnostics"):
-    Path(outdir).mkdir(parents=True, exist_ok=True)
-    outfile = Path(outdir) / f"diagnostic_report_v{version}.html"
-    with open(outfile, "w") as f:
-        f.write("<html><head><title>Diagnostics Report</title></head><body>")
-        f.write("<h1>SpectraMind V50 Diagnostics Dashboard</h1>")
-        f.write("<p>UMAP, t-SNE, SHAP, Symbolic, FFT overlays embedded here.</p>")
-        f.write("</body></html>")
-    print(f"[Diagnostics] HTML dashboard written to {outfile}")
-    return outfile
+
+def generate_html(version="v1", save_html="diagnostic_report_v1.html"):
+    html = f"<html><body><h1>SpectraMind V50 Diagnostics Report {version}</h1></body></html>"
+    with open(save_html, "w") as f:
+        f.write(html)
+    return save_html

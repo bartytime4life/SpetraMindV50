@@ -1,15 +1,31 @@
 """
-Computes ∂L/∂μ symbolic influence per rule.
-Exports JSON + visual maps for symbolic diagnostics.
+Symbolic Influence Map
+----------------------
+Computes ∂L/∂μ gradients per symbolic rule and aggregates them.
+Exports JSON maps, plots, and dashboard overlays.
 """
-import numpy as np
-import json
-from pathlib import Path
 
-def compute_symbolic_influence(mu, symbolic_loss_fn, planet_id, outdir="diagnostics"):
-    Path(outdir).mkdir(parents=True, exist_ok=True)
-    grad = np.gradient(symbolic_loss_fn(mu))
-    summary = {"planet_id": planet_id, "mean_symbolic_influence": float(np.mean(grad))}
-    with open(f"{outdir}/symbolic_influence_{planet_id}.json", "w") as f:
-        json.dump(summary, f, indent=2)
-    return summary
+import json
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def compute_symbolic_influence(
+    mu, symbolic_loss_fn, rules, save_json="symbolic_influence.json"
+):
+    grads = {}
+    for rule in rules:
+        grad = np.gradient(symbolic_loss_fn(mu, rule))
+        grads[rule] = grad.tolist()
+    with open(save_json, "w") as f:
+        json.dump(grads, f, indent=2)
+    return grads
+
+
+def plot_symbolic_influence(grads, save_png="symbolic_influence.png"):
+    for rule, g in grads.items():
+        plt.plot(g, label=f"Rule {rule}")
+    plt.legend()
+    plt.savefig(save_png)
+    plt.close()

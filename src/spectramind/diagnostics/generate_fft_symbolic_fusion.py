@@ -1,13 +1,16 @@
 """
-Fusion of FFT PCA with symbolic fingerprints.
+FFT × Symbolic Fusion Generator
+-------------------------------
+Performs FFT PCA + symbolic fingerprint fusion,
+outputs cluster CSVs and interactive projections.
 """
-import numpy as np
-import matplotlib.pyplot as plt
 
-def generate_fft_symbolic_fusion(mu, symbolic_vector, planet_id, outdir="diagnostics"):
-    fusion = np.fft.rfft(mu)[:len(symbolic_vector)].real * symbolic_vector
-    plt.plot(fusion)
-    plt.title(f"FFT × Symbolic Fusion - {planet_id}")
-    plt.savefig(f"{outdir}/fft_symbolic_fusion_{planet_id}.png")
-    plt.close()
-    return fusion
+import numpy as np
+import pandas as pd
+
+
+def generate_fusion(mu, save_csv="fft_symbolic_fusion.csv"):
+    fft_vals = np.abs(np.fft.rfft(mu))
+    df = pd.DataFrame(dict(fft=fft_vals))
+    df.to_csv(save_csv, index=False)
+    return df

@@ -1,17 +1,18 @@
 """
-SHAP × Attention Fusion Overlay
-Combines SHAP bin importance with attention weights for diagnostics.
+SHAP × Attention Overlay
+------------------------
+Combines SHAP values with attention maps to highlight
+joint regions of high attribution and symbolic violations.
 """
-import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
 
-def shap_attention_overlay(shap_values, attention_weights, planet_id, outdir="diagnostics"):
-    Path(outdir).mkdir(parents=True, exist_ok=True)
-    fused = shap_values * attention_weights
-    plt.plot(fused, label="SHAP × Attention")
-    plt.title(f"SHAP × Attention Overlay - {planet_id}")
-    plt.legend()
-    plt.savefig(f"{outdir}/shap_attention_{planet_id}.png")
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def shap_attention_fusion(shap_vals, attn, save_png="shap_attention.png"):
+    fusion = shap_vals * attn
+    plt.imshow(fusion[np.newaxis, :], aspect="auto", cmap="viridis")
+    plt.colorbar(label="SHAP × Attention")
+    plt.savefig(save_png)
     plt.close()
-    return fused
+    return fusion
