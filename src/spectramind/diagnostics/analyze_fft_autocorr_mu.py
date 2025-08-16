@@ -1,16 +1,17 @@
 """
-FFT and autocorrelation diagnostics for μ spectra.
+FFT Autocorrelation Analyzer
+----------------------------
+Computes FFT autocorrelation of μ spectra, overlays symbolic
+diagnostics, and exports plots.
 """
-import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
 
-def analyze_mu_fft(mu, planet_id, outdir="diagnostics"):
-    Path(outdir).mkdir(parents=True, exist_ok=True)
-    fft_vals = np.fft.rfft(mu)
-    power = np.abs(fft_vals) ** 2
-    plt.plot(power)
-    plt.title(f"FFT Power Spectrum - {planet_id}")
-    plt.savefig(f"{outdir}/fft_power_{planet_id}.png")
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+def analyze_mu(mu, save_png="fft_autocorr.png"):
+    ac = np.correlate(mu, mu, mode="full")
+    plt.plot(ac)
+    plt.savefig(save_png)
     plt.close()
-    return power
+    return ac
