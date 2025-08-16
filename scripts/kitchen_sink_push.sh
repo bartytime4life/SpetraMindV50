@@ -225,7 +225,7 @@ fi
 
 DATE_UTC="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 MSG_HEADER="${COMMIT_TYPE}(${COMMIT_SCOPE}): kitchen-sink push — format/lint/tests/selftest wiring"
-MSG_BODY=$'\n'-" ci:selftest: deep wired; conf_helpers/tests included"$'\n'-" config_hash: ${CONFIG_HASH}"$'\n'-" datetime_utc: ${DATE_UTC}"$'\n'-" branch: ${TARGET_BRANCH}"
+MSG_BODY=$'\n'"- ci:selftest: deep wired; conf_helpers/tests included"$'\n'"- config_hash: ${CONFIG_HASH}"$'\n'"- datetime_utc: ${DATE_UTC}"$'\n'"- branch: ${TARGET_BRANCH}"
 
 echo
 echo "Committing…"
