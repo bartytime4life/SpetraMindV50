@@ -29,3 +29,5 @@ __all__ = [
     "register_model",
 ]
 
+
+from .factory import build_from_cfg, BuiltModels

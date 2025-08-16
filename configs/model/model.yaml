@@ -1,0 +1,22 @@
+# configs/model/model.yaml
+# Master model group for SpectraMind V50. Compose subgroups here.
+# Usage:
+#   python -m spectramind.cli_core_v50 train model=model   # or via spectramind CLI
+#
+# You can override any subgroup, e.g.:
+#   model:
+#     decoder_mu: moe_decoder
+# or with Hydra CLI:
+#   python -m spectramind.cli_core_v50 train model.decoder_mu=moe_decoder
+
+defaults:
+  - encoder_fgs1: fgs1_mamba
+  - encoder_airs: airs_gnn
+  - decoder_mu: multi_scale_decoder
+  - decoder_sigma: flow_uncertainty_head
+  - corel: spectral_corel
+
+# The nested sections below are materialized by the defaults via Hydra's group mechanism.
+# We also keep top-level convenience mirrors (read-only) for quick reference in dashboards.
+name: "SpectraMindV50"
+description: "FGS1 Mamba + AIRS GNN + MultiScale μ + Flow σ + SpectralCOREL"

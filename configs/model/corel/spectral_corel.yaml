@@ -1,0 +1,6 @@
+# configs/model/corel/spectral_corel.yaml
+# Spectral COREL binwise calibration GNN with edge features.
+_name: spectral_corel
+input_dim: 283
+hidden_dim: 128
+output_dim: 283

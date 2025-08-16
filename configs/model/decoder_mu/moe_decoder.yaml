@@ -1,0 +1,6 @@
+# configs/model/decoder_mu/moe_decoder.yaml
+# Mixture-of-Experts μ decoder with expert attention weights.
+_name: moe_decoder
+hidden_dim: 128
+output_bins: 283
+num_experts: 4
