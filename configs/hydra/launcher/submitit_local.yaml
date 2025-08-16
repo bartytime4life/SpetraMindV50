@@ -1,0 +1,20 @@
+# Hydra Submitit Local Launcher — SpectraMind V50
+# Launches jobs on the local machine via Submitit.
+# Useful for parity with Slurm configs while developing locally.
+
+defaults:
+  - override /hydra/launcher: submitit_local
+
+hydra:
+  launcher:
+    _target_: hydra_plugins.hydra_submitit_launcher.submitit_launcher.LocalLauncher
+    gpus_per_node: 1
+    tasks_per_node: 1
+    cpus_per_task: 8
+    mem_gb: 32
+    nodes: 1
+    timeout_min: 240
+    name: local-smv50-${now:%Y%m%d_%H%M%S}
+    array_parallelism: 8
+    additional_parameters: {}
+    setup: null

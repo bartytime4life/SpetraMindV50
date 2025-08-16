@@ -1,0 +1,32 @@
+# Hydra Ray Launcher — SpectraMind V50
+# Distributed launcher using Ray.
+# Requires: hydra-ray-launcher plugin and a working Ray environment.
+
+defaults:
+  - override /hydra/launcher: ray
+
+hydra:
+  launcher:
+    _target_: hydra_plugins.hydra_ray_launcher.ray_launcher.RayLauncher
+    # Ray cluster/session initialization configuration
+    ray_init:
+      address: null         # e.g., "auto" to connect to existing cluster
+      include_dashboard: false
+      log_to_driver: true
+      ignore_reinit_error: true
+      num_cpus: 8
+      num_gpus: 1
+    # Remote options for individual tasks
+    ray_remote:
+      num_cpus: 1
+      num_gpus: 0
+      max_calls: 1
+      max_retries: 0
+      resources: null
+      scheduling_strategy: null
+    # General launcher options
+    sync_config:
+      upload_dir: null
+      exclude: []
+      include: []
+      verbose: true

@@ -26,4 +26,4 @@ hydra:
   defaults:
     - hydra/job_logging: default
     - hydra/launcher: basic
-    - hydra/sweeper: optuna
+    - hydra/sweeper: optuna_tpe

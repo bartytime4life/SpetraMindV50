@@ -1,0 +1,14 @@
+# Hydra Joblib Launcher — SpectraMind V50
+# Simple multi-process launcher for a single node.
+# Requires: hydra-joblib-launcher plugin.
+
+defaults:
+  - override /hydra/launcher: joblib
+
+hydra:
+  launcher:
+    _target_: hydra_plugins.hydra_joblib_launcher.joblib_launcher.JoblibLauncher
+    n_jobs: -1
+    backend: loky
+    verbose: 5
+    timeout_min: 0

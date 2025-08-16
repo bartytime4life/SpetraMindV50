@@ -1,35 +1,49 @@
-# Hydra Sweeper Configs
+# Hydra Sweeper Configs — SpectraMind V50
 
-This directory defines hyperparameter search strategies for **SpectraMind V50**.
+This directory contains hyperparameter sweeper configurations for SpectraMind V50 using Hydra plugin groups.
 
 ## Files
-- **optuna.yaml** — Optuna-based hyperparameter sweeper (default).
-  - Uses TPE sampler with deterministic seed.
-  - Supports `training.lr`, `batch_size`, `encoder_dim`, `dropout`, and `weight_decay`.
-  - Objective: minimize Generalized Log Likelihood (GLL).
-- **basic.yaml** — Minimal Hydra sweeper (grid/random) for debugging.
 
-## Usage
+* `optuna_tpe.yaml` — Optuna TPE sampler with deterministic seed, median pruner, and a challenge-grade search space spanning optimizer, schedule, capacities, and symbolic losses.
+* `optuna_cmaes.yaml` — Optuna CMA-ES sampler for smooth continuous landscapes.
+* `optuna_random.yaml` — Optuna Random sampler for broad exploration and smoke tests.
+* `optuna_nsga2.yaml` — Multi-objective Optuna NSGA-II (minimize GLL and calibration error).
+* `basic.yaml` — Hydra Basic sweeper for small deterministic grids.
 
-### Run Optuna sweep (default)
+## Typical Commands
+
+Local TPE:
+
 ```bash
-python train_v50.py -m
+python -m spectramind.cli.spectramind train -m hydra/sweeper=optuna_tpe
 ```
 
-### Override sweeper
+Slurm + TPE:
 
 ```bash
-python train_v50.py -m hydra/sweeper=basic
+python -m spectramind.cli.spectramind train -m hydra/launcher=submitit_slurm hydra/sweeper=optuna_tpe +hydra.sweeper.n_trials=200
 ```
 
-### Override search space at CLI
+Local CMA-ES:
 
 ```bash
-python train_v50.py -m training.lr=tag(log,interval(1e-4,1e-2)) model.dropout=interval(0.1,0.3)
+python -m spectramind.cli.spectramind train -m hydra/sweeper=optuna_cmaes
+```
+
+Multi-objective (NSGA-II):
+
+```bash
+python -m spectramind.cli.spectramind train -m hydra/sweeper=optuna_nsga2
+```
+
+Basic (grid-like discrete expansion):
+
+```bash
+python -m spectramind.cli.spectramind train -m hydra/sweeper=basic training.batch_size=16,32 model.encoder_dim=384,512
 ```
 
 ## Notes
 
-* All sweeps log metadata (commit hash, ENV, config hash) for reproducibility.
-* Parallelism (`n_jobs`) integrates with Hydra launcher configs (see `configs/hydra/launcher`).
-* For large sweeps, configure persistent Optuna storage (e.g., SQLite or PostgreSQL).
+* Override any parameter from CLI; sweeper `params` act as defaults.
+* For distributed sweeps, set `hydra.sweeper.storage` to a shared DB (e.g., `sqlite:///optuna.db` or a Postgres URI).
+* Combine with any launcher in `configs/hydra/launcher`.

@@ -1,5 +1,7 @@
-# Simple grid/random sweeper configuration
-# Useful for debugging sweeps without Optuna overhead.
+# Hydra Basic Sweeper (Grid/Cartesian expansion over discrete choices)
+# Use for deterministic small sweeps and debugging.
+# Usage:
+# python -m spectramind.cli.spectramind train -m hydra/sweeper=basic
 
 defaults:
   - override /hydra/sweeper: basic
