@@ -815,6 +815,11 @@ def create_fusion(cfg: Dict[str, Any]) -> FusionBase:
 
     # freeze params to ease tracing and evaluation
     mod.requires_grad_(False)
+    # Ensure modules are in inference mode so stochastic layers like
+    # dropout remain inactive when used via the factory.  This mirrors
+    # typical usage in evaluation utilities and avoids the caller having
+    # to remember to call ``eval`` manually.
+    mod.eval()
     return mod
 
 
