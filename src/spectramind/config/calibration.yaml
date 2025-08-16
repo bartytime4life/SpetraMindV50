@@ -1,0 +1,13 @@
+# Calibration configuration for SpectraMind V50
+
+temperature_scaling:
+  enabled: true
+  initial_temp: 1.0
+
+corel:
+  enabled: true
+  gnn_backend: "gat"
+  dropout: 0.1
+  coverage_target: 0.9
+  per_bin: true
+  symbolic_weighting: true

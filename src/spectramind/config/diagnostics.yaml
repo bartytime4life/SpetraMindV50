@@ -1,0 +1,24 @@
+# Diagnostics configuration for SpectraMind V50
+
+fft:
+  enabled: true
+  smoothness_threshold: 0.05
+
+umap:
+  enabled: true
+  n_neighbors: 15
+  min_dist: 0.1
+  n_components: 2
+
+tsne:
+  enabled: true
+  perplexity: 30
+  learning_rate: 200
+
+shap:
+  enabled: true
+  top_k_bins: 20
+
+symbolic:
+  overlays: true
+  violation_matrix: true
