@@ -1,213 +1,110 @@
-from __future__ import annotations
-
 """
-SpectraMind V50 — Contrastive Pretraining (Latent Alignment)
+Contrastive pretraining runner for SpectraMind V50.
 
-Features:
+Supports generic contrastive losses (InfoNCE-style) via a model that returns embeddings for two
+augmentations or views of the same input, and a loss module provided via config.
 
-* InfoNCE-style loss with temperature
-* Multi-view augment hooks (delegated to dataset)
-* AMP, grad accumulation, cosine LR warmup
-* JSONL + MLflow logging, early stopping on val NCE loss
+Expected step processor behavior:
+
+* batch provides two views: x1, x2 (and optional labels/meta)
+* model(x1, x2) -> dict with 'z1', 'z2' (embeddings)
+* loss_module(z1, z2) -> dict with {'total': loss, 'nce': ..., ...}
 """
-
 from typing import Any, Dict
+import math
+import os
 
-from .callbacks import Checkpointer, EarlyStopper
-from .common import capture_run_meta, get_device, set_seed, write_debug_log
-from .data_loading import build_dataloaders
-from .logger import (
-    get_logger,
-    try_mlflow_end,
-    try_mlflow_log_metrics,
-    try_mlflow_log_params,
-    try_mlflow_start,
-    write_jsonl,
-)
-from .schedulers import cosine_with_warmup
+import torch
+from torch.utils.data import DataLoader
 
-import importlib
-
-try:
-    import torch
-    import torch.nn.functional as F
-except Exception:  # pragma: no cover
-    torch = None  # type: ignore
-    F = None  # type: ignore
-
-try:
-    import hydra  # type: ignore
-    from omegaconf import OmegaConf  # type: ignore
-except Exception:  # pragma: no cover
-    hydra = None
-    OmegaConf = None  # type: ignore
+from .callbacks import CheckpointManager, EarlyStopping
+from .experiment_logger import ExperimentLogger
+from .optim import build_optimizer, build_scheduler
+from .registry import build_from_target
+from .trainer_base import TrainerBase
+from .utils import dump_yaml_safely, ensure_dir, get_device, seed_everything
 
 
-def _build_model(cfg: Dict[str, Any]):
-    mod, fn = cfg["model"]["module"].split(":")
-    return getattr(importlib.import_module(mod), fn)(cfg)  # type: ignore
+class _ContrastiveProcessor:
+    def __init__(self, loss_module: torch.nn.Module) -> None:
+        self.loss_module = loss_module
+
+    def __call__(self, model: torch.nn.Module, batch: Dict, device: torch.device):
+        x1 = batch["x1"].to(device)
+        x2 = batch["x2"].to(device)
+        out = model(x1, x2)  # expected to provide 'z1', 'z2'
+        z1, z2 = out["z1"], out["z2"]
+        losses = self.loss_module(z1, z2)
+        total = losses["total"]
+        scalars = {k: float(v.detach().item()) for k, v in losses.items()}
+        return total, scalars
 
 
-def _infonce(z1, z2, temp: float = 0.1):
-    """Standard InfoNCE loss for paired views z1, z2."""
-    z1 = F.normalize(z1, dim=-1)
-    z2 = F.normalize(z2, dim=-1)
-    logits = (z1 @ z2.t()) / temp
-    labels = torch.arange(z1.size(0), device=z1.device)
-    return F.cross_entropy(logits, labels)
+def run_train(cfg: Dict[str, Any]) -> Dict[str, Any]:
+    run = cfg.get("run", {})
+    out_dir = run.get("out_dir", "runs/contrastive")
+    run_name = run.get("name", "v50-contrastive")
+    seed = int(run.get("seed", 1337))
+    device_pref = run.get("device", "cuda")
 
+    ensure_dir(out_dir)
+    seed_everything(seed)
+    logger = ExperimentLogger(run_name=run_name, log_dir=out_dir, mlflow_enable=bool(run.get("mlflow", False)), mlflow_experiment=run.get("mlflow_experiment"))
+    logger.log_params({"cfg": cfg})
 
-def run_contrastive(cfg: Dict[str, Any]) -> Dict[str, Any]:
-    logger = get_logger()
-    set_seed(int(cfg.get("seed", 42)))
-    meta = capture_run_meta(
-        cfg, cli_version=str(cfg.get("cli_version", "v50")), seed=int(cfg.get("seed", 42))
-    )
-    write_debug_log(meta)
-    try_mlflow_start(
-        run_name=f"contrastive_v50_{meta.config_hash}",
-        tags={"cfg": meta.config_hash, "ver": meta.cli_version},
-    )
-    try_mlflow_log_params({"cfg_hash": meta.config_hash, "cli_version": meta.cli_version})
+    device = get_device(device_pref)
+    logger.info(f"Using device: {device}")
 
-    if torch is None:
-        raise RuntimeError("PyTorch is required for contrastive pretraining.")
+    # Data
+    data_cfg = cfg.get("data", {})
+    train_ds = build_from_target(data_cfg["train"])
+    val_ds = build_from_target(data_cfg["val"]) if "val" in data_cfg and data_cfg["val"] else None
+    loader_cfg = data_cfg.get("loader", {"batch_size": 64, "num_workers": 0, "pin_memory": False})
+    train_loader = DataLoader(train_ds, batch_size=int(loader_cfg.get("batch_size", 64)), shuffle=True, num_workers=int(loader_cfg.get("num_workers", 0)), pin_memory=bool(loader_cfg.get("pin_memory", False)), drop_last=True)
+    val_loader = DataLoader(val_ds, batch_size=int(loader_cfg.get("batch_size", 64)), shuffle=False, num_workers=int(loader_cfg.get("num_workers", 0)), pin_memory=bool(loader_cfg.get("pin_memory", False)), drop_last=False) if val_ds is not None else None
 
-    device, _ = get_device("cuda")
+    # Model & Loss
+    model = build_from_target(cfg["model"])
+    loss_module = build_from_target(cfg["loss"])  # should return dict with 'total'
+    step_proc = _ContrastiveProcessor(loss_module)
 
-    dls = build_dataloaders(cfg)
-    train_loader, val_loader = dls.train, dls.val
+    # Optim/Sched
+    optim_cfg = cfg.get("optim", {"name": "adamw", "lr": 1e-3, "weight_decay": 0.01})
+    optimizer = build_optimizer(model, optim_cfg)
+    total_steps = int(cfg.get("train", {}).get("epochs", 20)) * max(1, len(train_loader))
+    scheduler = build_scheduler(optimizer, cfg.get("sched"), total_steps=total_steps)
 
-    model = _build_model(cfg).to(device)
-
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=float(cfg["optimizer"].get("lr", 3e-4)),
-        weight_decay=float(cfg["optimizer"].get("wd", 1e-4)),
-    )
-    scheduler = cosine_with_warmup(
-        optimizer,
-        warmup_steps=int(cfg["scheduler"].get("warmup_steps", 500)),
-        total_steps=int(cfg["scheduler"].get("total_steps", 10000)),
-    )
-    ckpt_dir = cfg["trainer"].get("ckpt_dir", "artifacts/contrastive_checkpoints")
-    checkpointer = Checkpointer(
-        ckpt_dir, keep_last=int(cfg["trainer"].get("keep_last", 5))
-    )
-    early = EarlyStopper(
-        patience=int(cfg["trainer"]["early_stop"].get("patience", 8)),
-        min_delta=float(cfg["trainer"]["early_stop"].get("min_delta", 0.0)),
-        metric_name="val_loss",
+    # Trainer
+    ckpt = CheckpointManager(out_dir)
+    early = EarlyStopping(monitor="val_loss", mode="min", patience=int(cfg.get("train", {}).get("patience", 5)))
+    trainer = TrainerBase(
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        step_fn=step_proc,
+        device=get_device(device_pref),
+        logger=logger,
+        grad_accum_steps=int(cfg.get("train", {}).get("grad_accum", 1)),
+        use_amp=bool(cfg.get("train", {}).get("amp", True)),
+        clip_grad_norm=float(cfg.get("train", {}).get("clip_grad_norm", 1.0)),
+        checkpoint=ckpt,
+        early_stopping=early if val_loader is not None else None,
     )
 
-    amp = bool(cfg["trainer"].get("amp", True))
-    scaler = torch.cuda.amp.GradScaler(enabled=amp)
-    accum = int(cfg["trainer"].get("grad_accum", 1))
-    log_every = int(cfg["trainer"].get("log_every", 50))
-    temp = float(cfg.get("contrastive", {}).get("temperature", 0.1))
+    dump_yaml_safely(cfg, os.path.join(out_dir, "config_snapshot.yaml"))
 
-    global_step = 0
-    best = None
-    for epoch in range(1, int(cfg["trainer"]["max_epochs"]) + 1):
-        model.train()
-        running: Dict[str, float] = {}
-        for it, batch in enumerate(train_loader, start=1):
-            # Expect dataset to return two views: batch["view1"], batch["view2"]
-            view1, view2 = batch["view1"].to(device, non_blocking=True), batch["view2"].to(
-                device, non_blocking=True
-            )
-            with torch.autocast(
-                device_type="cuda" if torch.cuda.is_available() else "cpu",
-                dtype=torch.float16,
-                enabled=amp,
-            ):
-                z1, z2 = model(view1), model(view2)
-                loss = _infonce(z1, z2, temp=temp) / accum
-            scaler.scale(loss).backward()
-            if it % accum == 0:
-                scaler.step(optimizer)
-                scaler.update()
-                optimizer.zero_grad(set_to_none=True)
-                if scheduler is not None:
-                    scheduler.step()
-                global_step += 1
-                running["loss"] = running.get("loss", 0.0) + float(loss.item() * accum)
-                if global_step % log_every == 0:
-                    avg = {k: v / log_every for k, v in running.items()}
-                    write_jsonl({"event": "contrastive_train_step", "step": global_step, **avg})
-                    try_mlflow_log_metrics(avg, step=global_step)
-                    running = {}
-
-        # Validation loop (paired views)
-        model.eval()
-        vals = []
-        with torch.no_grad():
-            for batch in val_loader:
-                v1, v2 = batch["view1"].to(device, non_blocking=True), batch["view2"].to(
-                    device, non_blocking=True
-                )
-                z1, z2 = model(v1), model(v2)
-                vals.append(float(_infonce(z1, z2, temp=temp).item()))
-        vmean = float(sum(vals) / max(1, len(vals)))
-        write_jsonl({"event": "contrastive_val_epoch", "epoch": epoch, "val_loss": vmean})
-        try_mlflow_log_metrics({"val_loss": vmean}, step=epoch)
-
-        checkpointer.save_periodic(
-            {
-                "epoch": epoch,
-                "model": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "scheduler": (
-                    None if scheduler is None else scheduler.state_dict()
-                ),
-                "cfg": cfg,
-            },
-            tag=f"epoch_{epoch:03d}",
-        )
-        maybe = checkpointer.try_save_best(
-            {
-                "epoch": epoch,
-                "model": model.state_dict(),
-                "optimizer": optimizer.state_dict(),
-                "scheduler": (
-                    None if scheduler is None else scheduler.state_dict()
-                ),
-                "cfg": cfg,
-            },
-            value=vmean,
-        )
-        if maybe:
-            best = maybe
-
-        if early.step(vmean):
-            get_logger().info(
-                f"Early stopping at epoch {epoch} (best {early.best:.6f})."
-            )
-            break
-
-    try_mlflow_end()
-    from .common import export_manifest
-
-    manifest = {
-        "best_checkpoint": best,
-        "events_jsonl": "train_events.jsonl",
-        "log_file": "logs/train.log",
-        "cfg_hash": meta.config_hash,
-    }
-    export_manifest(manifest, out_path="artifacts/contrastive_manifest.json")
-    return manifest
+    summary = trainer.fit(
+        train_loader=train_loader,
+        val_loader=val_loader,
+        epochs=int(cfg.get("train", {}).get("epochs", 20)),
+        start_epoch=1,
+    )
+    logger.info(f"Contrastive pretraining completed. Best val loss: {summary['best_val_loss']:.6f}")
+    logger.close()
+    return summary
 
 
-if hydra is not None:
-
-    @hydra.main(config_path=None, config_name=None, version_base=None)
-    def _main(cfg):  # type: ignore
-        cfg_dict = OmegaConf.to_container(cfg, resolve=True)  # type: ignore
-        run_contrastive(cfg_dict)  # type: ignore
-
-
-if __name__ == "__main__":  # pragma: no cover
-    if hydra is None:
-        raise SystemExit("Hydra is required to run this module as a script.")
-    _main()  # type: ignore
-
+if __name__ == "__main__":
+    import sys
+    print("Run this via the SpectraMind CLI or call run_train(cfg) with contrastive dataset+model+loss.")
+    sys.exit(0)
