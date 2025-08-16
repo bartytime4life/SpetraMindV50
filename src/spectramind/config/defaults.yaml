@@ -1,0 +1,16 @@
+# Default Hydra configuration for SpectraMind V50
+# Includes recursive group defaults and reproducibility settings
+
+defaults:
+  - model
+  - training
+  - calibration
+  - diagnostics
+  - logging
+
+# Global reproducibility and metadata
+seed: 42
+exp_name: "spectramind_v50_run"
+output_dir: "./outputs/${exp_name}"
+use_mlflow: true
+mlflow_uri: "http://localhost:5000"

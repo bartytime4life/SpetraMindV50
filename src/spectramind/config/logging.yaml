@@ -1,0 +1,20 @@
+# Logging configuration for SpectraMind V50
+
+console:
+  level: "INFO"
+  format: "[%(asctime)s] %(levelname)s - %(message)s"
+
+file:
+  enabled: true
+  path: "./logs/v50.log"
+  rotation: "10 MB"
+  retention: "7 days"
+
+jsonl:
+  enabled: true
+  path: "./logs/v50_events.jsonl"
+
+mlflow:
+  enabled: true
+  uri: "http://localhost:5000"
+  experiment: "SpectraMindV50"

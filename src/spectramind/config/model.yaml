@@ -1,0 +1,27 @@
+# Model configuration for SpectraMind V50
+# Includes encoders, decoders, and symbolic modules
+
+fgs1_encoder:
+  type: "mamba"
+  hidden_dim: 256
+  layers: 6
+  dropout: 0.1
+
+airs_encoder:
+  type: "gat"
+  hidden_dim: 128
+  layers: 4
+  heads: 8
+  use_edge_features: true
+
+decoder:
+  mean_head: "multi_scale"
+  sigma_head: "flow_uncertainty"
+  dropout: 0.1
+
+symbolic_modules:
+  enable: true
+  smoothness_weight: 0.1
+  asymmetry_weight: 0.05
+  fft_weight: 0.05
+  nonnegativity: true

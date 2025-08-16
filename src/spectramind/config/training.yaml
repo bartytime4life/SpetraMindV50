@@ -1,0 +1,23 @@
+# Training configuration for SpectraMind V50
+
+optimizer:
+  type: "adamw"
+  lr: 1e-4
+  weight_decay: 0.01
+
+scheduler:
+  type: "cosine"
+  warmup_steps: 500
+
+trainer:
+  max_epochs: 50
+  batch_size: 32
+  mixed_precision: true
+  gradient_accumulation: 2
+  save_every: 5
+  checkpoint_dir: "./checkpoints"
+
+loss:
+  type: "gll"
+  use_symbolic: true
+  lambda_symbolic: 0.2
